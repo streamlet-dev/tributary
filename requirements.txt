@@ -1,17 +1,1 @@
-bokeh
-bs4
--e git+git://github.com/timkpaine/cufflinks.git#egg=cufflinks
-future
-jupyterlab
-matplotlib
-numpy
-pandas
-perspective-python
-plotly
-qgrid==1.0.1b0
-seaborn
-scipy
-six
-sklearn
-websocket-client
 ujson
