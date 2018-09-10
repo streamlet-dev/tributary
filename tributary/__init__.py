@@ -1,2 +1,2 @@
-from .pipeline import pipeline, stop
-from .events import *
+from .functional import pipeline, stop
+from .reactive import *
