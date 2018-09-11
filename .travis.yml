@@ -9,14 +9,12 @@ git:
 
 install:
     - pip install -r requirements.txt
-    # - pip install coveralls
     - pip install codecov
 
 script: make test
 
 after_success:
-    # - codecov --token f8f2787b-4aa9-4161-8b13-88ddde282d57
-    # - coveralls
+    - codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1
 
 branches:
   only:
