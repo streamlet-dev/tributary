@@ -3,25 +3,28 @@ import types
 from pprint import pprint
 from .base import _wrap, FunctionWrapper
 
+
 def Const(val):
     def _always(val):
         yield val
 
-    _always.__name__ = 'Const'
-    _always.__wraps__ = (val,)
+    return _wrap(_always, dict(val=val), name='Const', wraps=(val,))
 
-    return _wrap(_always, dict(val=val))
+
+def Foo(foo, foo_kwargs):
+    return _wrap(foo, foo_kwargs, name='Foo', wraps=(foo,))
 
 
 def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
     kwargs = kwargs or {}
 
     if not isinstance(foo_or_val, types.FunctionType):
-        _p = Const(foo_or_val)
+        foo = Const(foo_or_val)
     else:
-        _p = _wrap(foo_or_val, kwargs)
+        foo = Foo(foo_or_val, kwargs)
 
     def _repeater(foo, repeat, interval):
+        print('timer called')
         while repeat > 0:
             t1 = time.time()
             yield foo()
@@ -33,10 +36,7 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
                 time.sleep(max(0, interval-(t2-t1)))
             repeat -= 1
 
-    _repeater.__name__ = 'Timer'
-    _repeater.__wraps__ = (_p,)
-
-    return _wrap(_repeater, dict(foo=_p, repeat=repeat, interval=interval))
+    return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)
 
 
 def Print(foo, foo_kwargs=None):
@@ -44,13 +44,11 @@ def Print(foo, foo_kwargs=None):
     foo = _wrap(foo, foo_kwargs)
 
     def _print(foo):
+        print('print called')
         for r in foo():
             print(r)
 
-    _print.__name__ = 'Print'
-    _print.__wraps__ = (foo,)
-
-    return _wrap(_print, dict(foo=foo))
+    return _wrap(_print, dict(foo=foo), name='Print', wraps=(foo,), share=foo)
 
 
 def Share(f_wrap):
@@ -63,7 +61,7 @@ def Share(f_wrap):
 def Graph(f_wrap):
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('ViewGraph expects tributary')
-    return f_wrap.view(0)
+    return f_wrap.view(0)[0]
 
 
 def PPrint(f_wrap):

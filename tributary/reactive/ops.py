@@ -7,6 +7,7 @@ def unary(lam, foo, foo_kwargs=None, _name=''):
     foo = _wrap(foo, foo_kwargs)
 
     def _unary(foo):
+        print('%s called' % _name)
         for gen in foo():
             if isinstance(gen, types.GeneratorType):
                 for f in gen:
@@ -14,10 +15,7 @@ def unary(lam, foo, foo_kwargs=None, _name=''):
             else:
                 yield lam(gen)
 
-    _unary.__name__ = _name or 'Unary'
-    _unary.__wraps__ = (foo,)
-
-    return _wrap(_unary, dict(foo=foo))
+    return _wrap(_unary, dict(foo=foo), name=_name or 'Unary', wraps=(foo,), share=None)
 
 
 def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
@@ -27,6 +25,7 @@ def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
     foo2 = _wrap(foo2, foo2_kwargs)
 
     def _bin(foo1, foo2):
+        print('%s called' % _name)
         for gen1, gen2 in zip(foo1(), foo2()):
             if isinstance(gen1, types.GeneratorType) and \
                isinstance(gen2, types.GeneratorType):
@@ -45,10 +44,7 @@ def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
                 # print('gg', gen1, gen2)
                 yield lam(gen1, gen2)
 
-    _bin.__name__ = _name or 'Binary'
-    _bin.__wraps__ = (foo1, foo2)
-
-    return _wrap(_bin, dict(foo1=foo1, foo2=foo2))
+    return _wrap(_bin, dict(foo1=foo1, foo2=foo2), name=_name or 'Binary', wraps=(foo1, foo2), share=None)
 
 
 def Noop(foo, foo_kwargs=None):
