@@ -2,5 +2,5 @@
 Python Streams
 
 
-## Functional Data Streams and Pipelines
+## Forward-Propogating Data Streams
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.png)
