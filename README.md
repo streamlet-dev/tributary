@@ -7,7 +7,6 @@ Python Streams
 [![BCH compliance](https://bettercodehub.com/edge/badge/timkpaine/tributary?branch=master)](https://bettercodehub.com/)
 [![PyPI](https://img.shields.io/pypi/l/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
-[![npm](https://img.shields.io/npm/v/tributary.svg)](https://www.npmjs.com/package/tributary)
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
 
 
