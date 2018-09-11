@@ -19,6 +19,7 @@ class FunctionWrapper(object):
         if self._refs <= 0:
             raise Exception('Ref mismatch in %s' % str(self.foo))
         self._refs -= 1
+        # print(self.foo, self._last)
         return self._last
 
     def set_last(self, val):
@@ -32,22 +33,31 @@ class FunctionWrapper(object):
         self._refs += 1
 
     def __call__(self):
-        if self._refs != 0 and self._refs < self._refs_orig:
-            yield self.last
+        ret = self.foo(**self.foo_kwargs)
+        if isinstance(ret, types.GeneratorType):
+            for r in ret:
+                if isinstance(r, types.FunctionType):
+                    tmp = r()
+                else:
+                    tmp = r
+                if isinstance(tmp, types.GeneratorType):
+                    for rr in tmp:
+                        self.last = rr
+                        yield self.last
+                else:
+                    self.last = tmp
+                    yield self.last
         else:
-            ret = self.foo(**self.foo_kwargs)
-            if isinstance(ret, types.GeneratorType):
-                for r in ret:
-                    if isinstance(r, types.FunctionType):
-                        self.last = r()
-                    else:
-                        self.last = r
+            if isinstance(ret, types.FunctionType):
+                tmp = ret()
+            else:
+                tmp = ret
+            if isinstance(tmp, types.GeneratorType):
+                for rr in tmp:
+                    self.last = rr
                     yield self.last
             else:
-                if isinstance(ret, types.FunctionType):
-                    self.last = ret()
-                else:
-                    self.last = ret
+                self.last = tmp
                 yield self.last
 
     def __iter__(self):
