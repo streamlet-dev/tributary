@@ -40,7 +40,6 @@ class TestConfig:
         p = t.Print(res)  # 1
 
         t.PPrint(p)
-        t.GraphViz(p, 'test1')
         t.run(p)
 
     def test_2(self):
@@ -58,5 +57,4 @@ class TestConfig:
         test2 = t.Negate(t.Share(test))
         res2 = t.Add(test, test2)
         p2 = t.Print(res2)
-        t.GraphViz(p2, 'test2')
         t.run(p2)
