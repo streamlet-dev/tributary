@@ -32,6 +32,22 @@ class FunctionWrapper(object):
         self._refs_orig += 1
         self._refs += 1
 
+    def view(self, _id=0):
+        ret = {}
+
+        if hasattr(self.foo, '__wraps__'):
+            key = self.foo.__name__ + str(_id)
+            ret[key] = []
+
+            for f in self.foo.__wraps__:
+                if isinstance(f, FunctionWrapper):
+                    ret[key].append(f.view(_id+1))
+                else:
+                    ret[key].append(str(f))
+            return ret
+        ret[self.foo.__name__] = []
+        return ret
+
     def __call__(self):
         ret = self.foo(**self.foo_kwargs)
         if isinstance(ret, types.GeneratorType):

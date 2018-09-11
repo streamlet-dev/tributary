@@ -1,11 +1,15 @@
 import time
 import types
+from pprint import pprint
 from .base import _wrap, FunctionWrapper
-
 
 def Const(val):
     def _always(val):
         yield val
+
+    _always.__name__ = 'Const'
+    _always.__wraps__ = (val,)
+
     return _wrap(_always, dict(val=val))
 
 
@@ -29,6 +33,9 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
                 time.sleep(max(0, t2-t1-interval))
             repeat -= 1
 
+    _repeater.__name__ = 'Timer'
+    _repeater.__wraps__ = (_p,)
+
     return _wrap(_repeater, dict(foo=_p, repeat=repeat, interval=interval))
 
 
@@ -40,6 +47,9 @@ def Print(foo, foo_kwargs=None):
         for r in foo():
             print(r)
 
+    _print.__name__ = 'Print'
+    _print.__wraps__ = (foo,)
+
     return _wrap(_print, dict(foo=foo))
 
 
@@ -48,3 +58,38 @@ def Share(f_wrap):
         raise Exception('Share expects tributary')
     f_wrap.inc()
     return f_wrap
+
+
+def Graph(f_wrap):
+    if not isinstance(f_wrap, FunctionWrapper):
+        raise Exception('ViewGraph expects tributary')
+    return f_wrap.view(0)
+
+
+def PPrint(f_wrap):
+    pprint(Graph(f_wrap))
+
+
+def GraphViz(f_wrap, name='Graph'):
+    d = Graph(f_wrap)
+    from graphviz import Digraph
+    dot = Digraph(name)
+    dot.format = 'png'
+
+    def rec(nodes, parent):
+        for d in nodes:
+            if not isinstance(d, dict):
+                dot.node(d)
+                dot.edge(d, parent)
+
+            else:
+                for k in d:
+                    dot.node(k)
+                    rec(d[k], k)
+                    dot.edge(k, parent)
+
+    for k in d:
+        dot.node(k)
+        rec(d[k], k)
+
+    dot.render()
