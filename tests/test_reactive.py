@@ -2,8 +2,6 @@ import tributary as t
 import random
 import time
 
-from mock import MagicMock, patch
-
 
 class TestConfig:
     def setup(self):
@@ -15,15 +13,31 @@ class TestConfig:
             # return random.random()
             return 1
 
-        def long():
-            time.sleep(0)
-            return 5
-
         print('''
         ******************************
         *           test             *
         ******************************
         ''')
+        test = t.Timer(foo, {}, 0, 5)
+        test2 = t.Negate(t.Share(test))
+        res2 = t.Add(test, test2)
+        p2 = t.Print(res2)
+        t.run(p2)
+
+    def test_2(self):
+        print('''
+        ******************************
+        *           test2            *
+        ******************************
+        ''')
+
+        def foo():
+            # return random.random()
+            return 1
+
+        def long():
+            time.sleep(0)
+            return 5
 
         rand = t.Timer(foo, kwargs={}, interval=0, repeat=5)
         # rand2 = t.Timer(foo, kwargs={}, interval=0, repeat=5)
@@ -41,20 +55,3 @@ class TestConfig:
 
         t.PPrint(p)
         t.run(p)
-
-    def test_2(self):
-        print('''
-        ******************************
-        *           test2            *
-        ******************************
-        ''')
-
-        def foo():
-            # return random.random()
-            return 1
-
-        test = t.Timer(foo, {}, 0, 5)
-        test2 = t.Negate(t.Share(test))
-        res2 = t.Add(test, test2)
-        p2 = t.Print(res2)
-        t.run(p2)
