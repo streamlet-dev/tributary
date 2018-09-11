@@ -1,6 +1,14 @@
 from concurrent.futures import ThreadPoolExecutor, _base
-from concurrent.futures.thread import BrokenThreadPool, _WorkItem
+from concurrent.futures.thread import _WorkItem
 import concurrent.futures.thread as cft
+
+try:
+    # For Travis/ python 3.6
+    from concurrent.futures.thread import BrokenThreadPool
+except ImportError:
+    BrokenThreadPool = Exception
+
+
 _EXECUTOR = ThreadPoolExecutor(max_workers=2)
 
 
