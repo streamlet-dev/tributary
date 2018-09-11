@@ -11,5 +11,5 @@ Python Streams
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
 
 
-## Forward-Propogating Data Streams
+## Forward-Propagating Data Streams
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.png)
