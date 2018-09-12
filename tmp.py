@@ -21,10 +21,10 @@ print('''
 ''')
 test = t.Timer(foo, {}, .5, 5)
 test2 = t.Negate(t.Share(test))
-res2 = t.Add(test, test2)
-p2 = t.Print(res2)
-t.GraphViz(p2, 'test1')
-t.run(p2)
+res = t.Add(test, test2)
+p = t.Print(res)
+t.GraphViz(p, 'test1')
+t.run(p)
 
 
 print('''
@@ -43,9 +43,30 @@ neg_rand = t.Negate(t.Share(rand))
 x1 = t.Add(rand, five)  # 5 + rand
 x2 = t.Sub(x1, five2)  # rand
 x3 = t.Add(x2, neg_rand)  # 0
-res = t.Add(x3, one)  # 1
-p = t.Print(res)  # 1
+res2 = t.Add(x3, one)  # 1
+p2 = t.Print(res2)  # 1
 
-t.PPrint(p)
-t.GraphViz(p, 'test2')
-t.run(p)
+t.PPrint(p2)
+t.GraphViz(p2, 'test2')
+t.run(p2)
+
+
+print('''
+******************************
+*           test3            *
+******************************
+''')
+
+def stream():
+    for i in range(10):
+        yield i
+
+f = t.Foo(stream)
+sum = t.Sum(t.Share(f))
+count = t.Count(t.Share(f))
+f3 = t.Div(sum, count)
+p3 = t.Print(f3)
+
+t.PPrint(p3)
+t.GraphViz(p3, 'test3')
+t.run(p3)

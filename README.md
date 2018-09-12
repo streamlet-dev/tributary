@@ -17,3 +17,6 @@ Python Streams
 
 ### More Complex Example
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example2.png)
+
+### Rolling Mean
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example3.png)
