@@ -5,7 +5,6 @@ import time
 
 def foo():
     return random.random()
-    # return 1
 
 
 def long():
@@ -19,7 +18,7 @@ print('''
 *           test             *
 ******************************
 ''')
-test = t.Timer(foo, {}, .5, 5)
+test = t.Timer(foo, interval=.5, repeat=5)
 test2 = t.Negate(t.Share(test))
 res = t.Add(test, test2)
 p = t.Print(res)
@@ -32,11 +31,10 @@ print('''
 *           test2            *
 ******************************
 ''')
-rand = t.Timer(foo, kwargs={}, interval=0, repeat=5)
-# rand2 = t.Timer(foo, kwargs={}, interval=0, repeat=5)
-five = t.Timer(long, kwargs={}, interval=0, repeat=5)
-one = t.Timer(1, kwargs={}, interval=0, repeat=5)
-five2 = t.Timer(5, {}, 0, 5)
+rand = t.Timer(foo, interval=0, repeat=5)
+five = t.Timer(long, interval=0, repeat=5)
+one = t.Timer(1, interval=0, repeat=5)
+five2 = t.Timer(5, interval=0, repeat=5)
 
 neg_rand = t.Negate(t.Share(rand))
 
