@@ -11,6 +11,7 @@ Python Streams
 
 
 ## Forward-Propagating Data Streams
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.gif)
 
 ### Simple Example
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example1.png)
