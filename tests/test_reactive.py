@@ -35,7 +35,7 @@ class TestConfig:
 
         def long():
             print('long called')
-            time.sleep(1)
+            time.sleep(.1)
             return 5
 
         rand = t.Timer(foo, interval=0, repeat=5)
@@ -73,3 +73,51 @@ class TestConfig:
 
         t.PPrint(p3)
         t.run(p3)
+
+    def test_4(self):
+        print('''
+        ******************************
+        *           test4            *
+        ******************************
+        ''')
+
+        def stream(state):
+            for i in range(10):
+                yield i + state.val
+
+        f = t.Foo(t.State(stream, val=5))
+        p4 = t.Print(f)
+
+        t.GraphViz(p4, 'test4')
+        t.run(p4)
+
+    def test_5(self):
+        print('''
+        ******************************
+        *           test5            *
+        ******************************
+        ''')
+
+        def myfoo(state, data):
+            state.count = state.count + 1
+            data['count'] = state.count
+            return data
+
+        p5 = t.Print(t.Apply(t.State(myfoo, count=0), t.Random()))
+        t.GraphViz(p5, 'test5')
+        t.run(p5)
+
+    def test_6(self):
+        print('''
+        ******************************
+        *           test6            *
+        ******************************
+        ''')
+
+        def ran():
+            for i in range(10):
+                yield i
+
+        p6 = t.Print(t.Window(ran, size=3, full_only=True))
+        t.GraphViz(p6, 'test6')
+        t.run(p6)

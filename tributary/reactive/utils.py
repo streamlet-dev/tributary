@@ -1,6 +1,5 @@
 import time
 import types
-from pprint import pprint
 from .base import _wrap, FunctionWrapper
 
 
@@ -13,42 +12,6 @@ def Const(val):
 
 def Foo(foo, foo_kwargs=None):
     return _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))
-
-
-def Count(foo, foo_kwargs=None):
-    foo_kwargs = foo_kwargs or {}
-    foo = _wrap(foo, foo_kwargs)
-
-    def _count(foo):
-        count = 0
-        for gen in foo():
-            if isinstance(gen, types.GeneratorType):
-                for f in gen:
-                    count += 1
-                    yield count
-            else:
-                count += 1
-                yield count
-
-    return _wrap(_count, dict(foo=foo), name='Count', wraps=(foo,), share=foo)
-
-
-def Sum(foo, foo_kwargs=None):
-    foo_kwargs = foo_kwargs or {}
-    foo = _wrap(foo, foo_kwargs)
-
-    def _sum(foo):
-        sum = 0
-        for gen in foo():
-            if isinstance(gen, types.GeneratorType):
-                for f in gen:
-                    sum += f
-                    yield sum
-            else:
-                sum += gen
-                yield sum
-
-    return _wrap(_sum, dict(foo=foo), name='Sum', wraps=(foo,), share=foo)
 
 
 def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
@@ -73,17 +36,6 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
     return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)
 
 
-def Print(foo, foo_kwargs=None):
-    foo_kwargs = foo_kwargs or {}
-    foo = _wrap(foo, foo_kwargs)
-
-    def _print(foo):
-        for r in foo():
-            print(r)
-
-    return _wrap(_print, dict(foo=foo), name='Print', wraps=(foo,), share=foo)
-
-
 def Share(f_wrap):
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('Share expects tributary')
@@ -91,36 +43,46 @@ def Share(f_wrap):
     return f_wrap
 
 
-def Graph(f_wrap):
+def State(foo, foo_kwargs=None, **state):
+    foo_kwargs = foo_kwargs or {}
+    foo = _wrap(foo, foo_kwargs, name=foo.__name__, wraps=(foo,), state=state)
+    return foo
+
+
+def Apply(foo, f_wrap, foo_kwargs=None):
     if not isinstance(f_wrap, FunctionWrapper):
-        raise Exception('ViewGraph expects tributary')
-    return f_wrap.view(0)[0]
+        raise Exception('Node expects tributary')
+    foo_kwargs = foo_kwargs or {}
+    foo = Foo(foo, foo_kwargs)
+    foo._wraps = foo._wraps + (f_wrap, )
+
+    def _node(foo):
+        for f in f_wrap():
+            yield foo(f)
+
+    return _wrap(_node, dict(foo=foo), name='Apply', wraps=(foo,), share=foo)
 
 
-def PPrint(f_wrap):
-    pprint(Graph(f_wrap))
+def Window(foo, foo_kwargs=None, size=-1, full_only=True):
+    foo_kwargs = foo_kwargs or {}
+    foo = Foo(foo, foo_kwargs)
 
+    accum = []
 
-def GraphViz(f_wrap, name='Graph'):
-    d = Graph(f_wrap)
-    from graphviz import Digraph
-    dot = Digraph(name)
-    dot.format = 'png'
-
-    def rec(nodes, parent):
-        for d in nodes:
-            if not isinstance(d, dict):
-                dot.node(d)
-                dot.edge(d, parent)
-
+    def _window(foo, size, full_only, accum):
+        for x in foo():
+            if size == 0:
+                yield x
             else:
-                for k in d:
-                    dot.node(k)
-                    rec(d[k], k)
-                    dot.edge(k, parent)
+                accum.append(x)
 
-    for k in d:
-        dot.node(k)
-        rec(d[k], k)
+                if size > 0:
+                    accum = accum[-size:]
 
-    dot.render()
+                if full_only:
+                    if len(accum) == size or size == -1:
+                        yield accum
+                else:
+                    yield accum
+
+    return _wrap(_window, dict(foo=foo, size=size, full_only=full_only, accum=accum), name='Window', wraps=(foo,), share=foo)

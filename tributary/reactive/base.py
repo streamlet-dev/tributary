@@ -1,10 +1,11 @@
 import types
+from six import iteritems
 
 
-def _wrap(foo, foo_kwargs, name='', wraps=(), share=None):
+def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
     if isinstance(foo, FunctionWrapper):
         return foo
-    return FunctionWrapper(foo, foo_kwargs, name, wraps, share)
+    return FunctionWrapper(foo, foo_kwargs, name, wraps, share, state)
 
 
 def _call_if_function(f):
@@ -14,21 +15,33 @@ def _call_if_function(f):
 
 
 class FunctionWrapper(object):
-    def __init__(self, foo, foo_kwargs, name='', wraps=(), share=None):
-        self.foo = foo
-        self.foo_kwargs = foo_kwargs
+    def __init__(self, foo, foo_kwargs, name='', wraps=(), share=None, state=None):
+        state = state or {}
+
+        if len(foo.__code__.co_varnames) > 0 and \
+           foo.__code__.co_varnames[0] == 'state':
+            self._foo = foo.__get__(self, FunctionWrapper)
+            for k, v in iteritems(state):
+                if k not in ('_foo', '_foo_kwargs', '_refs_orig', '_name', '_wraps', '_share'):
+                    setattr(self, k, v)
+                else:
+                    raise Exception('Reserved Word - %s' % k)
+        else:
+            self._foo = foo
+
+        self._foo_kwargs = foo_kwargs
         self._refs_orig, self._refs = 1, 1
 
-        self.name = name
-        self.wraps = wraps
-        self.share = share if share else self
+        self._name = name
+        self._wraps = wraps
+        self._share = share if share else self
 
     def get_last(self):
         if not hasattr(self, '_last'):
             raise Exception('Never called!!')
 
         if self._refs < 0:
-            raise Exception('Ref mismatch in %s' % str(self.foo))
+            raise Exception('Ref mismatch in %s' % str(self._foo))
 
         self._refs -= 1
         return self._last
@@ -45,11 +58,11 @@ class FunctionWrapper(object):
 
     def view(self, _id=0):
         ret = {}
-        key = self.name + str(_id)
+        key = self._name + str(_id)
         ret[key] = []
         _id += 1
 
-        for f in self.wraps:
+        for f in self._wraps:
             if isinstance(f, FunctionWrapper):
                 r, m = f.view(_id)
                 ret[key].append(r)
@@ -58,9 +71,10 @@ class FunctionWrapper(object):
                 ret[key].append(str(f))
         return ret, _id
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         while(self._refs == self._refs_orig):
-            ret = self.foo(**self.foo_kwargs)
+            kwargs.update(self._foo_kwargs)
+            ret = self._foo(*args, **kwargs)
             # import ipdb; ipdb.set_trace()
             if isinstance(ret, types.GeneratorType):
                 for r in ret:
@@ -95,3 +109,6 @@ class FunctionWrapper(object):
         c_gen = self.__call__()
         for c in c_gen:
             yield c
+
+    def __add__(self, other):
+        pass

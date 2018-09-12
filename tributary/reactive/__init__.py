@@ -1,9 +1,16 @@
 from .base import _wrap
-from .utils import Const, Foo, Timer, Count, Sum, Print, Share, Graph, PPrint, GraphViz
-from .ops import Noop, Negate, Invert, Not, Add, Sub, Mult, Div, Mod, Pow, And, Or
+from .utils import *
+from .calculations import *
+from .input import *
+from .output import *
 
 
 def run(foo, **kwargs):
     foo = _wrap(foo, kwargs)
-    for item in foo():
-        pass
+    ret = []
+    try:
+        for item in foo():
+            ret.append(item)
+    except KeyboardInterrupt:
+        print('Terminating...')
+    return ret

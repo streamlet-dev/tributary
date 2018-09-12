@@ -1,4 +1,5 @@
 future
 graphviz
 IPython
+six
 ujson

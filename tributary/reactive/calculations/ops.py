@@ -1,5 +1,5 @@
 import types
-from .base import _wrap
+from ..base import _wrap, FunctionWrapper
 
 
 def unary(lam, foo, foo_kwargs=None, _name=''):
@@ -87,3 +87,35 @@ def And(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
 
 def Or(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x or y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Or')
+
+
+def Equal(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: x == y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Equal')
+
+
+def Less(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: x < y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Less')
+
+
+def More(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: x > y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='More')
+
+
+# Arithmetic
+FunctionWrapper.__add__ = Add
+FunctionWrapper.__sub__ = Sub
+FunctionWrapper.__mul__ = Mult
+FunctionWrapper.__div__ = Div
+FunctionWrapper.__truediv__ = Div
+FunctionWrapper.__pow__ = Pow
+FunctionWrapper.__mod__ = Mod
+
+# Logical
+# FunctionWrapper.__and__ = And
+# FunctionWrapper.__or__ = Or
+# FunctionWrapper.__invert__ = Not
+# TODO use __bool__ operator
+
+# Comparator
+FunctionWrapper.__lt__ = Less
+FunctionWrapper.__gt__ = More
