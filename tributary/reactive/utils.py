@@ -24,7 +24,6 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
         foo = Foo(foo_or_val, kwargs)
 
     def _repeater(foo, repeat, interval):
-        print('timer called')
         while repeat > 0:
             t1 = time.time()
             yield foo()
@@ -32,7 +31,6 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
 
             if interval > 0:
                 # sleep for rest of time that _p didnt take
-                print('sleep', interval-(t2-t1))
                 time.sleep(max(0, interval-(t2-t1)))
             repeat -= 1
 
@@ -44,7 +42,6 @@ def Print(foo, foo_kwargs=None):
     foo = _wrap(foo, foo_kwargs)
 
     def _print(foo):
-        print('print called')
         for r in foo():
             print(r)
 

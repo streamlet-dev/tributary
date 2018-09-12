@@ -4,14 +4,13 @@ import time
 
 
 def foo():
-    print('foo called')
     return random.random()
     # return 1
 
 
 def long():
     print('long called')
-    time.sleep(0)
+    time.sleep(1)
     return 5
 
 
@@ -20,7 +19,7 @@ print('''
 *           test             *
 ******************************
 ''')
-test = t.Timer(foo, {}, 0, 5)
+test = t.Timer(foo, {}, .5, 5)
 test2 = t.Negate(t.Share(test))
 res2 = t.Add(test, test2)
 p2 = t.Print(res2)

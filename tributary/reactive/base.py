@@ -26,11 +26,10 @@ class FunctionWrapper(object):
     def get_last(self):
         if not hasattr(self, '_last'):
             raise Exception('Never called!!')
-        if self._refs <= 0:
-            # raise Exception('Ref mismatch in %s' % str(self.foo))
-            pass
 
-        print('getting', self._refs, id(self), self._last)
+        if self._refs < 0:
+            raise Exception('Ref mismatch in %s' % str(self.foo))
+
         self._refs -= 1
         return self._last
 
@@ -60,35 +59,37 @@ class FunctionWrapper(object):
         return ret, _id
 
     def __call__(self):
-        ret = self.foo(**self.foo_kwargs)
-        if isinstance(ret, types.GeneratorType):
-            for r in ret:
-                tmp = _call_if_function(r)
+        while(self._refs == self._refs_orig):
+            ret = self.foo(**self.foo_kwargs)
+            # import ipdb; ipdb.set_trace()
+            if isinstance(ret, types.GeneratorType):
+                for r in ret:
+                    tmp = _call_if_function(r)
+
+                    if isinstance(tmp, types.GeneratorType):
+                        for rr in tmp:
+                            self.last = rr
+                            yield self.last
+
+                    else:
+                        self.last = tmp
+                        yield self.last
+            else:
+                tmp = _call_if_function(ret)
 
                 if isinstance(tmp, types.GeneratorType):
                     for rr in tmp:
                         self.last = rr
-                        for _ in range(self._refs):
-                            yield self.last
+                        yield self.last
 
                 else:
                     self.last = tmp
-
-                    for _ in range(self._refs):
-                        yield self.last
-        else:
-            tmp = _call_if_function(ret)
-
-            if isinstance(tmp, types.GeneratorType):
-                for rr in tmp:
-                    self.last = rr
-                    for _ in range(self._refs):
-                        yield self.last
-
-            else:
-                self.last = tmp
-                for _ in range(self._refs):
                     yield self.last
+        while(0 < self._refs < self._refs_orig):
+            yield self.last
+
+        # reset state to be called again
+        self._refs = self._refs_orig
 
     def __iter__(self):
         c_gen = self.__call__()
