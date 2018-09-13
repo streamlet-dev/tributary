@@ -56,11 +56,11 @@ def Apply(foo, f_wrap, foo_kwargs=None):
     foo = Foo(foo, foo_kwargs)
     foo._wraps = foo._wraps + (f_wrap, )
 
-    def _node(foo):
+    def _apply(foo):
         for f in f_wrap():
             yield foo(f)
 
-    return _wrap(_node, dict(foo=foo), name='Apply', wraps=(foo,), share=foo)
+    return _wrap(_apply, dict(foo=foo), name='Apply', wraps=(foo,), share=foo)
 
 
 def Window(foo, foo_kwargs=None, size=-1, full_only=True):
@@ -86,3 +86,16 @@ def Window(foo, foo_kwargs=None, size=-1, full_only=True):
                     yield accum
 
     return _wrap(_window, dict(foo=foo, size=size, full_only=full_only, accum=accum), name='Window', wraps=(foo,), share=foo)
+
+
+def Unroll(foo, foo_kwargs):
+    foo_kwargs = foo_kwargs or {}
+    foo = Foo(foo, foo_kwargs)
+
+    def _unroll(foo):
+        ret = foo()
+        if isinstance(ret, list) or isinstance(ret, types.GeneratorType):
+            for f in ret:
+                yield f
+
+    return _wrap(_unroll, dict(foo=foo), name='Apply', wraps=(foo,), share=foo)
