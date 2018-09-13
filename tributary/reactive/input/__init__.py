@@ -5,6 +5,7 @@ from ..base import _wrap
 
 from .ws import *
 from .http import *
+from .socketio import *
 
 
 def _gen():

@@ -32,4 +32,4 @@ def SyncHTTP(url, interval=1, repeat=1, json=False, wrap=False, field=None, prox
             if repeat >= 0:
                 count += 1
 
-    return _wrap(_req, dict(url=url, interval=interval, repeat=repeat, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies), name='WebSocket')
+    return _wrap(_req, dict(url=url, interval=interval, repeat=repeat, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies), name='HTTP')
