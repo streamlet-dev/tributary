@@ -3,5 +3,6 @@ graphviz
 IPython
 numpy
 six
+socketIO-client-nexus
 tornado
 ujson
