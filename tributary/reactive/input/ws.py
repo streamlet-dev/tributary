@@ -1,3 +1,4 @@
+from json import loads as load_json
 from websocket import create_connection
 from ..base import _wrap
 
@@ -14,7 +15,7 @@ def SyncWebSocket(url, json=False, wrap=False):
             if msg is None:
                 break
             if json:
-                msg = json.loads(msg)
+                msg = load_json(msg)
             if wrap:
                 msg = [msg]
             yield msg

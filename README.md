@@ -21,3 +21,14 @@ Python Streams
 
 ### Rolling Mean
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example3.png)
+
+
+## Sources
+### WebSocket
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/ws.png)
+
+### HTTP
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/http.png)
+
+### SocketIO
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/sio.png)
