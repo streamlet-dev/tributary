@@ -22,6 +22,9 @@ Python Streams
 ### Rolling Mean
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example3.png)
 
+### Custom Calculations and Window Functions
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example4.png)
+
 
 ## Sources
 ### WebSocket
