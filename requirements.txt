@@ -6,3 +6,4 @@ six
 socketIO-client-nexus
 tornado
 ujson
+websocket-client
