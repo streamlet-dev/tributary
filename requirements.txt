@@ -1,5 +1,7 @@
 future
 graphviz
 IPython
+numpy
 six
+tornado
 ujson

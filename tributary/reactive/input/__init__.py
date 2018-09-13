@@ -2,6 +2,7 @@ import time
 import math
 import numpy as np
 from ..base import _wrap
+from tornado.websocket import websocket_connect
 
 
 def _gen():
@@ -32,3 +33,16 @@ def Random(size=10, interval=0.1):
                 step += 1
 
     return _wrap(_random, dict(size=size, interval=interval), name='Random')
+
+
+def WebSocket(url):
+    def _listen(url):
+        conn = yield websocket_connect(url)
+        while True:
+            msg = yield conn.read_message()
+            if msg is None:
+                break
+            # Do something with msg
+
+    return _wrap(_listen, dict(url=url), name='WebSocket')
+
