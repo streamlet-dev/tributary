@@ -2,7 +2,9 @@ import time
 import math
 import numpy as np
 from ..base import _wrap
-from websocket import create_connection
+
+from .ws import *
+from .http import *
 
 
 def _gen():
@@ -33,19 +35,3 @@ def Random(size=10, interval=0.1):
                 step += 1
 
     return _wrap(_random, dict(size=size, interval=interval), name='Random')
-
-
-def WebSocket(url):
-    return SyncWebSocket(url)
-
-
-def SyncWebSocket(url):
-    def _listen(url):
-        ws = create_connection("ws://localhost:8899")
-        while True:
-            msg = ws.recv()
-            if msg is None:
-                break
-            yield msg
-
-    return _wrap(_listen, dict(url=url), name='WebSocket')
