@@ -1,4 +1,5 @@
 import types
+import sys
 from six import iteritems
 
 
@@ -34,6 +35,7 @@ class FunctionWrapper(object):
 
         self._name = name
         self._wraps = wraps
+
         self._share = share if share else self
 
     def get_last(self):
@@ -56,18 +58,31 @@ class FunctionWrapper(object):
         self._refs_orig += 1
         self._refs += 1
 
-    def view(self, _id=0):
+    def view(self, _id=0, _idmap=None):
+        _idmap = _idmap or {}
         ret = {}
-        key = self._name + str(_id)
-        ret[key] = []
+
+        # check if i exist already in graph
+        if id(self) in _idmap:
+            key = _idmap[id(self)]
+        else:
+            key = self._name + str(_id)
+            # _id += 1
+            _idmap[id(self)] = key
         _id += 1
 
+        ret[key] = []
         for f in self._wraps:
             if isinstance(f, FunctionWrapper):
-                r, m = f.view(_id)
+                r, m = f.view(_id, _idmap)
                 ret[key].append(r)
                 _id = m
             else:
+                if 'pandas' in sys.modules:
+                    import pandas as pd
+                    if isinstance(f, pd.DataFrame) or isinstance(f, pd.Series):
+                        # pprint
+                        f = 'DataFrame'
                 ret[key].append(str(f))
         return ret, _id
 
@@ -112,3 +127,14 @@ class FunctionWrapper(object):
 
     def __add__(self, other):
         pass
+
+
+def Const(val):
+    def _always(val):
+        yield val
+
+    return _wrap(_always, dict(val=val), name='Const', wraps=(val,))
+
+
+def Foo(foo, foo_kwargs=None):
+    return _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))

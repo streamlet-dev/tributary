@@ -24,6 +24,7 @@ def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
     foo2 = _wrap(foo2, foo2_kwargs)
 
     def _bin(foo1, foo2):
+        # TODO replace with merge
         for gen1, gen2 in zip(foo1(), foo2()):
             if isinstance(gen1, types.GeneratorType) and \
                isinstance(gen2, types.GeneratorType):

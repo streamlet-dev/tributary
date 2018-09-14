@@ -26,7 +26,7 @@ def PPrint(f_wrap):
 def GraphViz(f_wrap, name='Graph'):
     d = Graph(f_wrap)
     from graphviz import Digraph
-    dot = Digraph(name)
+    dot = Digraph(name, strict=True)
     dot.format = 'png'
 
     def rec(nodes, parent):
