@@ -1,4 +1,4 @@
-from .base import _wrap
+from .base import _wrap, Foo, Const, Share
 from .utils import *
 from .calculations import *
 from .input import *

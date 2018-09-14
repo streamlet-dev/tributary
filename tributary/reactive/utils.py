@@ -25,13 +25,6 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
     return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)
 
 
-def Share(f_wrap):
-    if not isinstance(f_wrap, FunctionWrapper):
-        raise Exception('Share expects a tributary')
-    f_wrap.inc()
-    return f_wrap
-
-
 def State(foo, foo_kwargs=None, **state):
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs, name=foo.__name__, wraps=(foo,), state=state)

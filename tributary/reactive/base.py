@@ -5,14 +5,33 @@ from six import iteritems
 
 def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
     if isinstance(foo, FunctionWrapper):
-        return foo
-    return FunctionWrapper(foo, foo_kwargs, name, wraps, share, state)
+        ret = foo
+    else:
+        ret = FunctionWrapper(foo, foo_kwargs, name, wraps, share, state)
+
+    for wrap in wraps:
+        if isinstance(wrap, FunctionWrapper):
+            if wrap == foo:
+                continue
+            _inc_ref(wrap, ret)
+    return ret
 
 
 def _call_if_function(f):
     if isinstance(f, types.FunctionType):
         return f()
     return f
+
+
+def _inc_ref(f_wrapped, f_wrapping):
+    if f_wrapped == f_wrapping:
+        raise Exception('Internal Error')
+
+    if f_wrapped._using is None or f_wrapped._using == id(f_wrapping):
+        f_wrapped._using = id(f_wrapping)
+        return
+    Share(f_wrapped)
+    f_wrapped._using = id(f_wrapping)
 
 
 class FunctionWrapper(object):
@@ -35,7 +54,7 @@ class FunctionWrapper(object):
 
         self._name = name
         self._wraps = wraps
-
+        self._using = None
         self._share = share if share else self
 
     def get_last(self):
@@ -138,3 +157,10 @@ def Const(val):
 
 def Foo(foo, foo_kwargs=None):
     return _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))
+
+
+def Share(f_wrap):
+    if not isinstance(f_wrap, FunctionWrapper):
+        raise Exception('Share expects a tributary')
+    f_wrap.inc()
+    return f_wrap
