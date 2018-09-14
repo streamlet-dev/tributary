@@ -1,6 +1,10 @@
 import time
 import types
 from .base import _wrap, FunctionWrapper, Foo, Const
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass
 
 
 def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
@@ -23,6 +27,18 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
             repeat -= 1
 
     return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)
+
+
+def Delay(f_wrap, delay=1):
+    if not isinstance(f_wrap, FunctionWrapper):
+        raise Exception('Delay expects a tributary')
+
+    def _delay(f_wrap, delay):
+        for f in f_wrap():
+            yield f
+            time.sleep(delay)
+
+    return _wrap(_delay, dict(f_wrap=f_wrap, delay=delay), name='Delay', wraps=(f_wrap,), share=f_wrap)
 
 
 def State(foo, foo_kwargs=None, **state):
@@ -60,7 +76,6 @@ def Window(foo, foo_kwargs=None, size=-1, full_only=True):
 
                 if size > 0:
                     accum = accum[-size:]
-
                 if full_only:
                     if len(accum) == size or size == -1:
                         yield accum
@@ -196,13 +211,27 @@ def DictMerge(f_wrap1, f_wrap2):
     return _wrap(_merge, dict(foo1=f_wrap1, foo2=f_wrap2), name='DictMerge', wraps=(f_wrap1, f_wrap2), share=None)
 
 
-def Delay(f_wrap, delay=1):
-    if not isinstance(f_wrap, FunctionWrapper):
-        raise Exception('Delay expects a tributary')
+def Reduce(*f_wraps):
+    for f_wrap in f_wraps:
+        if not isinstance(f_wrap, FunctionWrapper):
+            raise Exception('Reduce expects a tributary')
 
-    def _delay(f_wrap, delay):
-        for f in f_wrap():
-            yield f
-            time.sleep(delay)
+    def _reduce(foos):
+        for all_gens in zip(*[foo() for foo in foos]):
+            gens = []
+            vals = []
+            for gen in all_gens:
+                if isinstance(gen, types.GeneratorType):
+                    gens.append(gen)
+                else:
+                    vals.append(gen)
+            if gens:
+                for gens in zip(*gens):
+                    ret = list(vals)
+                    for gen in gens:
+                        ret.append(next(gen))
+                    yield ret
+            else:
+                yield vals
 
-    return _wrap(_delay, dict(f_wrap=f_wrap, delay=delay), name='Delay', wraps=(f_wrap,), share=f_wrap)
+    return _wrap(_reduce, dict(foos=f_wraps), name='Reduce', wraps=tuple(f_wraps), share=None)

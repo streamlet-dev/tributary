@@ -109,7 +109,6 @@ class FunctionWrapper(object):
         while(self._refs == self._refs_orig):
             kwargs.update(self._foo_kwargs)
             ret = self._foo(*args, **kwargs)
-            # import ipdb; ipdb.set_trace()
             if isinstance(ret, types.GeneratorType):
                 for r in ret:
                     tmp = _call_if_function(r)
