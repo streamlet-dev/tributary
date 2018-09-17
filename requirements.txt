@@ -1,4 +1,5 @@
 future
+gevent
 graphviz
 IPython
 numpy
