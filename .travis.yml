@@ -1,10 +1,6 @@
 language: python
 cache: pip
 
-python:
-  - "3.6"
-  - "2.7"
-
 matrix:
   - python: "2.7"
     env: PYTHONVER=2
