@@ -2,7 +2,7 @@ build:  ## Build the repository
 	python3 setup.py build 
 
 buildpy2:
-	python3 setup.py build 
+	python2 setup.py build 
 
 tests: ## Clean and Make unit tests
 	python3 -m nose -v tests --with-coverage --cover-erase --cover-package=`find tributary -name "*.py" | sed "s=\./==g" | sed "s=/=.=g" | sed "s/\.py//g" | tr '\n' ',' | rev | cut -c2- | rev`

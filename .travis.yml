@@ -13,7 +13,7 @@ branches:
   - master
 
 install: 
-  - if [ "$PYTHONVER" = "2" ]; then python2 -m pip install setuptools && python2 -m pip install -r requirements.txt; fi
+  - if [ "$PYTHONVER" = "2" ]; then python2 -m pip install -r requirements.txt; fi
   - if [ "$PYTHONVER" = "3" ]; then python3 -m pip install -r requirements.txt && python3 -m pip install codecov; fi
 
 script: 
