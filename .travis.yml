@@ -1,12 +1,15 @@
 language: python
 cache: pip
 
+python:
+  - "3.6"
+  - "2.7"
+
 matrix:
   - python: "2.7"
     env: PYTHONVER=2
   - python: "3.6"
     env: PYTHONVER=3
-    after_success: python3 -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1
 
 branches:
   only:
@@ -20,6 +23,9 @@ script:
   - if [ "$PYTHONVER" = "2" ]; then echo "Python2" && make testpy2; fi
   - if [ "$PYTHONVER" = "3" ]; then echo "Python3" && make test; fi
   - echo $PYTHONVER
+
+after_success: 
+  - if [ "$PYTHONVER" = "3" ]; then python3 -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1; fi
 
 notifications:
   email: false
