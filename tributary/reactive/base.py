@@ -172,7 +172,3 @@ class StreamEnd:
 class StreamNone:
     def __init__(self, last):
         self.value = last
-
-
-class StreamTerminate:
-    pass

@@ -10,13 +10,17 @@ class DummyWebSocket(tornado.websocket.WebSocketHandler):
         print("WebSocket opened")
         i = 0
         x = {y: _gen() for y in ('A', 'B', 'C', 'D')}
-        while i < len(x['A']):
-            self.write_message({'A': x['A'][i],
-                                'B': x['B'][i],
-                                'C': x['C'][i],
-                                'D': x['D'][i]})
-            i += 1
-            time.sleep(5)
+        try:
+            while i < len(x['A']):
+                self.write_message({'A': x['A'][i],
+                                    'B': x['B'][i],
+                                    'C': x['C'][i],
+                                    'D': x['D'][i]})
+                i += 1
+                time.sleep(.1)
+        finally:
+            print("WebSocket closed")
+            self.close()
 
     def on_message(self, message):
         self.write_message(u"You said: " + message)
