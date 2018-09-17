@@ -7,9 +7,9 @@ python:
 
 matrix:
   - python: "2.7"
-    env: PYTHON=2
+    env: PYTHONVER=2
   - python: "3.6"
-    env: PYTHON=3
+    env: PYTHONVER=3
     after_success: python3 -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1
 
 branches:
@@ -17,12 +17,12 @@ branches:
   - master
 
 install: 
-  - if [ "$PYTHON" = "2" ]; then python2 -m pip install -r requirements.txt; fi
-  - if [ "$PYTHON" = "3" ]; then python3 -m pip install -r requirements.txt && python3 -m pip install codecov; fi
+  - if [ "$PYTHONVER" = "2" ]; then python2 -m pip install -r requirements.txt; fi
+  - if [ "$PYTHONVER" = "3" ]; then python3 -m pip install -r requirements.txt && python3 -m pip install codecov; fi
 
 script: 
-  - if [ "$PYTHON" = "2" ]; then echo "Python2" && make testpy2; fi
-  - if [ "$PYTHON" = "3" ]; then echo "Python2" && make test; fi
+  - if [ "$PYTHONVER" = "2" ]; then echo "Python2" && make testpy2; fi
+  - if [ "$PYTHONVER" = "3" ]; then echo "Python2" && make test; fi
 
 notifications:
   email: false
