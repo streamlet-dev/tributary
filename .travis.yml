@@ -3,6 +3,7 @@ cache: pip
 
 python:
   - "3.6"
+  - "2.7"
 
 git:
     submodules: false
