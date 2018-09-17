@@ -19,8 +19,8 @@ branches:
   - master
 
 script: 
-  - if [ "$PYTHON" = "2" ]; then make testpy2; fi
-  - if [ "$PYTHON" = "3" ]; then make test; fi
+  - if [ "$PYTHON" = "2" ]; then echo "Python2" && make testpy2; fi
+  - if [ "$PYTHON" = "3" ]; then echo "Python2" && make test; fi
 
 notifications:
   email: false

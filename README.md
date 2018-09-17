@@ -10,7 +10,7 @@ Python Streams
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
 
 
-## Forward-Propagating Data Streams
+## Python Data Streams
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.gif)
 
 ### Simple Example
