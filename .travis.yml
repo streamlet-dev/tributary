@@ -8,14 +8,11 @@ python:
 matrix:
   - python: "2.7"
     script: make testpy2
+    install: python2 -m pip install -r requirements.txt
   - python: "3.6"
+    install: python3 -m pip install -r requirements.txt && python3 -m pip install codecov
     script: make test
     after_success: python3 -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1
-
-install:
-    - python2.7 -m pip install -r requirements.txt
-    - python3.6 -m pip install -r requirements.txt
-    - python3.6 -m pip install codecov
 
 branches:
   only:
