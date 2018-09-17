@@ -6,10 +6,11 @@ python:
   - "2.7"
 
 matrix:
-  - python: "2.7"
-    env: PYTHONVER=2
-  - python: "3.6"
-    env: PYTHONVER=3
+  include:
+    - python: "2.7"
+      env: PYTHONVER=2
+    - python: "3.6"
+      env: PYTHONVER=3
 
 branches:
   only:
