@@ -14,8 +14,8 @@ matrix:
 
 install:
     - python2.7 -m pip install -r requirements.txt
-    - python3.7 -m pip install -r requirements.txt
-    - python3.7 -m pip install codecov
+    - python3.6 -m pip install -r requirements.txt
+    - python3.6 -m pip install codecov
 
 branches:
   only:
