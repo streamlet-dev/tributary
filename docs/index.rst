@@ -8,7 +8,7 @@ tributary
 
 Python Streams
 
-|Build Status| |GitHub issues| |codecov| |BCH compliance| |PyPI| |PyPI|
+|Build Status| |GitHub| |codecov| |BCH compliance| |PyPI| |PyPI|
 |Docs|
 
 Forward-Propagating Data Streams
@@ -56,7 +56,7 @@ SocketIO
 
 .. |Build Status| image:: https://travis-ci.org/timkpaine/tributary.svg?branch=master
    :target: https://travis-ci.org/timkpaine/tributary
-.. |GitHub issues| image:: https://img.shields.io/github/issues/timkpaine/tributary.svg
+.. |GitHub| image:: https://img.shields.io/github/issues/timkpaine/tributary.svg
    :target: 
 .. |codecov| image:: https://codecov.io/gh/timkpaine/tributary/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/timkpaine/tributary
