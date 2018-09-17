@@ -10,12 +10,12 @@ matrix:
     script: make testpy2
   - python: "3.6"
     script: make test
-    after_success: python -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1
+    after_success: python3 -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1
 
 install:
-    - pip2 install -r requirements.txt
-    - pip3 install -r requirements.txt
-    - pip3 install codecov
+    - python2.7 -m pip install -r requirements.txt
+    - python3.7 -m pip install -r requirements.txt
+    - python3.7 -m pip install codecov
 
 branches:
   only:
