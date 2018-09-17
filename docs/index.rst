@@ -4,15 +4,78 @@
    contain the root `toctree` directive.
 
 tributary
-===================================
-An orchestration layer for plots and tables, dummy datasets, research, reports, and anything else a data scientist might need.
+=========
 
-|build-status| |issues| |waffle| |codecov| |gitter| |bch| |pypiv| |pypil| |docs|
+Python Streams
 
-.. image:: ./img/demo.gif
-    :scale: 100%
-    :alt: demo.gif
+|Build Status| |GitHub issues| |codecov| |BCH compliance| |PyPI| |PyPI|
+|Docs|
 
+Forward-Propagating Data Streams
+--------------------------------
+
+|image7|
+
+Simple Example
+~~~~~~~~~~~~~~
+
+|image8|
+
+More Complex Example
+~~~~~~~~~~~~~~~~~~~~
+
+|image9|
+
+Rolling Mean
+~~~~~~~~~~~~
+
+|image10|
+
+Custom Calculations and Window Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+|image11|
+
+Sources
+-------
+
+WebSocket
+~~~~~~~~~
+
+|image12|
+
+HTTP
+~~~~
+
+|image13|
+
+SocketIO
+~~~~~~~~
+
+|image14|
+
+.. |Build Status| image:: https://travis-ci.org/timkpaine/tributary.svg?branch=master
+   :target: https://travis-ci.org/timkpaine/tributary
+.. |GitHub issues| image:: https://img.shields.io/github/issues/timkpaine/tributary.svg
+   :target: 
+.. |codecov| image:: https://codecov.io/gh/timkpaine/tributary/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/timkpaine/tributary
+.. |BCH compliance| image:: https://bettercodehub.com/edge/badge/timkpaine/tributary?branch=master
+   :target: https://bettercodehub.com/
+.. |PyPI| image:: https://img.shields.io/pypi/l/tributary.svg
+   :target: https://pypi.python.org/pypi/tributary
+.. |PyPI| image:: https://img.shields.io/pypi/v/tributary.svg
+   :target: https://pypi.python.org/pypi/tributary
+.. |Docs| image:: https://img.shields.io/readthedocs/tributary.svg
+   :target: https://tributary.readthedocs.io
+.. |image7| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.gif
+.. |image8| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example1.png
+.. |image9| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example2.png
+.. |image10| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example3.png
+.. |image11| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example4.png
+.. |image12| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/ws.png
+.. |image13| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/http.png
+.. |image14| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/sio.png
 
 .. toctree::
    :maxdepth: 2
@@ -20,49 +83,3 @@ An orchestration layer for plots and tables, dummy datasets, research, reports, 
 
    installation
    quickstart
-
-
-.. |build-status| image:: https://travis-ci.org/timkpaine/tributary.svg?branch=master
-    :alt: Build Status
-    :scale: 100%
-    :target: https://travis-ci.org/timkpaine/tributary
-
-.. |issues| image:: https://img.shields.io/github/issues/timkpaine/tributary.svg
-    :alt: Issues
-    :scale: 100%
-    :target: https://img.shields.io/github/issues/timkpaine/tributary.svg
-
-.. |waffle| image:: https://badge.waffle.io/timkpaine/tributary.svg?label=ready&title=Ready
-    :alt: Waffle
-    :scale: 100%
-    :target: http://waffle.io/timkpaine/tributary
-
-.. |codecov| image:: https://codecov.io/gh/timkpaine/tributary/branch/master/graph/badge.svg
-    :alt: Codecov
-    :scale: 100%
-    :target: https://codecov.io/gh/timkpaine/tributary
-
-.. |gitter| image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
-    :alt: Gitter
-    :scale: 100%
-    :target: https://gitter.im/pytributary/Lobby
-
-.. |bch| image:: https://bettercodehub.com/edge/badge/timkpaine/tributary?branch=master
-    :alt: BCH
-    :scale: 100%
-    :target: https://bettercodehub.com/
-
-.. |pypiv| image:: https://img.shields.io/pypi/v/pytributary.svg
-    :alt: Version
-    :scale: 100%
-    :target: https://pypi.python.org/pypi/pytributary
-
-.. |pypil| image:: https://img.shields.io/pypi/l/pytributary.svg
-    :alt: License
-    :scale: 100%
-    :target: https://pypi.python.org/pypi/pytributary
-
-.. |docs| image:: https://img.shields.io/readthedocs/pytributary.svg
-    :alt: Docs
-    :scale: 100%
-    :target: http://pytributary.readthedocs.io/en/latest/
