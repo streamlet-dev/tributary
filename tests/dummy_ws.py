@@ -16,7 +16,7 @@ class DummyWebSocket(tornado.websocket.WebSocketHandler):
                                 'C': x['C'][i],
                                 'D': x['D'][i]})
             i += 1
-            time.sleep(.5)
+            time.sleep(5)
 
     def on_message(self, message):
         self.write_message(u"You said: " + message)

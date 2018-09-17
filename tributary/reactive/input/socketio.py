@@ -10,17 +10,17 @@ def SocketIO(url, *args, **kwargs):
     return SyncSocketIO(url, *args, **kwargs)
 
 
-def SyncSocketIO(url, channel='', field='', sendinit=None, json=False, wrap=False):
+def SyncSocketIO(url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
     o = urlparse(url)
     socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
     if sendinit:
         socketIO.emit(sendinit)
 
-    def _sio(url, channel, field='', json=False, wrap=False):
+    def _sio(url, channel, field='', json=False, wrap=False, interval=1):
         while True:
             _data = []
             socketIO.on(channel, lambda data: _data.append(data))
-            socketIO.wait(seconds=1)
+            socketIO.wait(seconds=interval)
             for msg in _data:
                 if json:
                     msg = json.loads(msg)
@@ -33,4 +33,4 @@ def SyncSocketIO(url, channel='', field='', sendinit=None, json=False, wrap=Fals
 
                 yield msg
 
-    return _wrap(_sio, dict(url=url, channel=channel, field=field, json=json, wrap=wrap), name='SocketIO')
+    return _wrap(_sio, dict(url=url, channel=channel, field=field, json=json, wrap=wrap, interval=interval), name='SocketIO')

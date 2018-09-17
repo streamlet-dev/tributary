@@ -163,3 +163,16 @@ def Share(f_wrap):
         raise Exception('Share expects a tributary')
     f_wrap.inc()
     return f_wrap
+
+
+class StreamEnd:
+    pass
+
+
+class StreamNone:
+    def __init__(self, last):
+        self.value = last
+
+
+class StreamTerminate:
+    pass

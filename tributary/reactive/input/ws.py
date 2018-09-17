@@ -9,7 +9,7 @@ def WebSocket(url, *args, **kwargs):
 
 def SyncWebSocket(url, json=False, wrap=False):
     def _listen(url):
-        ws = create_connection("ws://localhost:8899")
+        ws = create_connection(url)
         while True:
             msg = ws.recv()
             if msg is None:
