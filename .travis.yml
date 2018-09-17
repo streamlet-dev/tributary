@@ -7,16 +7,18 @@ python:
 
 matrix:
   - python: "2.7"
-    install: python2 -m pip install -r requirements.txt
     env: PYTHON=2
   - python: "3.6"
-    install: python3 -m pip install -r requirements.txt && python3 -m pip install codecov
     env: PYTHON=3
     after_success: python3 -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1
 
 branches:
   only:
   - master
+
+install: 
+  - if [ "$PYTHON" = "2" ]; then python2 -m pip install -r requirements.txt; fi
+  - if [ "$PYTHON" = "3" ]; then python3 -m pip install -r requirements.txt && python3 -m pip install codecov; fi
 
 script: 
   - if [ "$PYTHON" = "2" ]; then echo "Python2" && make testpy2; fi
