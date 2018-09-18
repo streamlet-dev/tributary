@@ -28,7 +28,7 @@ def Random(size=10, interval=0.1):
                        'B': x['B'][i],
                        'C': x['C'][i],
                        'D': x['D'][i]}
-                asyncio.sleep(interval)
+                await asyncio.sleep(interval)
                 step += 1
 
     return _wrap(_random, dict(size=size, interval=interval), name='Random')
