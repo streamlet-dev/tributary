@@ -18,7 +18,7 @@ class TestConfig:
         ******************************
         ''')
         test = t.Timer(foo, {}, 0, 5)
-        test2 = t.Negate(t.Share(test))
+        test2 = t.Negate(test)
         res2 = t.Add(test, test2)
         p2 = t.Print(res2)
         t.run(p2)
@@ -43,7 +43,7 @@ class TestConfig:
         one = t.Timer(1, interval=0, repeat=5)
         five2 = t.Timer(5, interval=0, repeat=5)
 
-        neg_rand = t.Negate(t.Share(rand))
+        neg_rand = t.Negate(rand)
 
         x1 = t.Add(rand, five)  # 5 + rand
         x2 = t.Sub(x1, five2)  # rand
@@ -66,8 +66,8 @@ class TestConfig:
                 yield i
 
         f = t.Foo(stream)
-        sum = t.Sum(t.Share(f))
-        count = t.Count(t.Share(f))
+        sum = t.Sum(f)
+        count = t.Count(f)
         f3 = t.Div(sum, count)
         p3 = t.Print(f3)
 
