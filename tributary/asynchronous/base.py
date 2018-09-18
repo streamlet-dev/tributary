@@ -124,6 +124,18 @@ class FunctionWrapper(object):
                     else:
                         self.last = tmp
                         yield self.last
+            elif isinstance(ret, types.GeneratorType):
+                for r in ret:
+                    tmp = _call_if_function(r)
+
+                    if isinstance(tmp, types.GeneratorType):
+                        for rr in tmp:
+                            self.last = rr
+                            yield self.last
+
+                    else:
+                        self.last = tmp
+                        yield self.last
             else:
                 tmp = _call_if_function(ret)
 
