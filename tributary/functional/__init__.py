@@ -10,7 +10,7 @@ except ImportError:
     BrokenThreadPool = Exception
 
 
-_EXECUTOR = ThreadPoolExecutor(max_workers=2)
+_EXECUTOR = ThreadPoolExecutor(max_workers=10)
 
 
 def submit(fn, *args, **kwargs):
