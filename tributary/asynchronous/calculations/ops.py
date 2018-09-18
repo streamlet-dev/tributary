@@ -1,28 +1,6 @@
 import types
-import asyncio
 from aiostream.stream import zip
 from ..base import _wrap, FunctionWrapper
-
-
-async def anext(aiterator):
-    try:
-        return await aiterator.__anext__()
-    except StopAsyncIteration as exc:
-        raise exc
-
-
-def aiter(aiterable):
-    return aiterable.__aiter__()
-
-
-async def azip(*iterables):
-    iterators = [aiter(it) for it in iterables]
-    while iterators:
-        results = await asyncio.gather(
-            *[anext(it) for it in iterators],
-            return_exceptions=False,
-        )
-        yield tuple(results)
 
 
 def unary(lam, foo, foo_kwargs=None, _name=''):

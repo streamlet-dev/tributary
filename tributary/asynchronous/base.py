@@ -1,4 +1,3 @@
-import asyncio
 import types
 import sys
 from six import iteritems
