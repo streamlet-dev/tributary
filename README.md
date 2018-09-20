@@ -53,3 +53,11 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 
 ### SocketIO
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/sio.png)
+
+### Kafka
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/kafka.png)
+
+## Sinks
+### HTTP
+### Kafka
+
