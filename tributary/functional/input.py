@@ -1,6 +1,6 @@
 import requests
 import time
-from json import loads as load_json
+from ujson import loads as load_json
 from websocket import create_connection
 from socketIO_client_nexus import SocketIO as SIO
 try:

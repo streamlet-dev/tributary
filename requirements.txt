@@ -1,3 +1,4 @@
+confluent-kafka
 future
 gevent
 graphviz

@@ -1,4 +1,4 @@
-from json import loads as load_json
+from ujson import loads as load_json
 from websocket import create_connection
 from ..base import _wrap
 from ...base import StreamNone, StreamEnd

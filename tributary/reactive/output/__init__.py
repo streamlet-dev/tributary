@@ -1,6 +1,8 @@
 from pprint import pprint
 from ..base import _wrap, FunctionWrapper
 
+from .kafka import Kafka as KafkaSink
+
 
 def Print(foo, foo_kwargs=None):
     foo_kwargs = foo_kwargs or {}

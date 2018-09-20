@@ -3,9 +3,10 @@ import math
 import numpy as np
 from ..base import _wrap
 
-from .ws import *
-from .http import *
-from .socketio import *
+from .ws import WebSocket, SyncWebSocket
+from .http import HTTP, SyncHTTP
+from .socketio import SocketIO, SyncSocketIO
+from .kafka import Kafka, SyncKafka
 
 
 def _gen():
