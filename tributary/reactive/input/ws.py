@@ -1,7 +1,8 @@
 from json import loads as load_json
 from websocket import create_connection
-from ..base import _wrap, StreamNone, StreamEnd
-from ..thread import run
+from ..base import _wrap
+from ...base import StreamNone, StreamEnd
+from ...thread import run
 
 
 def WebSocket(url, *args, **kwargs):
@@ -9,7 +10,7 @@ def WebSocket(url, *args, **kwargs):
 
 
 def SyncWebSocket(url, json=False, wrap=False):
-    def _listen(url):
+    def _listen(url, json, wrap):
         ws = create_connection(url)
         for x in run(ws.recv):
             if isinstance(x, StreamNone):
@@ -23,4 +24,4 @@ def SyncWebSocket(url, json=False, wrap=False):
                 x = [x]
             yield x
 
-    return _wrap(_listen, dict(url=url), name='WebSocket')
+    return _wrap(_listen, dict(url=url, json=json, wrap=wrap), name='WebSocket')

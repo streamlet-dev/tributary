@@ -1,7 +1,11 @@
 from __future__ import print_function
+
+import concurrent.futures.thread as cft
 from concurrent.futures import ThreadPoolExecutor, _base
 from concurrent.futures.thread import _WorkItem
-import concurrent.futures.thread as cft
+from functools import partial
+from .input import *
+from .utils import *
 
 try:
     # For Travis/ python 3.6
@@ -86,3 +90,9 @@ def stop():
     _EXECUTOR._threads.clear()
     cft._threads_queues.clear()
     _EXECUTOR = None
+
+
+def wrap(function, *args, **kwargs):
+    foo = partial(function, *args, **kwargs)
+    foo.__name__ = function.__name__
+    return foo
