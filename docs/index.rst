@@ -91,6 +91,11 @@ SocketIO
 
 |image14|
 
+Kafka
+~~~~~~~~
+
+|image15|
+
 .. |Build Status| image:: https://travis-ci.org/timkpaine/tributary.svg?branch=master
    :target: https://travis-ci.org/timkpaine/tributary
 .. |GitHub| image:: https://img.shields.io/github/issues/timkpaine/tributary.svg
@@ -113,6 +118,7 @@ SocketIO
 .. |image12| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/ws.png
 .. |image13| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/http.png
 .. |image14| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/sio.png
+.. |image15| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/kafka.png
 
 .. toctree::
    :maxdepth: 2
