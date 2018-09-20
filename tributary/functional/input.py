@@ -2,6 +2,13 @@ import requests
 import time
 from json import loads as load_json
 from websocket import create_connection
+from socketIO_client_nexus import SocketIO as SIO
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
+
 from ..base import StreamNone, StreamEnd
 from ..thread import run
 
@@ -44,3 +51,26 @@ def http(url, callback, interval=1, repeat=1, json=False, wrap=False, field=None
             time.sleep(interval)
         if repeat >= 0:
             count += 1
+
+
+def socketio(url, callback, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
+    o = urlparse(url)
+    socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
+    if sendinit:
+        socketIO.emit(sendinit)
+
+    while True:
+        _data = []
+        socketIO.on(channel, lambda data: _data.append(data))
+        socketIO.wait(seconds=interval)
+        for msg in _data:
+            if json:
+                msg = json.loads(msg)
+
+            if field:
+                msg = msg[field]
+
+            if wrap:
+                msg = [msg]
+
+            callback(msg)
