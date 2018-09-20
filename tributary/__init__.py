@@ -5,7 +5,7 @@ if not _PATCHED:
     _PATCHED = True
 
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 
 from .functional import pipeline, stop
