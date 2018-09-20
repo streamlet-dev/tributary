@@ -94,7 +94,7 @@ SocketIO
 .. |Build Status| image:: https://travis-ci.org/timkpaine/tributary.svg?branch=master
    :target: https://travis-ci.org/timkpaine/tributary
 .. |GitHub| image:: https://img.shields.io/github/issues/timkpaine/tributary.svg
-   :target: 
+   :target: https://github.com/timkpaine/tributary/issues
 .. |codecov| image:: https://codecov.io/gh/timkpaine/tributary/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/timkpaine/tributary
 .. |BCH compliance| image:: https://bettercodehub.com/edge/badge/timkpaine/tributary?branch=master
