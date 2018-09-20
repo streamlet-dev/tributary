@@ -2,6 +2,7 @@ from pprint import pprint
 from ..base import _wrap, FunctionWrapper
 
 from .kafka import Kafka as KafkaSink
+from .http import HTTP as HTTPSink
 
 
 def Print(foo, foo_kwargs=None):
