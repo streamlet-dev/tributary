@@ -1,6 +1,5 @@
 from .base import StreamNone
-from gevent import monkey, spawn
-monkey.patch_all(thread=False, select=False)
+from gevent import spawn
 
 
 def run(target, timeout=1):
