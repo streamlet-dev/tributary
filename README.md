@@ -13,6 +13,24 @@ Python Streams
 ## Python Data Streams
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.gif)
 
+
+# Stream Types
+Tributary offers several kinds of streams:
+
+## Reactive
+These are synchronous, reactive data streams, built using python generators
+
+## Asynchronous
+These are asynchronous, reactive data streams, built using asynchronous python generators
+
+## Functional
+These are functional streams, built by currying python functions (callbacks)
+
+## Lazy (work in progress)
+These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
+
+# Examples
+## Reactive
 ### Simple Example
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example1.png)
 
