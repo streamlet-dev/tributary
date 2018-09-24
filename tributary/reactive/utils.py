@@ -8,12 +8,10 @@ except ImportError:
 
 
 def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
-    kwargs = kwargs or {}
-
     if not isinstance(foo_or_val, types.FunctionType):
         foo = Const(foo_or_val)
     else:
-        foo = Foo(foo_or_val, kwargs)
+        foo = Foo(foo_or_val, kwargs or {})
 
     def _repeater(foo, repeat, interval):
         while repeat > 0:
@@ -42,8 +40,7 @@ def Delay(f_wrap, delay=1):
 
 
 def State(foo, foo_kwargs=None, **state):
-    foo_kwargs = foo_kwargs or {}
-    foo = _wrap(foo, foo_kwargs, name=foo.__name__, wraps=(foo,), state=state)
+    foo = _wrap(foo, foo_kwargs or {}, name=foo.__name__, wraps=(foo,), state=state)
     return foo
 
 
@@ -62,8 +59,7 @@ def Apply(foo, f_wrap, foo_kwargs=None):
 
 
 def Window(foo, foo_kwargs=None, size=-1, full_only=True):
-    foo_kwargs = foo_kwargs or {}
-    foo = Foo(foo, foo_kwargs)
+    foo = Foo(foo, foo_kwargs or {})
 
     accum = []
 
@@ -86,8 +82,7 @@ def Window(foo, foo_kwargs=None, size=-1, full_only=True):
 
 
 def Unroll(foo, foo_kwargs):
-    foo_kwargs = foo_kwargs or {}
-    foo = Foo(foo, foo_kwargs)
+    foo = Foo(foo, foo_kwargs or {})
 
     def _unroll(foo):
         ret = foo()

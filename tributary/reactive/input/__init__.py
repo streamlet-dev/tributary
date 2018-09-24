@@ -1,8 +1,10 @@
 import time
 import math
 import numpy as np
-from ..base import _wrap
 
+from ...thread import run
+from ...base import StreamNone, StreamEnd
+from ..base import _wrap
 from .ws import WebSocket, SyncWebSocket
 from .http import HTTP, SyncHTTP
 from .socketio import SocketIO, SyncSocketIO
@@ -37,3 +39,17 @@ def Random(size=10, interval=0.1):
                 step += 1
 
     return _wrap(_random, dict(size=size, interval=interval), name='Random')
+
+
+def Functional(foo, foo_kwargs, callback_name):
+    foo = _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))
+
+    def _foo(foo, callback_name):
+        for x in run(foo):
+            if isinstance(x, StreamNone):
+                continue
+            elif not x or isinstance(x, StreamEnd):
+                break
+            yield x
+
+    return _wrap(_foo, dict(foo=foo), name='Functional', wraps=(foo,))

@@ -1,13 +1,13 @@
 from pprint import pprint
-from ..base import _wrap, FunctionWrapper
+from functools import partial
 
+from ..base import _wrap, FunctionWrapper
 from .kafka import Kafka as KafkaSink
 from .http import HTTP as HTTPSink
 
 
 def Print(foo, foo_kwargs=None):
-    foo_kwargs = foo_kwargs or {}
-    foo = _wrap(foo, foo_kwargs)
+    foo = _wrap(foo, foo_kwargs or {})
 
     def _print(foo):
         for r in foo():
@@ -52,8 +52,7 @@ def GraphViz(f_wrap, name='Graph'):
 
 
 def Perspective(foo, foo_kwargs=None, **psp_kwargs):
-    foo_kwargs = foo_kwargs or {}
-    foo = _wrap(foo, foo_kwargs)
+    foo = _wrap(foo, foo_kwargs or {})
 
     from perspective import PerspectiveWidget
     p = PerspectiveWidget([], **psp_kwargs)
@@ -67,3 +66,16 @@ def Perspective(foo, foo_kwargs=None, **psp_kwargs):
     display(p)
 
     return _wrap(_perspective, dict(foo=foo), name='Perspective', wraps=(foo,), share=foo)
+
+
+def Functional(f_wrap, callback, callback_kwargs):
+    if not isinstance(f_wrap, FunctionWrapper):
+        raise Exception('Functional expects tributary')
+
+    callback = partial(callback, **callback_kwargs)
+
+    def _foo(foo, callback_):
+        for x in foo():
+            yield callback(foo)
+
+    return _wrap(_foo, dict(foo=f_wrap), name='Functional', wraps=(f_wrap,))
