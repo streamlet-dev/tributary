@@ -22,6 +22,7 @@ def AsyncSocketIO(url, channel='', field='', sendinit=None, json=False, wrap=Fal
             socketIO.on(channel, lambda data: _data.append(data))
             socketIO.wait(seconds=interval)
             for msg in _data:
+                # FIXME clear _data
                 if json:
                     msg = json.loads(msg)
 

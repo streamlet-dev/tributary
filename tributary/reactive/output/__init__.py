@@ -68,7 +68,7 @@ def Perspective(foo, foo_kwargs=None, **psp_kwargs):
     return _wrap(_perspective, dict(foo=foo), name='Perspective', wraps=(foo,), share=foo)
 
 
-def Functional(f_wrap, callback, callback_kwargs):
+def FunctionalSink(f_wrap, callback, callback_kwargs):
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('Functional expects tributary')
 

@@ -47,8 +47,8 @@ def State(foo, foo_kwargs=None, **state):
 def Apply(foo, f_wrap, foo_kwargs=None):
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('Apply expects a tributary')
-    foo_kwargs = foo_kwargs or {}
-    foo = Foo(foo, foo_kwargs)
+
+    foo = Foo(foo, foo_kwargs or {})
     foo._wraps = foo._wraps + (f_wrap, )
 
     def _apply(foo):
