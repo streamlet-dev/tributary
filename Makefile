@@ -7,11 +7,15 @@ buildpy2:
 tests: ## Clean and Make unit tests
 	python3 -m nose -v tests --with-coverage --cover-erase --cover-package=`find tributary -name "*.py" | sed "s=\./==g" | sed "s=/=.=g" | sed "s/\.py//g" | tr '\n' ',' | rev | cut -c2- | rev`
 	
-test: ## run the tests for travis CI
+test: lint ## run the tests for travis CI
 	@ python3 -m nose -v tests --with-coverage --cover-erase --cover-package=`find tributary -name "*.py" | sed "s=\./==g" | sed "s=/=.=g" | sed "s/\.py//g" | tr '\n' ',' | rev | cut -c2- | rev`
 
 testpy2: buildpy2
 	@ python2 -m nose -v tests --with-coverage --cover-erase --cover-package=`find tributary -name "*.py" | sed "s=\./==g" | sed "s=/=.=g" | sed "s/\.py//g" | tr '\n' ',' | rev | cut -c2- | rev`
+
+lint: ## run linter
+	pylint lantern || echo
+	flake8 lantern 
 
 annotate: ## MyPy type annotation check
 	mypy -s tributary  
