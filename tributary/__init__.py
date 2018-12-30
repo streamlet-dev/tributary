@@ -8,5 +8,5 @@ if not _PATCHED:
 __version__ = '0.0.3'
 
 
-from .functional import pipeline, stop
-from .reactive import *
+from .functional import pipeline, stop  # noqa: F401
+from .reactive import *  # noqa: F401, F403

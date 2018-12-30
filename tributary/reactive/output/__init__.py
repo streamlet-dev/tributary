@@ -2,8 +2,8 @@ from pprint import pprint
 from functools import partial
 
 from ..base import _wrap, FunctionWrapper
-from .kafka import Kafka as KafkaSink
-from .http import HTTP as HTTPSink
+from .kafka import Kafka as KafkaSink  # noqa: F401
+from .http import HTTP as HTTPSink  # noqa: F401
 
 
 def Print(foo, foo_kwargs=None):

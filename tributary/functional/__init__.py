@@ -4,8 +4,8 @@ import concurrent.futures.thread as cft
 from concurrent.futures import ThreadPoolExecutor, _base
 from concurrent.futures.thread import _WorkItem
 from functools import partial
-from .input import *
-from .utils import *
+from .input import *  # noqa: F401, F403
+from .utils import *  # noqa: F401, F403
 
 try:
     # For Travis/ python 3.6

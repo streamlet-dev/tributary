@@ -2,13 +2,13 @@ import time
 import math
 import numpy as np
 
-from ...thread import run
-from ...base import StreamNone, StreamEnd
-from ..base import _wrap, FunctionWrapper
-from .ws import WebSocket, SyncWebSocket
-from .http import HTTP, SyncHTTP
-from .socketio import SocketIO, SyncSocketIO
-from .kafka import Kafka, SyncKafka
+from ...thread import run  # noqa: F401
+from ...base import StreamNone, StreamEnd  # noqa: F401
+from ..base import _wrap, FunctionWrapper  # noqa: F401
+from .ws import WebSocket, SyncWebSocket  # noqa: F401
+from .http import HTTP, SyncHTTP  # noqa: F401
+from .socketio import SocketIO, SyncSocketIO  # noqa: F401
+from .kafka import Kafka, SyncKafka  # noqa: F401
 
 
 def _gen():
