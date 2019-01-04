@@ -29,6 +29,9 @@ These are functional streams, built by currying python functions (callbacks)
 ## Lazy (work in progress)
 These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
 
+## Event Loop
+These function as tornado based event-loop based streams similar to streamz.
+
 # Examples
 ## Reactive
 ### Simple Example
