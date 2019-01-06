@@ -14,8 +14,8 @@ testpy2: buildpy2
 	@ python2 -m nose2 -v tests --with-coverage --coverage=tributary
 
 lint: ## run linter
-	pylint lantern || echo
-	flake8 lantern 
+	pylint tributary || echo
+	flake8 tributary 
 
 annotate: ## MyPy type annotation check
 	mypy -s tributary  
