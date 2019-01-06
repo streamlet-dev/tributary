@@ -1,4 +1,5 @@
 import types
+from pprint import pprint
 from ..base import _wrap, FunctionWrapper
 
 
@@ -26,6 +27,10 @@ def Graph(f_wrap):
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('ViewGraph expects tributary')
     return f_wrap.view(0)[0]
+
+
+def PPrint(f_wrap):
+    pprint(Graph(f_wrap))
 
 
 def GraphViz(f_wrap, name='Graph'):
