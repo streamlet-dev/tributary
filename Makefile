@@ -5,13 +5,10 @@ buildpy2:
 	python2 setup.py build 
 
 tests: ## Clean and Make unit tests
-	python3 -m nose2 -v tests --with-coverage --coverage=tributary
+	python3 -m pytest tests --cov=tributary
 
 test: lint ## run the tests for travis CI
-	@ python3 -m nose2 -v tests --with-coverage --coverage=tributary
-
-testpy2: buildpy2
-	@ python2 -m nose2 -v tests --with-coverage --coverage=tributary
+	@ python3 -m pytest tests --cov=tributary
 
 lint: ## run linter
 	pylint tributary || echo
