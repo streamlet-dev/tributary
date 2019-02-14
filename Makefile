@@ -5,10 +5,10 @@ buildpy2:
 	python2 setup.py build 
 
 tests: ## Clean and Make unit tests
-	python3 -m pytest tests --cov=tributary
+	python3 -m pytest -v tests --cov=tributary
 
 test: lint ## run the tests for travis CI
-	@ python3 -m pytest tests --cov=tributary
+	@ python3 -m pytest -v tests --cov=tributary
 
 lint: ## run linter
 	pylint tributary || echo
