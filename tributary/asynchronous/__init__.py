@@ -16,7 +16,7 @@ async def _run(foo, **kwargs):
                 async for i in item:
                     ret.append(i)
             elif isinstance(item, types.CoroutineType):
-                    ret.append(await item)
+                ret.append(await item)
             else:
                 ret.append(item)
 
