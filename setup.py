@@ -27,7 +27,7 @@ setup(
     author_email='timothy.k.paine@gmail.com',
     license='Apache 2.0',
     install_requires=requires,
-    extras_require={'dev': requires + ['nose2', 'pylint', 'flake8']},
+    extras_require={'dev': requires + ['pytest', 'pytest-cov', 'pylint', 'flake8']},
 
     classifiers=[
         'Development Status :: 3 - Alpha',
