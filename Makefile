@@ -10,7 +10,7 @@ tests: ## Clean and Make unit tests
 test: lint ## run the tests for travis CI
 	@ python3 -m pytest -v tests --cov=tributary
 
-testpy2: lint ## run the tests for travis CI
+testpy2: ## run the tests for travis CI
 	@ python2 -m pytest -v tests --cov=tributary
 
 lint: ## run linter
