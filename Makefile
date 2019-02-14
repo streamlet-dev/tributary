@@ -11,7 +11,6 @@ test: lint ## run the tests for travis CI
 	@ python3 -m pytest -v tests --cov=tributary
 
 lint: ## run linter
-	pylint tributary || echo
 	flake8 tributary 
 
 annotate: ## MyPy type annotation check
