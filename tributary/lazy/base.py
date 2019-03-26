@@ -27,6 +27,43 @@ class Node(object):
         self._recompute()
         return self._value
 
+    def print(self, counter=0):
+        key = str(self) + '-' + str(counter)
+        ret = {key: []}
+        counter += 1
+        if self._dependencies:
+            for deps in six.itervalues(self._dependencies):
+                for dep in deps:
+                    ret[key].append(dep.print(counter))
+                    counter += 1
+        return ret
+
+    def graph(self):
+        return self.print()
+
+    def graphviz(self):
+        d = self.graph()
+        from graphviz import Digraph
+        dot = Digraph(self._name, strict=True)
+        dot.format = 'png'
+
+        def rec(nodes, parent):
+            for d in nodes:
+                if not isinstance(d, dict):
+                    dot.node(d)
+                    dot.edge(d, parent)
+
+                else:
+                    for k in d:
+                        dot.node(k)
+                        rec(d[k], k)
+                        dot.edge(k, parent)
+
+        for k in d:
+            dot.node(k)
+            rec(d[k], k)
+        return dot
+
     def _compute_from_dependencies(self):
         if self._dependencies:
             for deps in six.itervalues(self._dependencies):
@@ -47,25 +84,67 @@ class Node(object):
         self._dirty = self._dirty or self._subtree_dirty()
         if self._dirty:
             if self._trace:
-                print('recomputing: %s-%d' % (self._name, id(self)))
+                print('recomputing: %s' % (self._name))
             self._value = self._compute_from_dependencies()
         self._dirty = False
 
-    def __add__(self, other):
-        return Node(name='_add_{lhs}_{rhs}'.format(lhs=self._name, rhs=other._name),
+    def _gennode(self, other, name, foo, foo_args):
+        return Node(name='{name}_{lhs}_{rhs}'.format(name=name, lhs=self._name, rhs=other._name),
                     derived=True,
-                    dependencies={(lambda x: x[0]._value + x[1]._value): [self, other]},
+                    dependencies={foo: foo_args},
                     trace=self._trace or other._trace)
+
+    def _tonode(self, other):
+        if isinstance(other, Node):
+            return other
+        return Node(name='gen_' + str(other)[:5],
+                    derived=True,
+                    dependencies={},
+                    trace=self._trace)
+
+    def __add__(self, other):
+        other = self._tonode(other)
+        return self._gennode(other, 'add', (lambda x: x[0]._value + x[1]._value), [self, other])
 
     def __sub__(self, other):
-        return Node(name='_sub_{lhs}_{rhs}'.format(lhs=self._name, rhs=other._name),
-                    derived=True,
-                    dependencies={(lambda x: x[0]._value - x[1]._value): [self, other]},
-                    trace=self._trace or other._trace)
+        other = self._tonode(other)
+        return self._gennode(other, 'sub', (lambda x: x[0]._value - x[1]._value), [self, other])
+
+    def __bool__(self):
+        self._recompute()
+        return self._value
+
+    __nonzero__ = __bool__  # Py2 compat
+
+    def __eq__(self, other):
+        if isinstance(other, Node) and super(Node, self).__eq__(other):
+            return True
+
+        other = self._tonode(other)
+        return self._gennode(other, 'eq', (lambda x: x[0]._value == x[1]._value), [self, other])
+
+    def __ne__(self, other):
+        other = self._tonode(other)
+        return self._gennode(other, 'ne', (lambda x: x[0]._value != x[1]._value), [self, other])
+
+    def __ge__(self, other):
+        other = self._tonode(other)
+        return self._gennode(other, 'ge', (lambda x: x[0]._value >= x[1]._value), [self, other])
+
+    def __gt__(self, other):
+        other = self._tonode(other)
+        return self._gennode(other, 'gt', (lambda x: x[0]._value > x[1]._value), [self, other])
+
+    def __le__(self, other):
+        other = self._tonode(other)
+        return self._gennode(other, 'le', (lambda x: x[0]._value <= x[1]._value), [self, other])
+
+    def __lt__(self, other):
+        other = self._tonode(other)
+        return self._gennode(other, 'lt', (lambda x: x[0]._value < x[1]._value), [self, other])
 
     def __repr__(self):
-        self._recompute()
-        return '%s-%d-%d' % (self._name, id(self), self._value)
+        return '%s' % (self._name)
 
 
 class BaseClass(object):
@@ -98,7 +177,7 @@ class BaseClass(object):
     def __setattr__(self, name, value):
         if hasattr(self, '_BaseClass__nodes') and name in super(BaseClass, self).__getattribute__('_BaseClass__nodes'):
             node = super(BaseClass, self).__getattribute__('_BaseClass__nodes')[name]
-            if node == value:
+            if isinstance(value, Node) and node == value:
                 return
             elif isinstance(value, Node):
                 raise Exception('Cannot set to node')
