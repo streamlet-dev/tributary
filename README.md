@@ -33,7 +33,7 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 These function as tornado based event-loop based streams similar to streamz.
 
 # Examples
-- [Reactive](examples/reactive.md)
+- [Reactive](docs/examples/reactive.md)
 
 # Math
 `(Work in progress)`
