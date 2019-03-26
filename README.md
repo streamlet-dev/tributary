@@ -34,6 +34,7 @@ These function as tornado based event-loop based streams similar to streamz.
 
 # Examples
 - [Reactive](docs/examples/reactive.md)
+- [Lazy](docs/examples/lazy.md)
 
 # Math
 `(Work in progress)`
