@@ -26,7 +26,7 @@ These are synchronous, reactive data streams, built using asynchronous python ge
 ## Functional
 These are functional streams, built by currying python functions (callbacks). 
 
-## Lazy (work in progress)
+## Lazy
 These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
 
 ## Event Loop

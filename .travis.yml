@@ -17,7 +17,7 @@ install:
   - if [ "$PYTHONVER" = "3" ]; then python3 -m pip install -r requirements.txt && python3 -m pip install -U pytest pytest-cov flake8 pylint codecov; fi
 
 script: 
-  - if [ "$PYTHONVER" = "2" ]; then echo "Python2" && make testpy2; fi
+  # - if [ "$PYTHONVER" = "2" ]; then echo "Python2" && make testpy2; fi
   - if [ "$PYTHONVER" = "3" ]; then echo "Python3" && make test; fi
   - echo $PYTHONVER
 
