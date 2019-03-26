@@ -1,1 +1,1 @@
-from .base import BaseClass, node
+from .base import BaseClass, node  # noqa: F401
