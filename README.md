@@ -11,20 +11,20 @@ Python Streams
 
 
 ## Python Data Streams
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.gif)
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/example.gif)
 
 
 # Stream Types
 Tributary offers several kinds of streams:
 
 ## Reactive
-These are synchronous, reactive data streams, built using python generators
+These are synchronous, reactive data streams, built using python generators. They are designed to mimic complex event processors in terms of event ordering.
 
 ## Asynchronous
-These are asynchronous, reactive data streams, built using asynchronous python generators
+These are synchronous, reactive data streams, built using asynchronous python generators. They are a variant of the reactive streams, but should offer performance improvements over the non-asynchronous variants. 
 
 ## Functional
-These are functional streams, built by currying python functions (callbacks)
+These are functional streams, built by currying python functions (callbacks). 
 
 ## Lazy (work in progress)
 These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
@@ -33,34 +33,14 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 These function as tornado based event-loop based streams similar to streamz.
 
 # Examples
-## Reactive
-### Simple Example
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example1.png)
+- [Reactive](examples/reactive.md)
 
-### More Complex Example
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example2.png)
+# Math
+`(Work in progress)`
 
-### Rolling Mean
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example3.png)
+# Sources and Sinks
+`(Work in progress)`
 
-### Custom Calculations and Window Functions
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example4.png)
-
-
-## Sources
-### WebSocket
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/ws.png)
-
-### HTTP
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/http.png)
-
-### SocketIO
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/sio.png)
-
-### Kafka
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/kafka.png)
-
-## Sinks
-### HTTP
-### Kafka
-
+- kafka
+- websocket
+- http
