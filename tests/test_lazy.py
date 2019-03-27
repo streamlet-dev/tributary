@@ -11,9 +11,16 @@ if sys.version_info[0] > 2:
         def __init__(self, *args, **kwargs):
             self.y = self.node('y', readonly=False, default_or_starting_value=2, trace=True)
 
+            # ensure no __nodes clobber
+            self.test = self.node('test', readonly=False, default_or_starting_value=2, trace=True)
+            self.x = self.node('x', readonly=False, default_or_starting_value=2, trace=True)
+
     class Foo3(t.BaseClass):
         @t.node(trace=True)
         def foo1(self):
+            return self.random()  # test self access
+
+        def random(self):
             return random.random()
 
         @t.node(trace=True)

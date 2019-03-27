@@ -28,6 +28,8 @@ class Node(object):
         self._callable_is_method = callable_is_method
         self._always_dirty = always_dirty
 
+        self._self_reference = self
+
         if callable:
             self._dependencies = {self._callable: (self._callable_args, self._callable_kwargs)}
         else:
@@ -44,6 +46,10 @@ class Node(object):
     def _transform_kwargs(self, kwargs):
         return kwargs
 
+    def _with_self(self, other_self):
+        self._self_reference = other_self
+        return self
+
     def _compute_from_dependencies(self):
         if self._dependencies:
             for deps in six.itervalues(self._dependencies):
@@ -58,7 +64,7 @@ class Node(object):
             k = list(self._dependencies.keys())[0]
 
             if self._callable_is_method:
-                new_value = k(self, *self._dependencies[k][0], **self._dependencies[k][1])
+                new_value = k(self._self_reference, *self._dependencies[k][0], **self._dependencies[k][1])
             else:
                 new_value = k(*self._dependencies[k][0], **self._dependencies[k][1])
 
@@ -179,11 +185,11 @@ class Node(object):
 
     def __add__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'add', (lambda x, y: x() + y()), [self, other])
+        return self._gennode(other, 'add', (lambda x, y: x() + y()), [self._self_reference, other])
 
     def __sub__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'sub', (lambda x, y: x() - y()), [self, other])
+        return self._gennode(other, 'sub', (lambda x, y: x() - y()), [self._self_reference, other])
 
     def __bool__(self):
         return self.value()
@@ -195,27 +201,27 @@ class Node(object):
             return True
 
         other = self._tonode(other)
-        return self._gennode(other, 'eq', (lambda x, y: x() == y()), [self, other])
+        return self._gennode(other, 'eq', (lambda x, y: x() == y()), [self._self_reference, other])
 
     def __ne__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'ne', (lambda x, y: x() != y()), [self, other])
+        return self._gennode(other, 'ne', (lambda x, y: x() != y()), [self._self_reference, other])
 
     def __ge__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'ge', (lambda x, y: x() >= y()), [self, other])
+        return self._gennode(other, 'ge', (lambda x, y: x() >= y()), [self._self_reference, other])
 
     def __gt__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'gt', (lambda x, y: x() > y()), [self, other])
+        return self._gennode(other, 'gt', (lambda x, y: x() > y()), [self._self_reference, other])
 
     def __le__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'le', (lambda x, y: x() <= y()), [self, other])
+        return self._gennode(other, 'le', (lambda x, y: x() <= y()), [self._self_reference, other])
 
     def __lt__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'lt', (lambda x, y: x() < y()), [self, other])
+        return self._gennode(other, 'lt', (lambda x, y: x() < y()), [self._self_reference, other])
 
     def __repr__(self):
         return '%s' % (self._name)
@@ -226,7 +232,7 @@ class BaseClass(object):
         pass
 
     def node(self, name, readonly=False, nullable=True, default_or_starting_value=None, trace=False):
-        if not hasattr(self, '__nodes'):
+        if not hasattr(self, '_BaseClass__nodes'):
             self.__nodes = {}
 
         self.__nodes[name] = Node(name=name,
@@ -359,5 +365,5 @@ def node(meth, memoize=False, trace=False):
                     trace=trace)
 
     if is_method:
-        return lambda self, *args, **kwargs: new_node
+        return lambda self, *args, **kwargs: new_node._with_self(self)
     return lambda *args, **kwargs: new_node
