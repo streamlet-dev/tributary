@@ -5,7 +5,7 @@ if not _PATCHED:
     _PATCHED = True
 
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 
 from .functional import pipeline, stop  # noqa: F401
