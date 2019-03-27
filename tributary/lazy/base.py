@@ -31,6 +31,7 @@ class Node(object):
         self._self_reference = self
 
         if callable:
+            self._callable._node_wrapper = None  # not known until program start
             self._dependencies = {self._callable: (self._callable_args, self._callable_kwargs)}
         else:
             self._dependencies = {}
@@ -68,10 +69,13 @@ class Node(object):
             else:
                 new_value = k(*self._dependencies[k][0], **self._dependencies[k][1])
 
+            if isinstance(new_value, Node):
+                k._node_wrapper = new_value
+                new_value = new_value()  # get value
+
             if self._trace:
                 if new_value != self._value:
                     print('recomputing: %s-%d' % (self._name, id(self)))
-
             self._value = new_value
         return self._value
 
@@ -133,15 +137,20 @@ class Node(object):
                         break
 
     def value(self):
-        self._recompute()
         return self._value
 
     def print(self, counter=0):
-        key = str(self) + '-' + str(counter)
+        key = str(self) + '#' + str(counter)
         ret = {key: []}
         counter += 1
         if self._dependencies:
-            for deps in six.itervalues(self._dependencies):
+            for call, deps in six.iteritems(self._dependencies):
+                # callable node
+                if hasattr(call, '_node_wrapper') and \
+                   call._node_wrapper is not None:
+                    ret[key].append(call._node_wrapper.print(counter))
+                    counter += 1
+
                 # args
                 for arg in deps[0]:
                     ret[key].append(arg.print(counter))
@@ -181,15 +190,20 @@ class Node(object):
         return dot
 
     def __call__(self):
+        self._recompute()
         return self.value()
 
     def __add__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'add', (lambda x, y: x() + y()), [self._self_reference, other])
+        if isinstance(self._self_reference, Node):
+            return self._gennode(other, '+', (lambda x, y: x.value() + y.value()), [self._self_reference, other])
+        return self._gennode(other, '+', (lambda x, y: x.value() + y.value()), [self, other])
 
     def __sub__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'sub', (lambda x, y: x() - y()), [self._self_reference, other])
+        if isinstance(self._self_reference, Node):
+            return self._gennode(other, '-', (lambda x, y: x.value() - y.value()), [self._self_reference, other])
+        return self._gennode(other, '-', (lambda x, y: x.value() - y.value()), [self, other])
 
     def __bool__(self):
         return self.value()
@@ -201,27 +215,41 @@ class Node(object):
             return True
 
         other = self._tonode(other)
-        return self._gennode(other, 'eq', (lambda x, y: x() == y()), [self._self_reference, other])
+        return self._gennode(other, '==', (lambda x, y: x() == y()), [self._self_reference, other])
 
     def __ne__(self, other):
+        if isinstance(other, Node) and super(Node, self).__eq__(other):
+            return False
+
         other = self._tonode(other)
-        return self._gennode(other, 'ne', (lambda x, y: x() != y()), [self._self_reference, other])
+        return self._gennode(other, '!=', (lambda x, y: x() != y()), [self, other])
 
     def __ge__(self, other):
+        if isinstance(other, Node) and super(Node, self).__eq__(other):
+            return True
+
         other = self._tonode(other)
-        return self._gennode(other, 'ge', (lambda x, y: x() >= y()), [self._self_reference, other])
+        return self._gennode(other, '>=', (lambda x, y: x() >= y()), [self, other])
 
     def __gt__(self, other):
+        if isinstance(other, Node) and super(Node, self).__eq__(other):
+            return False
+
         other = self._tonode(other)
-        return self._gennode(other, 'gt', (lambda x, y: x() > y()), [self._self_reference, other])
+        return self._gennode(other, '>', (lambda x, y: x() > y()), [self, other])
 
     def __le__(self, other):
+        if isinstance(other, Node) and super(Node, self).__eq__(other):
+            return True
+
         other = self._tonode(other)
-        return self._gennode(other, 'le', (lambda x, y: x() <= y()), [self._self_reference, other])
+        return self._gennode(other, '<=', (lambda x, y: x() <= y()), [self, other])
 
     def __lt__(self, other):
+        if isinstance(other, Node) and super(Node, self).__eq__(other):
+            return False
         other = self._tonode(other)
-        return self._gennode(other, 'lt', (lambda x, y: x() < y()), [self._self_reference, other])
+        return self._gennode(other, '<', (lambda x, y: x() < y()), [self, other])
 
     def __repr__(self):
         return '%s' % (self._name)
@@ -296,7 +324,9 @@ def node(meth, memoize=False, trace=False):
         raise Exception('varargs not supported yet!')
 
     node_args = []
+    node_kwargs = {}
     is_method = False
+
     for i, arg in enumerate(argspec.args):
         if arg == 'self':
             # TODO
@@ -318,7 +348,6 @@ def node(meth, memoize=False, trace=False):
                               default_or_starting_value=default_or_starting_value,
                               trace=trace))
 
-    node_kwargs = {}
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
         node_kwargs[k] = Node(name=k,
                               derived=True,
@@ -365,5 +394,9 @@ def node(meth, memoize=False, trace=False):
                     trace=trace)
 
     if is_method:
-        return lambda self, *args, **kwargs: new_node._with_self(self)
-    return lambda *args, **kwargs: new_node
+        ret = lambda self, *args, **kwargs: new_node._with_self(self)  # noqa: E731
+    else:
+        ret = lambda *args, **kwargs: new_node  # noqa: E731
+
+    ret._node_wrapper = new_node
+    return ret

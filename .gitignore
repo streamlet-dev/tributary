@@ -163,3 +163,9 @@ typings/
 yarn.lock
 package-lock.json
 .autoversion
+.idea
+*.gv
+*.gv.png
+
+tmp.py
+tmp2.py
