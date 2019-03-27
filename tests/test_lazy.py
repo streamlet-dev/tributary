@@ -19,11 +19,11 @@ if sys.version_info[0] > 2:
             f1 = Foo1()
             f2 = Foo2()
             z = f1.x + f2.y
-            assert z.value() == 3
+            assert z() == 3
             f1.x = 2
-            assert z.value() == 4
+            assert z() == 4
             f2.y = 4
-            assert z.value() == 6
+            assert z() == 6
 
         def test_2(self):
             f1 = Foo1()

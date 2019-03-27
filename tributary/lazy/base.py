@@ -6,22 +6,89 @@ class Node(object):
     def __init__(self,
                  name,
                  derived=False,
-                 dependencies=None,
                  readonly=False,
                  nullable=False,
                  default_or_starting_value=None,
+                 callable=None,
+                 callable_args=None,
+                 callable_kwargs=None,
                  trace=False,
                  ):
+        self._callable = callable
         self._name = name
         self._value = default_or_starting_value
         self._readonly = readonly
         self._trace = trace
-        self._dependencies = dependencies or {}
+
+        self._callable = callable
+        self._callable_args = self._transform_args(callable_args or [])
+        self._calable_kwargs = self._transform_kwargs(callable_kwargs or {})
+
+        if callable:
+            self._dependencies = {self._callable: (self._callable_args, self._calable_kwargs)}
+        else:
+            self._dependencies = {}
 
         if derived:
             self._dirty = True
         else:
             self._dirty = False
+
+    def _transform_args(self, args):
+        return args
+
+    def _transform_kwargs(self, kwargs):
+        return kwargs
+
+    def _compute_from_dependencies(self):
+        if self._dependencies:
+            for deps in six.itervalues(self._dependencies):
+                # recompute args
+                for arg in deps[0]:
+                    arg._recompute()
+
+                # recompute kwargs
+                for kwarg in six.itervalues(deps[1]):
+                    kwarg._recompute()
+
+            k = list(self._dependencies.keys())[0]
+            self._value = k(*self._dependencies[k][0], **self._dependencies[k][1])
+        return self._value
+
+    def _subtree_dirty(self):
+        for deps in six.itervalues(self._dependencies):
+            # check args
+            for arg in deps[0]:
+                if arg._dirty or arg._subtree_dirty():
+                    return True
+
+            # check kwargs
+            for kwarg in six.itervalues(deps[1]):
+                if kwarg._dirty or kwarg._subtree_dirty():
+                    return True
+        return False
+
+    def _recompute(self):
+        self._dirty = self._dirty or self._subtree_dirty()
+        if self._dirty:
+            if self._trace:
+                print('recomputing: %s' % (self._name))
+            self._value = self._compute_from_dependencies()
+        self._dirty = False
+
+    def _gennode(self, other, name, foo, foo_args):
+        return Node(name='{name}_{lhs}_{rhs}'.format(name=name, lhs=self._name, rhs=other._name),
+                    derived=True,
+                    callable=foo,
+                    callable_args=foo_args,
+                    trace=self._trace or other._trace)
+
+    def _tonode(self, other):
+        if isinstance(other, Node):
+            return other
+        return Node(name='gen_' + str(other)[:5],
+                    derived=True,
+                    trace=self._trace)
 
     def value(self):
         self._recompute()
@@ -33,8 +100,14 @@ class Node(object):
         counter += 1
         if self._dependencies:
             for deps in six.itervalues(self._dependencies):
-                for dep in deps:
-                    ret[key].append(dep.print(counter))
+                # args
+                for arg in deps[0]:
+                    ret[key].append(arg.print(counter))
+                    counter += 1
+
+                # kwargs
+                for kwarg in six.itervalues(deps[1]):
+                    ret[key].append(kwarg.print(counter))
                     counter += 1
         return ret
 
@@ -64,51 +137,17 @@ class Node(object):
             rec(d[k], k)
         return dot
 
-    def _compute_from_dependencies(self):
-        if self._dependencies:
-            for deps in six.itervalues(self._dependencies):
-                for dep in deps:
-                    dep._recompute()
-            k = list(self._dependencies.keys())[0]
-            self._value = k(self._dependencies[k])
+    def __call__(self):
+        self._recompute()
         return self._value
-
-    def _subtree_dirty(self):
-        for deps in six.itervalues(self._dependencies):
-            for dep in deps:
-                if dep._dirty or dep._subtree_dirty():
-                    return True
-        return False
-
-    def _recompute(self):
-        self._dirty = self._dirty or self._subtree_dirty()
-        if self._dirty:
-            if self._trace:
-                print('recomputing: %s' % (self._name))
-            self._value = self._compute_from_dependencies()
-        self._dirty = False
-
-    def _gennode(self, other, name, foo, foo_args):
-        return Node(name='{name}_{lhs}_{rhs}'.format(name=name, lhs=self._name, rhs=other._name),
-                    derived=True,
-                    dependencies={foo: foo_args},
-                    trace=self._trace or other._trace)
-
-    def _tonode(self, other):
-        if isinstance(other, Node):
-            return other
-        return Node(name='gen_' + str(other)[:5],
-                    derived=True,
-                    dependencies={},
-                    trace=self._trace)
 
     def __add__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'add', (lambda x: x[0]._value + x[1]._value), [self, other])
+        return self._gennode(other, 'add', (lambda x, y: x._value + y._value), [self, other])
 
     def __sub__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'sub', (lambda x: x[0]._value - x[1]._value), [self, other])
+        return self._gennode(other, 'sub', (lambda x, y: x._value - y._value), [self, other])
 
     def __bool__(self):
         self._recompute()
@@ -121,27 +160,27 @@ class Node(object):
             return True
 
         other = self._tonode(other)
-        return self._gennode(other, 'eq', (lambda x: x[0]._value == x[1]._value), [self, other])
+        return self._gennode(other, 'eq', (lambda x, y: x._value == y._value), [self, other])
 
     def __ne__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'ne', (lambda x: x[0]._value != x[1]._value), [self, other])
+        return self._gennode(other, 'ne', (lambda x, y: x._value != y._value), [self, other])
 
     def __ge__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'ge', (lambda x: x[0]._value >= x[1]._value), [self, other])
+        return self._gennode(other, 'ge', (lambda x, y: x._value >= y._value), [self, other])
 
     def __gt__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'gt', (lambda x: x[0]._value > x[1]._value), [self, other])
+        return self._gennode(other, 'gt', (lambda x, y: x._value > y._value), [self, other])
 
     def __le__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'le', (lambda x: x[0]._value <= x[1]._value), [self, other])
+        return self._gennode(other, 'le', (lambda x, y: x._value <= y._value), [self, other])
 
     def __lt__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'lt', (lambda x: x[0]._value < x[1]._value), [self, other])
+        return self._gennode(other, 'lt', (lambda x, y: x._value < y._value), [self, other])
 
     def __repr__(self):
         return '%s' % (self._name)
@@ -182,8 +221,9 @@ class BaseClass(object):
             elif isinstance(value, Node):
                 raise Exception('Cannot set to node')
             else:
+                if node._value != value:
+                    node._dirty = True
                 node._value = value
-                node._dirty = True
         else:
             super(BaseClass, self).__setattr__(name, value)
 
