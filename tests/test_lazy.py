@@ -1,5 +1,6 @@
 import tributary.lazy as t
 import sys
+import random
 
 if sys.version_info[0] > 2:
     class Foo1(t.BaseClass):
@@ -9,6 +10,15 @@ if sys.version_info[0] > 2:
     class Foo2(t.BaseClass):
         def __init__(self, *args, **kwargs):
             self.y = self.node('y', readonly=False, default_or_starting_value=2, trace=True)
+
+    class Foo3(t.BaseClass):
+        @t.node(trace=True)
+        def foo1(self):
+            return random.random()
+
+        @t.node(trace=True)
+        def foo3(self, x=4):
+            return 3 + x
 
     class TestConfig:
         def setup(self):
@@ -36,3 +46,33 @@ if sys.version_info[0] > 2:
             f2.x = 4
             f3.x = 4
             assert z.value() == 2
+
+        def test_3(self):
+            f1 = Foo1()
+            f3 = Foo3()
+            z = f1.x + f3.foo1()
+            print(z())  # should call foo1 and recompute
+            print(z())  # should call foo1 and recompute again
+            f1.x = 10
+            print(z())  # should call foo1 and recompute again
+            print(z())  # should call foo1 and recompute again
+
+        def test_4(self):
+            f1 = Foo1()
+            f3 = Foo3()
+            z = f1.x + f3.foo3()
+            print(z())  # should call foo3 and recompute (first time)
+            print(z())  # should not recompute (foo3 unchanged)
+            f1.x = 10
+            print(z())  # should call foo3 and recompute
+            print(z())  # should not recompute (x unchanged)
+
+        def test_5(self):
+            f1 = Foo1()
+            f3 = Foo3().foo3()
+            z = f1.x + f3
+            print(z())  # should call foo3 and recompute (first time)
+            print(z())  # should not recompute (foo3 unchanged)
+            f3.set(x=0)
+            print(z())  # should call foo3 and recompute (value changed)
+            print(z())  # should not recompute (value unchanged)

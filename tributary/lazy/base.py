@@ -1,5 +1,6 @@
 import six
 import functools
+import inspect
 
 
 class Node(object):
@@ -12,6 +13,8 @@ class Node(object):
                  callable=None,
                  callable_args=None,
                  callable_kwargs=None,
+                 callable_is_method=False,
+                 always_dirty=False,
                  trace=False,
                  ):
         self._callable = callable
@@ -19,13 +22,14 @@ class Node(object):
         self._value = default_or_starting_value
         self._readonly = readonly
         self._trace = trace
-
         self._callable = callable
         self._callable_args = self._transform_args(callable_args or [])
-        self._calable_kwargs = self._transform_kwargs(callable_kwargs or {})
+        self._callable_kwargs = self._transform_kwargs(callable_kwargs or {})
+        self._callable_is_method = callable_is_method
+        self._always_dirty = always_dirty
 
         if callable:
-            self._dependencies = {self._callable: (self._callable_args, self._calable_kwargs)}
+            self._dependencies = {self._callable: (self._callable_args, self._callable_kwargs)}
         else:
             self._dependencies = {}
 
@@ -52,27 +56,35 @@ class Node(object):
                     kwarg._recompute()
 
             k = list(self._dependencies.keys())[0]
-            self._value = k(*self._dependencies[k][0], **self._dependencies[k][1])
+
+            if self._callable_is_method:
+                new_value = k(self, *self._dependencies[k][0], **self._dependencies[k][1])
+            else:
+                new_value = k(*self._dependencies[k][0], **self._dependencies[k][1])
+
+            if self._trace:
+                if new_value != self._value:
+                    print('recomputing: %s-%d' % (self._name, id(self)))
+
+            self._value = new_value
         return self._value
 
     def _subtree_dirty(self):
         for deps in six.itervalues(self._dependencies):
             # check args
             for arg in deps[0]:
-                if arg._dirty or arg._subtree_dirty():
+                if arg._dirty or arg._subtree_dirty() or arg._always_dirty:
                     return True
 
             # check kwargs
             for kwarg in six.itervalues(deps[1]):
-                if kwarg._dirty or kwarg._subtree_dirty():
+                if kwarg._dirty or kwarg._subtree_dirty() or kwarg._always_dirty:
                     return True
         return False
 
     def _recompute(self):
-        self._dirty = self._dirty or self._subtree_dirty()
+        self._dirty = self._dirty or self._subtree_dirty() or self._always_dirty
         if self._dirty:
-            if self._trace:
-                print('recomputing: %s' % (self._name))
             self._value = self._compute_from_dependencies()
         self._dirty = False
 
@@ -88,7 +100,31 @@ class Node(object):
             return other
         return Node(name='gen_' + str(other)[:5],
                     derived=True,
+                    default_or_starting_value=other,
                     trace=self._trace)
+
+    def set(self, **kwargs):
+        for k, v in six.iteritems(kwargs):
+            _set = False
+            for deps in six.itervalues(self._dependencies):
+                # try to set args
+                for arg in deps[0]:
+                    if arg._name == k:
+                        arg._dirty = arg._value != v
+                        arg._value = v
+                        _set = True
+                        break
+
+                if _set:
+                    continue
+
+                # try to set kwargs
+                for kwarg in six.itervalues(deps[1]):
+                    if kwarg._name == k:
+                        kwarg._dirty = kwarg._value != v
+                        kwarg._value = v
+                        _set = True
+                        break
 
     def value(self):
         self._recompute()
@@ -109,6 +145,7 @@ class Node(object):
                 for kwarg in six.itervalues(deps[1]):
                     ret[key].append(kwarg.print(counter))
                     counter += 1
+
         return ret
 
     def graph(self):
@@ -138,20 +175,18 @@ class Node(object):
         return dot
 
     def __call__(self):
-        self._recompute()
-        return self._value
+        return self.value()
 
     def __add__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'add', (lambda x, y: x._value + y._value), [self, other])
+        return self._gennode(other, 'add', (lambda x, y: x() + y()), [self, other])
 
     def __sub__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'sub', (lambda x, y: x._value - y._value), [self, other])
+        return self._gennode(other, 'sub', (lambda x, y: x() - y()), [self, other])
 
     def __bool__(self):
-        self._recompute()
-        return self._value
+        return self.value()
 
     __nonzero__ = __bool__  # Py2 compat
 
@@ -160,27 +195,27 @@ class Node(object):
             return True
 
         other = self._tonode(other)
-        return self._gennode(other, 'eq', (lambda x, y: x._value == y._value), [self, other])
+        return self._gennode(other, 'eq', (lambda x, y: x() == y()), [self, other])
 
     def __ne__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'ne', (lambda x, y: x._value != y._value), [self, other])
+        return self._gennode(other, 'ne', (lambda x, y: x() != y()), [self, other])
 
     def __ge__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'ge', (lambda x, y: x._value >= y._value), [self, other])
+        return self._gennode(other, 'ge', (lambda x, y: x() >= y()), [self, other])
 
     def __gt__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'gt', (lambda x, y: x._value > y._value), [self, other])
+        return self._gennode(other, 'gt', (lambda x, y: x() > y()), [self, other])
 
     def __le__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'le', (lambda x, y: x._value <= y._value), [self, other])
+        return self._gennode(other, 'le', (lambda x, y: x() <= y()), [self, other])
 
     def __lt__(self, other):
         other = self._tonode(other)
-        return self._gennode(other, 'lt', (lambda x, y: x._value < y._value), [self, other])
+        return self._gennode(other, 'lt', (lambda x, y: x() < y()), [self, other])
 
     def __repr__(self):
         return '%s' % (self._name)
@@ -221,8 +256,7 @@ class BaseClass(object):
             elif isinstance(value, Node):
                 raise Exception('Cannot set to node')
             else:
-                if node._value != value:
-                    node._dirty = True
+                node._dirty = node._value != value
                 node._value = value
         else:
             super(BaseClass, self).__setattr__(name, value)
@@ -241,7 +275,89 @@ def _either_type(f):
 
 
 @_either_type
-def node(meth, trace=False):
+def node(meth, memoize=False, trace=False):
+    argspec = inspect.getfullargspec(meth)
+    # args = argspec.args
+    # varargs = argspec.varargs
+    # varkw = argspec.varkw
+    # defaults = argspec.defaults
+    # kwonlyargs = argspec.kwonlyargs
+    # kwonlydefaults = args.kwonlydefaults
+
+    if argspec.varargs:
+        raise Exception('varargs not supported yet!')
+    if argspec.varkw:
+        raise Exception('varargs not supported yet!')
+
+    node_args = []
+    is_method = False
+    for i, arg in enumerate(argspec.args):
+        if arg == 'self':
+            # TODO
+            is_method = True
+            continue
+
+        if (is_method and len(argspec.defaults or []) >= i) or \
+           (not is_method and len(argspec.defaults or []) > i):
+            default_or_starting_value = argspec.defaults[0]
+            nullable = True
+        else:
+            default_or_starting_value = None
+            nullable = False
+
+        node_args.append(Node(name=arg,
+                              derived=True,
+                              readonly=False,
+                              nullable=nullable,
+                              default_or_starting_value=default_or_starting_value,
+                              trace=trace))
+
+    node_kwargs = {}
+    for k, v in six.iteritems(argspec.kwonlydefaults or {}):
+        node_kwargs[k] = Node(name=k,
+                              derived=True,
+                              readonly=False,
+                              nullable=True,
+                              default_or_starting_value=v,
+                              trace=trace)
+
     def meth_wrapper(self, *args, **kwargs):
-        return meth(self, *args, **kwargs)
-    return meth_wrapper
+        if len(args) > len(node_args):
+            raise Exception('Missing args (call or preprocessing error has occurred)')
+
+        if len(kwargs) > len(node_kwargs):
+            raise Exception('Missing kwargs (call or preprocessing error has occurred)')
+
+        # move to __call__
+        # # update args
+        # for i, value in args:
+        #     node = node_args[i]
+        #     if node._value != value:
+        #         node._dirty = True
+        #     node._value = value
+
+        # # update kwargs
+        # for k, value in six.iteritems(kwargs):
+        #     node = node_kwargs[k]
+        #     if node._value != value:
+        #         node._dirty = True
+        #     node._value = value
+
+        if is_method:
+            val = meth(self, *(arg.value() for arg in args), **kwargs)
+        else:
+            val = meth(*(arg.value() for arg in args), **kwargs)
+        return val
+
+    new_node = Node(name=meth.__name__,
+                    derived=True,
+                    callable=meth_wrapper,
+                    callable_args=node_args,
+                    callable_kwargs=node_kwargs,
+                    callable_is_method=is_method,
+                    always_dirty=not memoize,
+                    trace=trace)
+
+    if is_method:
+        return lambda self, *args, **kwargs: new_node
+    return lambda *args, **kwargs: new_node
