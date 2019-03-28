@@ -146,6 +146,9 @@ class Node(object):
 
     def print(self, counter=0):
         key = str(self) + ' (#' + str(counter) + ')'
+        if self._dirty or self._subtree_dirty() or self._always_dirty:
+            key += '(dirty)'
+
         ret = {key: []}
         counter += 1
         if self._dependencies:
@@ -180,14 +183,22 @@ class Node(object):
         def rec(nodes, parent):
             for d in nodes:
                 if not isinstance(d, dict):
-                    dot.node(d)
-                    dot.edge(d, parent)
-
+                    if '(dirty)' in d:
+                        dot.node(d, color='red')
+                        dot.edge(d, parent, color='red')
+                    else:
+                        dot.node(d)
+                        dot.edge(d, parent)
                 else:
                     for k in d:
-                        dot.node(k)
-                        rec(d[k], k)
-                        dot.edge(k, parent)
+                        if '(dirty)' in k:
+                            dot.node(k, color='red')
+                            rec(d[k], k)
+                            dot.edge(k, parent, color='red')
+                        else:
+                            dot.node(k)
+                            rec(d[k], k)
+                            dot.edge(k, parent)
 
         for k in d:
             dot.node(k)
@@ -291,7 +302,6 @@ class Node(object):
         elif ufunc == np.multiply:
             if isinstance(inputs[0], Node): return inputs[0].__mul__(inputs[1])
             else: return inputs[1].__mul__(inputs[0])
-
         elif ufunc == np.exp:
             return inputs[0].exp()
         elif ufunc == sp.special.erf:
