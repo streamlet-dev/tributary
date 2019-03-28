@@ -2,6 +2,8 @@ import six
 import math
 import inspect
 import functools
+import numpy as np
+import scipy as sp
 
 
 class Node(object):
@@ -220,6 +222,22 @@ class Node(object):
 
     __rmul__ = __mul__
 
+    def __div__(self, other):
+        other = Node._tonode(other)
+        if isinstance(self._self_reference, Node):
+            return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self._self_reference, other], self._trace or other._trace)
+        return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self, other], self._trace or other._trace)
+
+    __rdiv__ = __div__
+
+    def __truediv__(self, other):
+        other = Node._tonode(other)
+        if isinstance(self._self_reference, Node):
+            return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self._self_reference, other], self._trace or other._trace)
+        return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self, other], self._trace or other._trace)
+
+    __rtruediv__ = __truediv__
+
     def __pow__(self, other):
         other = Node._tonode(other)
         if isinstance(self._self_reference, Node):
@@ -227,16 +245,66 @@ class Node(object):
         return Node._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
 
     def sin(self):
-        # other = Node._tonode(other)
-        # import ipdb; ipdb.set_trace()
         return Node._gennode('sin(' + self._name + ')', (lambda x: math.sin(self.value())), [self], self._trace)
 
     def tan(self):
-        # other = Node._tonode(other)
-        # import ipdb; ipdb.set_trace()
         return Node._gennode('tan(' + self._name + ')', (lambda x: math.tan(self.value())), [self], self._trace)
 
+    def sqrt(self):
+        return Node._gennode('sqrt(' + self._name + ')', (lambda x: math.sqrt(self.value())), [self], self._trace)
+
+    def log(self):
+        return Node._gennode('log(' + self._name + ')', (lambda x: math.log(self.value())), [self], self._trace)
+
+    def exp(self):
+        return Node._gennode('exp(' + self._name + ')', (lambda x: math.exp(self.value())), [self], self._trace)
+
+    def erf(self):
+        return Node._gennode('erf(' + self._name + ')', (lambda x: math.erf(self.value())), [self], self._trace)
+
+    def __float__(self):
+        return Node._gennode('float(' + self._name + ')', (lambda x: float(self.value())), [self], self._trace)
+
+    def __int__(self):
+        return Node._gennode('int(' + self._name + ')', (lambda x: int(self.value())), [self], self._trace)
+
+    def __len__(self):
+        return Node._gennode('len(' + self._name + ')', (lambda x: len(self.value())), [self], self._trace)
+
+    def __getitem__(self):
+        import ipdb; ipdb.set_trace()
+
+    # def __array__(self, *args):
+    #     import ipdb; ipdb.set_trace()
+    #     return self.value()
+
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        if ufunc == np.add:
+            if isinstance(inputs[0], Node): return inputs[0].__add__(inputs[1])
+            else: return inputs[1].__add__(inputs[0])
+        elif ufunc == np.subtract:
+            if isinstance(inputs[0], Node): return inputs[0].__sub__(inputs[1])
+            else: return inputs[1].__sub__(inputs[0])
+        elif ufunc == np.divide:
+            if isinstance(inputs[0], Node): return inputs[0].__truedivide__(inputs[1])
+            else: return inputs[1].__truedivide__(inputs[0])
+        elif ufunc == np.multiply:
+            if isinstance(inputs[0], Node): return inputs[0].__mul__(inputs[1])
+            else: return inputs[1].__mul__(inputs[0])
+
+        elif ufunc == np.exp:
+            return inputs[0].exp()
+        elif ufunc == sp.special.erf:
+            return inputs[0].erf()
+        else:
+            import ipdb; ipdb.set_trace()
+
+    def __neg__(self):
+        return Node._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
+
     def __bool__(self):
+        if self.value() is None:
+            return False
         return self.value()
 
     __nonzero__ = __bool__  # Py2 compat
