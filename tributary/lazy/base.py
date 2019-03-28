@@ -1,6 +1,7 @@
 import six
-import functools
+import math
 import inspect
+import functools
 
 
 class Node(object):
@@ -75,7 +76,7 @@ class Node(object):
 
             if self._trace:
                 if new_value != self._value:
-                    print('recomputing: %s-%d' % (self._name, id(self)))
+                    print('recomputing: %s#%d' % (self._name, id(self)))
             self._value = new_value
         return self._value
 
@@ -98,20 +99,22 @@ class Node(object):
             self._value = self._compute_from_dependencies()
         self._dirty = False
 
-    def _gennode(self, other, name, foo, foo_args):
-        return Node(name='{name}_{lhs}_{rhs}'.format(name=name, lhs=self._name, rhs=other._name),
+    @staticmethod
+    def _gennode(name, sub_name, foo, foo_args, trace=False):
+        return Node(name='{name}_{sub_name}'.format(name=name, sub_name=sub_name),
                     derived=True,
                     callable=foo,
                     callable_args=foo_args,
-                    trace=self._trace or other._trace)
+                    trace=trace)
 
-    def _tonode(self, other):
+    @staticmethod
+    def _tonode(other, trace=False):
         if isinstance(other, Node):
             return other
         return Node(name='gen_' + str(other)[:5],
                     derived=True,
                     default_or_starting_value=other,
-                    trace=self._trace)
+                    trace=trace)
 
     def set(self, **kwargs):
         for k, v in six.iteritems(kwargs):
@@ -194,16 +197,44 @@ class Node(object):
         return self.value()
 
     def __add__(self, other):
-        other = self._tonode(other)
+        other = Node._tonode(other)
         if isinstance(self._self_reference, Node):
-            return self._gennode(other, '+', (lambda x, y: x.value() + y.value()), [self._self_reference, other])
-        return self._gennode(other, '+', (lambda x, y: x.value() + y.value()), [self, other])
+            return Node._gennode('+', self._name + '_' + other._name, (lambda x, y: x.value() + y.value()), [self._self_reference, other], self._trace or other._trace)
+        return Node._gennode('+', self._name + '_' + other._name, (lambda x, y: x.value() + y.value()), [self, other], self._trace or other._trace)
+
+    __radd__ = __add__
 
     def __sub__(self, other):
-        other = self._tonode(other)
+        other = Node._tonode(other)
         if isinstance(self._self_reference, Node):
-            return self._gennode(other, '-', (lambda x, y: x.value() - y.value()), [self._self_reference, other])
-        return self._gennode(other, '-', (lambda x, y: x.value() - y.value()), [self, other])
+            return Node._gennode('-', self._name + '_' + other._name, (lambda x, y: x.value() - y.value()), [self._self_reference, other], self._trace or other._trace)
+        return Node._gennode('-', self._name + '_' + other._name, (lambda x, y: x.value() - y.value()), [self, other], self._trace or other._trace)
+
+    __rsub__ = __sub__
+
+    def __mul__(self, other):
+        other = Node._tonode(other)
+        if isinstance(self._self_reference, Node):
+            return Node._gennode('*', self._name + '_' + other._name, (lambda x, y: x.value() * y.value()), [self._self_reference, other], self._trace or other._trace)
+        return Node._gennode('*', self._name + '_' + other._name, (lambda x, y: x.value() * y.value()), [self, other], self._trace or other._trace)
+
+    __rmul__ = __mul__
+
+    def __pow__(self, other):
+        other = Node._tonode(other)
+        if isinstance(self._self_reference, Node):
+            return Node._gennode('**', self._name + '_' + other._name, (lambda x, y: x.value() ** y.value()), [self._self_reference, other], self._trace or other._trace)
+        return Node._gennode('**', self._name + '_' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
+
+    def sin(self):
+        # other = Node._tonode(other)
+        # import ipdb; ipdb.set_trace()
+        return Node._gennode('sin', self._name, (lambda x: math.sin(self.value())), [self], self._trace)
+
+    def tan(self):
+        # other = Node._tonode(other)
+        # import ipdb; ipdb.set_trace()
+        return Node._gennode('tan', self._name, (lambda x: math.tan(self.value())), [self], self._trace)
 
     def __bool__(self):
         return self.value()
@@ -214,42 +245,42 @@ class Node(object):
         if isinstance(other, Node) and super(Node, self).__eq__(other):
             return True
 
-        other = self._tonode(other)
-        return self._gennode(other, '==', (lambda x, y: x() == y()), [self._self_reference, other])
+        other = Node._tonode(other)
+        return Node._gennode('==', self._name + '_' + other._name, (lambda x, y: x() == y()), [self._self_reference, other], self._trace or other._trace)
 
     def __ne__(self, other):
         if isinstance(other, Node) and super(Node, self).__eq__(other):
             return False
 
-        other = self._tonode(other)
-        return self._gennode(other, '!=', (lambda x, y: x() != y()), [self, other])
+        other = Node._tonode(other)
+        return Node._gennode('!=', self._name + '_' + other._name, (lambda x, y: x() != y()), [self, other], self._trace or other._trace)
 
     def __ge__(self, other):
         if isinstance(other, Node) and super(Node, self).__eq__(other):
             return True
 
-        other = self._tonode(other)
-        return self._gennode(other, '>=', (lambda x, y: x() >= y()), [self, other])
+        other = Node._tonode(other)
+        return Node._gennode('>=', self._name + '_' + other._name, (lambda x, y: x() >= y()), [self, other], self._trace or other._trace)
 
     def __gt__(self, other):
         if isinstance(other, Node) and super(Node, self).__eq__(other):
             return False
 
-        other = self._tonode(other)
-        return self._gennode(other, '>', (lambda x, y: x() > y()), [self, other])
+        other = Node._tonode(other)
+        return Node._gennode('>', self._name + '_' + other._name, (lambda x, y: x() > y()), [self, other], self._trace or other._trace)
 
     def __le__(self, other):
         if isinstance(other, Node) and super(Node, self).__eq__(other):
             return True
 
-        other = self._tonode(other)
-        return self._gennode(other, '<=', (lambda x, y: x() <= y()), [self, other])
+        other = Node._tonode(other)
+        return Node._gennode('<=', self._name + '_' + other._name, (lambda x, y: x() <= y()), [self, other], self._trace or other._trace)
 
     def __lt__(self, other):
         if isinstance(other, Node) and super(Node, self).__eq__(other):
             return False
-        other = self._tonode(other)
-        return self._gennode(other, '<', (lambda x, y: x() < y()), [self, other])
+        other = Node._tonode(other)
+        return Node._gennode('<', self._name + '_' + other._name, (lambda x, y: x() < y()), [self, other], self._trace or other._trace)
 
     def __repr__(self):
         return '%s' % (self._name)
