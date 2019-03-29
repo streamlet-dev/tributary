@@ -31,7 +31,6 @@ def construct_lazy(expr):
 
     class Lazy(tl.BaseClass):
         def __init__(self, **kwargs):
-            print(names)
             for n in names:
                 setattr(self, n, self.node(name=n, default_or_starting_value=kwargs.get(n, None)))
 
