@@ -1,4 +1,4 @@
-# <a href="https://tributary.readthedocs.io"><img src="docs/img/icon.png" width="200"></a>
+# <a href="https://tributary.readthedocs.io"><img src="docs/img/icon.png" width="300"></a>
 Python Data Streams
 
 [![Build Status](https://travis-ci.org/timkpaine/tributary.svg?branch=master)](https://travis-ci.org/timkpaine/tributary)
@@ -9,8 +9,6 @@ Python Data Streams
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
 
-
-## Python Data Streams
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/example.gif)
 
 
