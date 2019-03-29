@@ -1,5 +1,5 @@
-# tributary
-Python Streams
+# [![tributary](docs/img/icon.png)](https://tributary.readthedocs.io)
+Python Data Streams
 
 [![Build Status](https://travis-ci.org/timkpaine/tributary.svg?branch=master)](https://travis-ci.org/timkpaine/tributary)
 [![GitHub issues](https://img.shields.io/github/issues/timkpaine/tributary.svg)]()
