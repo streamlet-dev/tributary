@@ -1,4 +1,4 @@
-# [![tributary](docs/img/icon.png){:width="50%"}](https://tributary.readthedocs.io)
+# [![tributary](docs/img/icon.png?s=200)](https://tributary.readthedocs.io)
 Python Data Streams
 
 [![Build Status](https://travis-ci.org/timkpaine/tributary.svg?branch=master)](https://travis-ci.org/timkpaine/tributary)
