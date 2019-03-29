@@ -282,32 +282,26 @@ class Node(object):
     def __len__(self):
         return Node._gennode('len(' + self._name + ')', (lambda x: len(self.value())), [self], self._trace)
 
-    def __getitem__(self):
-        import ipdb; ipdb.set_trace()
-
-    # def __array__(self, *args):
-    #     import ipdb; ipdb.set_trace()
-    #     return self.value()
-
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         if ufunc == np.add:
-            if isinstance(inputs[0], Node): return inputs[0].__add__(inputs[1])
-            else: return inputs[1].__add__(inputs[0])
+            if isinstance(inputs[0], Node): return inputs[0].__add__(inputs[1])  # noqa: E701
+            else: return inputs[1].__add__(inputs[0])  # noqa: E701
         elif ufunc == np.subtract:
-            if isinstance(inputs[0], Node): return inputs[0].__sub__(inputs[1])
-            else: return inputs[1].__sub__(inputs[0])
+            if isinstance(inputs[0], Node): return inputs[0].__sub__(inputs[1])  # noqa: E701
+            else: return inputs[1].__sub__(inputs[0])  # noqa: E701
         elif ufunc == np.divide:
-            if isinstance(inputs[0], Node): return inputs[0].__truedivide__(inputs[1])
-            else: return inputs[1].__truedivide__(inputs[0])
+            if isinstance(inputs[0], Node): return inputs[0].__truedivide__(inputs[1])  # noqa: E701
+            else: return inputs[1].__truedivide__(inputs[0])  # noqa: E701
         elif ufunc == np.multiply:
-            if isinstance(inputs[0], Node): return inputs[0].__mul__(inputs[1])
-            else: return inputs[1].__mul__(inputs[0])
+            if isinstance(inputs[0], Node): return inputs[0].__mul__(inputs[1])  # noqa: E701
+            else: return inputs[1].__mul__(inputs[0])  # noqa: E701
         elif ufunc == np.exp:
             return inputs[0].exp()
         elif ufunc == sp.special.erf:
             return inputs[0].erf()
         else:
-            import ipdb; ipdb.set_trace()
+            raise NotImplementedError('Not Implemented!')
+            # import ipdb; ipdb.set_trace()
 
     def __neg__(self):
         return Node._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
