@@ -1,4 +1,4 @@
-# [![tributary](docs/img/icon.png?s=200)](https://tributary.readthedocs.io)
+# <a href="https://tributary.readthedocs.io"><img src="docs/img/icon.png" width="200"></a>
 Python Data Streams
 
 [![Build Status](https://travis-ci.org/timkpaine/tributary.svg?branch=master)](https://travis-ci.org/timkpaine/tributary)
