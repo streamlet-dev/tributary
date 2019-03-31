@@ -332,7 +332,6 @@ class Node(object):
         elif ufunc == sp.special.erf:
             return inputs[0].erf()
         else:
-            import ipdb; ipdb.set_trace()
             raise NotImplementedError('Not Implemented!')
 
     def __neg__(self):
