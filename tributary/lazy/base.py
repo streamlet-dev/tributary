@@ -258,8 +258,20 @@ class Node(object):
     def sin(self):
         return Node._gennode('sin(' + self._name + ')', (lambda x: math.sin(self.value())), [self], self._trace)
 
+    def cos(self):
+        return Node._gennode('cos(' + self._name + ')', (lambda x: math.cos(self.value())), [self], self._trace)
+
     def tan(self):
         return Node._gennode('tan(' + self._name + ')', (lambda x: math.tan(self.value())), [self], self._trace)
+
+    def arcsin(self):
+        return Node._gennode('sin(' + self._name + ')', (lambda x: math.arcsin(self.value())), [self], self._trace)
+
+    def arccos(self):
+        return Node._gennode('arccos(' + self._name + ')', (lambda x: math.arccos(self.value())), [self], self._trace)
+
+    def arctan(self):
+        return Node._gennode('arctan(' + self._name + ')', (lambda x: math.arctan(self.value())), [self], self._trace)
 
     def sqrt(self):
         return Node._gennode('sqrt(' + self._name + ')', (lambda x: math.sqrt(self.value())), [self], self._trace)
@@ -284,24 +296,44 @@ class Node(object):
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         if ufunc == np.add:
-            if isinstance(inputs[0], Node): return inputs[0].__add__(inputs[1])  # noqa: E701
-            else: return inputs[1].__add__(inputs[0])  # noqa: E701
+            if isinstance(inputs[0], Node):
+                return inputs[0].__add__(inputs[1])
+            else:
+                return inputs[1].__add__(inputs[0])
         elif ufunc == np.subtract:
-            if isinstance(inputs[0], Node): return inputs[0].__sub__(inputs[1])  # noqa: E701
-            else: return inputs[1].__sub__(inputs[0])  # noqa: E701
-        elif ufunc == np.divide:
-            if isinstance(inputs[0], Node): return inputs[0].__truedivide__(inputs[1])  # noqa: E701
-            else: return inputs[1].__truedivide__(inputs[0])  # noqa: E701
+            if isinstance(inputs[0], Node):
+                return inputs[0].__sub__(inputs[1])
+            else:
+                return inputs[1].__sub__(inputs[0])
         elif ufunc == np.multiply:
-            if isinstance(inputs[0], Node): return inputs[0].__mul__(inputs[1])  # noqa: E701
-            else: return inputs[1].__mul__(inputs[0])  # noqa: E701
+            if isinstance(inputs[0], Node):
+                return inputs[0].__mul__(inputs[1])
+            else:
+                return inputs[1].__mul__(inputs[0])
+        elif ufunc == np.divide:
+            if isinstance(inputs[0], Node):
+                return inputs[0].__truedivide__(inputs[1])
+            else:
+                return inputs[1].__truedivide__(inputs[0])
+        elif ufunc == np.sin:
+            return inputs[0].sin()
+        elif ufunc == np.cos:
+            return inputs[0].cos()
+        elif ufunc == np.tan:
+            return inputs[0].tan()
+        elif ufunc == np.arcsin:
+            return inputs[0].arcsin()
+        elif ufunc == np.arccos:
+            return inputs[0].arccos()
+        elif ufunc == np.arctan:
+            return inputs[0].arctan()
         elif ufunc == np.exp:
             return inputs[0].exp()
         elif ufunc == sp.special.erf:
             return inputs[0].erf()
         else:
+            import ipdb; ipdb.set_trace()
             raise NotImplementedError('Not Implemented!')
-            # import ipdb; ipdb.set_trace()
 
     def __neg__(self):
         return Node._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
