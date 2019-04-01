@@ -22,10 +22,10 @@ def submit(fn, *args, **kwargs):
         raise RuntimeError('Already stopped!')
     self = _EXECUTOR
     with self._shutdown_lock:
-        if self._broken:
+        if hasattr(self, '_broken') and self._broken:
             raise BrokenThreadPool(self._broken)
 
-        if self._shutdown:
+        if hasattr(self, '_shutdown') and self._shutdown:
             raise RuntimeError('cannot schedule new futures after shutdown')
         if cft._shutdown:
             raise RuntimeError('cannot schedule new futures after'
