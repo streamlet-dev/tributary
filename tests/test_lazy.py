@@ -103,3 +103,10 @@ class TestConfig:
         print(z())
         print('recompute?')
         print(z())
+
+    def test_misc(self):
+        f4 = Foo4()
+        z = f4.foo1()
+        assert z.print()
+        assert z.graph()
+        assert z.graphviz()
