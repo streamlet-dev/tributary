@@ -1,6 +1,4 @@
-import numpy as np
 import sympy as sy
-from IPython.display import display, HTML
 from sympy.stats import Normal as syNormal, cdf
 
 
