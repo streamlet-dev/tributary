@@ -83,7 +83,13 @@ class Node(object):
         return self._value
 
     def _subtree_dirty(self):
-        for deps in six.itervalues(self._dependencies):
+        for call, deps in six.iteritems(self._dependencies):
+            # callable node
+            if hasattr(call, '_node_wrapper') and \
+               call._node_wrapper is not None:
+                if call._node_wrapper._dirty or call._node_wrapper._subtree_dirty() or call._node_wrapper._always_dirty:
+                    return True
+
             # check args
             for arg in deps[0]:
                 if arg._dirty or arg._subtree_dirty() or arg._always_dirty:
@@ -176,6 +182,7 @@ class Node(object):
 
     def graphviz(self):
         d = self.graph()
+
         from graphviz import Digraph
         dot = Digraph(self._name, strict=True)
         dot.format = 'png'
@@ -184,26 +191,63 @@ class Node(object):
             for d in nodes:
                 if not isinstance(d, dict):
                     if '(dirty)' in d:
-                        dot.node(d, color='red')
-                        dot.edge(d, parent, color='red')
+                        dot.node(d.replace('(dirty)', ''), color='red')
+                        dot.edge(d.replace('(dirty)', ''), parent.replace('(dirty)', ''), color='red')
                     else:
                         dot.node(d)
-                        dot.edge(d, parent)
+                        dot.edge(d, parent.replace('(dirty)', ''))
                 else:
                     for k in d:
                         if '(dirty)' in k:
-                            dot.node(k, color='red')
+                            dot.node(k.replace('(dirty)', ''), color='red')
                             rec(d[k], k)
-                            dot.edge(k, parent, color='red')
+                            dot.edge(k.replace('(dirty)', ''), parent.replace('(dirty)', ''), color='red')
                         else:
                             dot.node(k)
                             rec(d[k], k)
-                            dot.edge(k, parent)
+                            dot.edge(k, parent.replace('(dirty)', ''))
 
         for k in d:
-            dot.node(k)
+            if '(dirty)' in k:
+                dot.node(k.replace('(dirty)', ''), color='red')
+            else:
+                dot.node(k)
             rec(d[k], k)
         return dot
+
+    def networkx(self):
+        d = self.graph()
+        # FIXME deduplicate
+        from pygraphviz import AGraph
+        import networkx as nx
+        dot = AGraph(strict=True, directed=True)
+
+        def rec(nodes, parent):
+            for d in nodes:
+                if not isinstance(d, dict):
+                    if '(dirty)' in d:
+                        d = d.replace('(dirty)', '')
+                        dot.add_node(d, label=d, color='red')
+                        dot.add_edge(d, parent, color='red')
+                    else:
+                        dot.add_node(d, label=d)
+                        dot.add_edge(d, parent)
+                else:
+                    for k in d:
+                        if '(dirty)' in k:
+                            k = k.replace('(dirty)', '')
+                            dot.add_node(k, label=k, color='red')
+                            rec(d[k], k)
+                            dot.add_edge(k, parent, color='red')
+                        else:
+                            dot.add_node(k, label=k)
+                            rec(d[k], k)
+                            dot.add_edge(k, parent)
+
+        for k in d:
+            dot.add_node(k, label=k)
+            rec(d[k], k)
+        return nx.nx_agraph.from_agraph(dot)
 
     def __call__(self):
         self._recompute()
@@ -424,7 +468,7 @@ class BaseClass(object):
             elif isinstance(value, Node):
                 raise Exception('Cannot set to node')
             else:
-                node._dirty = node._value != value
+                node._dirty = (node._value != value) or abs(node._value - value) > 10**-5
                 node._value = value
         else:
             super(BaseClass, self).__setattr__(name, value)
@@ -443,7 +487,7 @@ def _either_type(f):
 
 
 @_either_type
-def node(meth, memoize=False, trace=False):
+def node(meth, memoize=True, trace=False):
     argspec = inspect.getfullargspec(meth)
     # args = argspec.args
     # varargs = argspec.varargs
