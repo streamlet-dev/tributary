@@ -6,7 +6,7 @@ import numpy as np
 import scipy as sp
 
 
-class Node(object):
+class _Node(object):
     def __init__(self,
                  name,
                  derived=False,
@@ -32,6 +32,9 @@ class Node(object):
         self._always_dirty = always_dirty
 
         self._self_reference = self
+
+        # cache node operations that have already been done
+        self._node_op_cache = {}
 
         if callable:
             self._callable._node_wrapper = None  # not known until program start
@@ -72,7 +75,7 @@ class Node(object):
             else:
                 new_value = k(*self._dependencies[k][0], **self._dependencies[k][1])
 
-            if isinstance(new_value, Node):
+            if isinstance(new_value, _Node):
                 k._node_wrapper = new_value
                 new_value = new_value()  # get value
 
@@ -107,22 +110,26 @@ class Node(object):
             self._value = self._compute_from_dependencies()
         self._dirty = False
 
-    @staticmethod
-    def _gennode(name, foo, foo_args, trace=False):
-        return Node(name=name,
-                    derived=True,
-                    callable=foo,
-                    callable_args=foo_args,
-                    trace=trace)
+    def _gennode(self, name, foo, foo_args, trace=False):
+        if name not in self._node_op_cache:
+            self._node_op_cache[name] = \
+                    _Node(name=name,
+                          derived=True,
+                          callable=foo,
+                          callable_args=foo_args,
+                          trace=trace)
+        return self._node_op_cache[name]
 
-    @staticmethod
-    def _tonode(other, trace=False):
-        if isinstance(other, Node):
+    def _tonode(self, other, trace=False):
+        if isinstance(other, _Node):
             return other
-        return Node(name='var(' + str(other)[:5] + ')',
-                    derived=True,
-                    default_or_starting_value=other,
-                    trace=trace)
+        if str(other) not in self._node_op_cache:
+            self._node_op_cache[str(other)] = \
+               _Node(name='var(' + str(other)[:5] + ')',
+                     derived=True,
+                     default_or_starting_value=other,
+                     trace=trace)
+        return self._node_op_cache[str(other)]
 
     def set(self, **kwargs):
         for k, v in six.iteritems(kwargs):
@@ -150,32 +157,41 @@ class Node(object):
     def value(self):
         return self._value
 
-    def print(self, counter=0):
-        key = str(self) + ' (#' + str(counter) + ')'
+    def _print(self, counter=0, cache=None):
+        if cache is None:
+            cache = {}
+
+        key = cache.get(id(self), str(self) + ' (#' + str(counter) + ')')
+        cache[id(self)] = key
+
         if self._dirty or self._subtree_dirty() or self._always_dirty:
             key += '(dirty)'
 
         ret = {key: []}
         counter += 1
+
         if self._dependencies:
             for call, deps in six.iteritems(self._dependencies):
                 # callable node
                 if hasattr(call, '_node_wrapper') and \
                    call._node_wrapper is not None:
-                    ret[key].append(call._node_wrapper.print(counter))
-                    counter += 1
+                    val, counter = call._node_wrapper._print(counter, cache)
+                    ret[key].append(val)
 
                 # args
                 for arg in deps[0]:
-                    ret[key].append(arg.print(counter))
-                    counter += 1
+                    val, counter = arg._print(counter, cache)
+                    ret[key].append(val)
 
                 # kwargs
                 for kwarg in six.itervalues(deps[1]):
-                    ret[key].append(kwarg.print(counter))
-                    counter += 1
+                    val, counter = kwarg._print(counter, cache)
+                    ret[key].append(val)
 
-        return ret
+        return ret, counter
+
+    def print(self):
+        return self._print(0, {})[0]
 
     def graph(self):
         return self.print()
@@ -254,108 +270,108 @@ class Node(object):
         return self.value()
 
     def __add__(self, other):
-        other = Node._tonode(other)
-        if isinstance(self._self_reference, Node):
-            return Node._gennode(self._name + '+' + other._name, (lambda x, y: x.value() + y.value()), [self._self_reference, other], self._trace or other._trace)
-        return Node._gennode(self._name + '+' + other._name, (lambda x, y: x.value() + y.value()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '+' + other._name, (lambda x, y: x.value() + y.value()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '+' + other._name, (lambda x, y: x.value() + y.value()), [self, other], self._trace or other._trace)
 
     __radd__ = __add__
 
     def __sub__(self, other):
-        other = Node._tonode(other)
-        if isinstance(self._self_reference, Node):
-            return Node._gennode(self._name + '-' + other._name, (lambda x, y: x.value() - y.value()), [self._self_reference, other], self._trace or other._trace)
-        return Node._gennode(self._name + '-' + other._name, (lambda x, y: x.value() - y.value()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '-' + other._name, (lambda x, y: x.value() - y.value()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '-' + other._name, (lambda x, y: x.value() - y.value()), [self, other], self._trace or other._trace)
 
     __rsub__ = __sub__
 
     def __mul__(self, other):
-        other = Node._tonode(other)
-        if isinstance(self._self_reference, Node):
-            return Node._gennode(self._name + '*' + other._name, (lambda x, y: x.value() * y.value()), [self._self_reference, other], self._trace or other._trace)
-        return Node._gennode(self._name + '*' + other._name, (lambda x, y: x.value() * y.value()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '*' + other._name, (lambda x, y: x.value() * y.value()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '*' + other._name, (lambda x, y: x.value() * y.value()), [self, other], self._trace or other._trace)
 
     __rmul__ = __mul__
 
     def __div__(self, other):
-        other = Node._tonode(other)
-        if isinstance(self._self_reference, Node):
-            return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self._self_reference, other], self._trace or other._trace)
-        return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self, other], self._trace or other._trace)
 
     __rdiv__ = __div__
 
     def __truediv__(self, other):
-        other = Node._tonode(other)
-        if isinstance(self._self_reference, Node):
-            return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self._self_reference, other], self._trace or other._trace)
-        return Node._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self, other], self._trace or other._trace)
 
     __rtruediv__ = __truediv__
 
     def __pow__(self, other):
-        other = Node._tonode(other)
-        if isinstance(self._self_reference, Node):
-            return Node._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self._self_reference, other], self._trace or other._trace)
-        return Node._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
 
     def sin(self):
-        return Node._gennode('sin(' + self._name + ')', (lambda x: math.sin(self.value())), [self], self._trace)
+        return self._gennode('sin(' + self._name + ')', (lambda x: math.sin(self.value())), [self], self._trace)
 
     def cos(self):
-        return Node._gennode('cos(' + self._name + ')', (lambda x: math.cos(self.value())), [self], self._trace)
+        return self._gennode('cos(' + self._name + ')', (lambda x: math.cos(self.value())), [self], self._trace)
 
     def tan(self):
-        return Node._gennode('tan(' + self._name + ')', (lambda x: math.tan(self.value())), [self], self._trace)
+        return self._gennode('tan(' + self._name + ')', (lambda x: math.tan(self.value())), [self], self._trace)
 
     def arcsin(self):
-        return Node._gennode('sin(' + self._name + ')', (lambda x: math.arcsin(self.value())), [self], self._trace)
+        return self._gennode('sin(' + self._name + ')', (lambda x: math.arcsin(self.value())), [self], self._trace)
 
     def arccos(self):
-        return Node._gennode('arccos(' + self._name + ')', (lambda x: math.arccos(self.value())), [self], self._trace)
+        return self._gennode('arccos(' + self._name + ')', (lambda x: math.arccos(self.value())), [self], self._trace)
 
     def arctan(self):
-        return Node._gennode('arctan(' + self._name + ')', (lambda x: math.arctan(self.value())), [self], self._trace)
+        return self._gennode('arctan(' + self._name + ')', (lambda x: math.arctan(self.value())), [self], self._trace)
 
     def sqrt(self):
-        return Node._gennode('sqrt(' + self._name + ')', (lambda x: math.sqrt(self.value())), [self], self._trace)
+        return self._gennode('sqrt(' + self._name + ')', (lambda x: math.sqrt(self.value())), [self], self._trace)
 
     def log(self):
-        return Node._gennode('log(' + self._name + ')', (lambda x: math.log(self.value())), [self], self._trace)
+        return self._gennode('log(' + self._name + ')', (lambda x: math.log(self.value())), [self], self._trace)
 
     def exp(self):
-        return Node._gennode('exp(' + self._name + ')', (lambda x: math.exp(self.value())), [self], self._trace)
+        return self._gennode('exp(' + self._name + ')', (lambda x: math.exp(self.value())), [self], self._trace)
 
     def erf(self):
-        return Node._gennode('erf(' + self._name + ')', (lambda x: math.erf(self.value())), [self], self._trace)
+        return self._gennode('erf(' + self._name + ')', (lambda x: math.erf(self.value())), [self], self._trace)
 
     def __float__(self):
-        return Node._gennode('float(' + self._name + ')', (lambda x: float(self.value())), [self], self._trace)
+        return self._gennode('float(' + self._name + ')', (lambda x: float(self.value())), [self], self._trace)
 
     def __int__(self):
-        return Node._gennode('int(' + self._name + ')', (lambda x: int(self.value())), [self], self._trace)
+        return self._gennode('int(' + self._name + ')', (lambda x: int(self.value())), [self], self._trace)
 
     def __len__(self):
-        return Node._gennode('len(' + self._name + ')', (lambda x: len(self.value())), [self], self._trace)
+        return self._gennode('len(' + self._name + ')', (lambda x: len(self.value())), [self], self._trace)
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         if ufunc == np.add:
-            if isinstance(inputs[0], Node):
+            if isinstance(inputs[0], _Node):
                 return inputs[0].__add__(inputs[1])
             else:
                 return inputs[1].__add__(inputs[0])
         elif ufunc == np.subtract:
-            if isinstance(inputs[0], Node):
+            if isinstance(inputs[0], _Node):
                 return inputs[0].__sub__(inputs[1])
             else:
                 return inputs[1].__sub__(inputs[0])
         elif ufunc == np.multiply:
-            if isinstance(inputs[0], Node):
+            if isinstance(inputs[0], _Node):
                 return inputs[0].__mul__(inputs[1])
             else:
                 return inputs[1].__mul__(inputs[0])
         elif ufunc == np.divide:
-            if isinstance(inputs[0], Node):
+            if isinstance(inputs[0], _Node):
                 return inputs[0].__truedivide__(inputs[1])
             else:
                 return inputs[1].__truedivide__(inputs[0])
@@ -379,7 +395,7 @@ class Node(object):
             raise NotImplementedError('Not Implemented!')
 
     def __neg__(self):
-        return Node._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
+        return self._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
 
     def __bool__(self):
         if self.value() is None:
@@ -389,45 +405,57 @@ class Node(object):
     __nonzero__ = __bool__  # Py2 compat
 
     def __eq__(self, other):
-        if isinstance(other, Node) and super(Node, self).__eq__(other):
+        if isinstance(other, _Node) and super(_Node, self).__eq__(other):
             return True
 
-        other = Node._tonode(other)
-        return Node._gennode(self._name + '==' + other._name, (lambda x, y: x() == y()), [self._self_reference, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '==' + other._name, (lambda x, y: x() == y()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '==' + other._name, (lambda x, y: x() == y()), [self, other], self._trace or other._trace)
 
     def __ne__(self, other):
-        if isinstance(other, Node) and super(Node, self).__eq__(other):
+        if isinstance(other, _Node) and super(_Node, self).__eq__(other):
             return False
 
-        other = Node._tonode(other)
-        return Node._gennode(self._name + '!=' + other._name, (lambda x, y: x() != y()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '!=' + other._name, (lambda x, y: x() != y()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '!=' + other._name, (lambda x, y: x() != y()), [self, other], self._trace or other._trace)
 
     def __ge__(self, other):
-        if isinstance(other, Node) and super(Node, self).__eq__(other):
+        if isinstance(other, _Node) and super(_Node, self).__eq__(other):
             return True
 
-        other = Node._tonode(other)
-        return Node._gennode(self._name + '>=' + other._name, (lambda x, y: x() >= y()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '>=' + other._name, (lambda x, y: x() >= y()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '>=' + other._name, (lambda x, y: x() >= y()), [self, other], self._trace or other._trace)
 
     def __gt__(self, other):
-        if isinstance(other, Node) and super(Node, self).__eq__(other):
+        if isinstance(other, _Node) and super(_Node, self).__eq__(other):
             return False
 
-        other = Node._tonode(other)
-        return Node._gennode(self._name + '>' + other._name, (lambda x, y: x() > y()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '>' + other._name, (lambda x, y: x() > y()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '>' + other._name, (lambda x, y: x() > y()), [self, other], self._trace or other._trace)
 
     def __le__(self, other):
-        if isinstance(other, Node) and super(Node, self).__eq__(other):
+        if isinstance(other, _Node) and super(_Node, self).__eq__(other):
             return True
 
-        other = Node._tonode(other)
-        return Node._gennode(self._name + '<=' + other._name, (lambda x, y: x() <= y()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '<=' + other._name, (lambda x, y: x() <= y()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '<=' + other._name, (lambda x, y: x() <= y()), [self, other], self._trace or other._trace)
 
     def __lt__(self, other):
-        if isinstance(other, Node) and super(Node, self).__eq__(other):
+        if isinstance(other, _Node) and super(_Node, self).__eq__(other):
             return False
-        other = Node._tonode(other)
-        return Node._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self, other], self._trace or other._trace)
+        other = self._tonode(other)
+        if isinstance(self._self_reference, _Node):
+            return self._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self._self_reference, other], self._trace or other._trace)
+        return self._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self, other], self._trace or other._trace)
 
     def __repr__(self):
         return self._name
@@ -441,14 +469,14 @@ class BaseClass(object):
         if not hasattr(self, '_BaseClass__nodes'):
             self.__nodes = {}
 
-        self.__nodes[name] = Node(name=name,
-                                  derived=False,
-                                  readonly=readonly,
-                                  nullable=nullable,
-                                  default_or_starting_value=default_or_starting_value,
-                                  trace=trace)
-        setattr(self, name, self.__nodes[name])
-
+        if name not in self.__nodes:
+            self.__nodes[name] = _Node(name=name,
+                                       derived=False,
+                                       readonly=readonly,
+                                       nullable=nullable,
+                                       default_or_starting_value=default_or_starting_value,
+                                       trace=trace)
+            setattr(self, name, self.__nodes[name])
         return self.__nodes[name]
 
     def __getattribute__(self, name):
@@ -463,9 +491,9 @@ class BaseClass(object):
     def __setattr__(self, name, value):
         if hasattr(self, '_BaseClass__nodes') and name in super(BaseClass, self).__getattribute__('_BaseClass__nodes'):
             node = super(BaseClass, self).__getattribute__('_BaseClass__nodes')[name]
-            if isinstance(value, Node) and node == value:
+            if isinstance(value, _Node) and node == value:
                 return
-            elif isinstance(value, Node):
+            elif isinstance(value, _Node):
                 raise Exception('Cannot set to node')
             else:
                 node._dirty = (node._value != value) or abs(node._value - value) > 10**-5
@@ -519,20 +547,20 @@ def node(meth, memoize=True, trace=False):
             default_or_starting_value = None
             nullable = False
 
-        node_args.append(Node(name=arg,
-                              derived=True,
-                              readonly=False,
-                              nullable=nullable,
-                              default_or_starting_value=default_or_starting_value,
-                              trace=trace))
+        node_args.append(_Node(name=arg,
+                               derived=True,
+                               readonly=False,
+                               nullable=nullable,
+                               default_or_starting_value=default_or_starting_value,
+                               trace=trace))
 
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
-        node_kwargs[k] = Node(name=k,
-                              derived=True,
-                              readonly=False,
-                              nullable=True,
-                              default_or_starting_value=v,
-                              trace=trace)
+        node_kwargs[k] = _Node(name=k,
+                               derived=True,
+                               readonly=False,
+                               nullable=True,
+                               default_or_starting_value=v,
+                               trace=trace)
 
     def meth_wrapper(self, *args, **kwargs):
         if len(args) > len(node_args):
@@ -547,14 +575,14 @@ def node(meth, memoize=True, trace=False):
             val = meth(*(arg.value() for arg in args), **kwargs)
         return val
 
-    new_node = Node(name=meth.__name__,
-                    derived=True,
-                    callable=meth_wrapper,
-                    callable_args=node_args,
-                    callable_kwargs=node_kwargs,
-                    callable_is_method=is_method,
-                    always_dirty=not memoize,
-                    trace=trace)
+    new_node = _Node(name=meth.__name__,
+                     derived=True,
+                     callable=meth_wrapper,
+                     callable_args=node_args,
+                     callable_kwargs=node_kwargs,
+                     callable_is_method=is_method,
+                     always_dirty=not memoize,
+                     trace=trace)
 
     if is_method:
         ret = lambda self, *args, **kwargs: new_node._with_self(self)  # noqa: E731
