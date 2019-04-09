@@ -541,21 +541,6 @@ def node(meth, memoize=True, trace=False):
         if len(kwargs) > len(node_kwargs):
             raise Exception('Missing kwargs (call or preprocessing error has occurred)')
 
-        # move to __call__
-        # # update args
-        # for i, value in args:
-        #     node = node_args[i]
-        #     if node._value != value:
-        #         node._dirty = True
-        #     node._value = value
-
-        # # update kwargs
-        # for k, value in six.iteritems(kwargs):
-        #     node = node_kwargs[k]
-        #     if node._value != value:
-        #         node._dirty = True
-        #     node._value = value
-
         if is_method:
             val = meth(self, *(arg.value() for arg in args), **kwargs)
         else:
