@@ -110,3 +110,4 @@ class TestConfig:
         assert z.print()
         assert z.graph()
         assert z.graphviz()
+        assert z.networkx()

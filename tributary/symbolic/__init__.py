@@ -36,6 +36,7 @@ def construct_lazy(expr):
 
             self._nodes = [getattr(self, n) for n in names]
             self._function = lambdify(syms, expr)
+            self._expr = expr
 
         @tl.node
         def evaluate(self):
