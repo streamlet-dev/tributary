@@ -12,16 +12,24 @@ class Foo2(t.BaseClass):
 f1 = Foo1()
 f2 = Foo2()
 z = f1.x + f2.y
-print(z.value())
-print(z.value())  # no recalc
+print(z())
+print(z())  # no recalc
 f1.x = 2
-print(z.value())
+print(z())
 print(z.value()) # no recalc
 f2.y = 4
-print(z.value())
-print(z.value()) # no recalc
+print(z())
+print(z)) # no recalc
 
 z.graphviz().render()
 ```
 
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example1.png)
+
+```python
+# if we update a dependent variable without recalculating, we see the dependencies
+f2.y = 4
+
+z.graphviz().render()
+```
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example2.png)
