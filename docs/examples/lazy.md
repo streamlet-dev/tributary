@@ -77,7 +77,7 @@ price.evaluate()()  # 124.032
 price.evaluate().graphviz()
 ```
 
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example4.svg)
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example4.png)
 
 If we adjust an input, we can see the nodes that will be recalculated on next evaluation
 
@@ -87,4 +87,4 @@ price.strike = 205
 price.evaluate().graphviz()
 ```
 
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example5.svg)
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example5.png)
