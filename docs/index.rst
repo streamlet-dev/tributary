@@ -126,3 +126,4 @@ Kafka
 
    installation
    quickstart
+   api

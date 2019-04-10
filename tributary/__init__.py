@@ -5,8 +5,6 @@ if not _PATCHED:
     _PATCHED = True
 
 
-__version__ = '0.0.4'
-
-
+from ._version import VERSION as __version__  # noqa: F401
 from .functional import pipeline, stop  # noqa: F401
 from .reactive import *  # noqa: F401, F403
