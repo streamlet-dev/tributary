@@ -44,6 +44,12 @@ def _call_if_function(f):
 
 
 def _inc_ref(f_wrapped, f_wrapping):
+    '''Increment reference count for wrapped f
+
+    Args:
+        f_wrapped (FunctionWrapper): function that is wrapped
+        f_wrapping (FunctionWrapper): function that wants to use f_wrapped
+    '''
     if f_wrapped == f_wrapping:
         raise Exception('Internal Error')
 
@@ -55,7 +61,21 @@ def _inc_ref(f_wrapped, f_wrapping):
 
 
 class FunctionWrapper(object):
+    '''Generic streaming wrapper for a function'''
     def __init__(self, foo, foo_kwargs, name='', wraps=(), share=None, state=None):
+        '''
+            Args:
+        foo (callable): function to wrap
+        foo_kwargs (dict): kwargs of function
+        name (str): name of function to call
+        wraps (tuple): functions or FunctionWrappers that this is wrapping
+        share:
+        state: state context
+
+    Returns:
+        FunctionWrapper: wrapped function
+
+        '''
         state = state or {}
 
         if len(foo.__code__.co_varnames) > 0 and \
@@ -78,6 +98,7 @@ class FunctionWrapper(object):
         self._share = share if share else self
 
     def get_last(self):
+        '''Get last call value'''
         if not hasattr(self, '_last'):
             raise Exception('Never called!!')
 
@@ -88,16 +109,19 @@ class FunctionWrapper(object):
         return self._last
 
     def set_last(self, val):
+        '''Set last call value'''
         self._refs = self._refs_orig
         self._last = val
 
     last = property(get_last, set_last)
 
     def inc(self):
+        '''incremenet reference count'''
         self._refs_orig += 1
         self._refs += 1
 
     def view(self, _id=0, _idmap=None):
+        '''Return tree representation of data stream'''
         _idmap = _idmap or {}
         ret = {}
 
@@ -182,6 +206,13 @@ class FunctionWrapper(object):
 
 
 def Const(val):
+    '''Streaming wrapper around scalar val
+
+    Arguments:
+        val (any): a scalar
+    Returns:
+        FunctionWrapper: a streaming wrapper
+    '''
     async def _always(val):
         yield val
 
@@ -189,20 +220,27 @@ def Const(val):
 
 
 def Foo(foo, foo_kwargs=None):
+    '''Streaming wrapper around function call
+
+    Arguments:
+        foo (callable): a function or callable
+        foo_kwargs (dict): kwargs for the function or callable foo
+    Returns:
+        FunctionWrapper: a streaming wrapper around foo
+    '''
     return _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))
 
 
 def Share(f_wrap):
+    '''Function to increment dataflow node reference count
+
+    Arguments:
+        f_wrap (FunctionWrapper): a streaming function
+    Returns:
+        FunctionWrapper: the same
+    '''
+
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('Share expects a tributary')
     f_wrap.inc()
     return f_wrap
-
-
-class StreamEnd:
-    pass
-
-
-class StreamNone:
-    def __init__(self, last):
-        self.value = last
