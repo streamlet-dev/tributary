@@ -4,6 +4,19 @@ from six import iteritems
 
 
 def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
+    '''wrap a function in a streaming variant
+
+    Args:
+        foo (callable): function to wrap
+        foo_kwargs (dict): kwargs of function
+        name (str): name of function to call
+        wraps (tuple): functions or FunctionWrappers that this is wrapping
+        share:
+        state: state context
+
+    Returns:
+        FunctionWrapper: wrapped function
+    '''
     if isinstance(foo, FunctionWrapper):
         ret = foo
     else:
@@ -18,6 +31,12 @@ def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
 
 
 def _call_if_function(f):
+    '''call f if it is a function
+    Args:
+        f (any): a function or value
+    Returns:
+        any: return either f() or f
+    '''
     if isinstance(f, types.FunctionType):
         return f()
     else:
