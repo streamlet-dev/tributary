@@ -32,7 +32,7 @@ def Sum(foo, foo_kwargs=None):
     async def _sum(foo):
         sum = 0
         async for gen in foo():
-            if isinstance(gen, types.GeneratorType):
+            if isinstance(gen, types.AsyncGeneratorType):
                 async for f in gen:
                     sum += f
                     yield sum
