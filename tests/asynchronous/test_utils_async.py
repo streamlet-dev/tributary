@@ -16,6 +16,18 @@ class TestConfig:
         assert last - first > timedelta(seconds=2)
         assert len(out) == 2
 
+    def test_delay(self):
+        def foo():
+            return 1
+
+        delay = t.Delay(foo, delay=1)
+        first = datetime.now()
+        out = t.run(delay)
+        last = datetime.now()
+        assert last - first < timedelta(seconds=2)
+        assert last - first > timedelta(seconds=1)
+        assert len(out) == 1
+
     def test_state(self):
         def stream(state):
             for i in range(10):
@@ -46,3 +58,169 @@ class TestConfig:
         out = t.run(w)
         assert len(out) == 8
         assert out[-1] == [7, 8, 9]
+
+    def test_unroll(self):
+        def ran():
+            return [1, 2, 3]
+
+        w = t.Unroll(ran)
+        out = t.run(w)
+        assert len(out) == 3
+        assert out[-1] == 3
+
+    def test_unrollDF(self):
+        import pandas as pd
+        df = pd.DataFrame(pd.util.testing.makeTimeSeries())
+
+        def ran():
+            return df
+
+        w = t.UnrollDataFrame(ran)
+        out = t.run(w)
+        assert len(out) == 30
+
+    def test_merge1(self):
+        def foo1():
+            return 1
+
+        def foo2():
+            return 2
+
+        out = t.run(t.Merge(foo1, foo2))
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_merge2(self):
+        async def foo1():
+            yield 1
+
+        def foo2():
+            return 2
+
+        m = t.Merge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_merge3(self):
+        def foo1():
+            return 1
+
+        async def foo2():
+            yield 2
+
+        m = t.Merge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_merge4(self):
+        async def foo1():
+            yield 1
+
+        async def foo2():
+            yield 2
+
+        m = t.Merge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_list_merge1(self):
+        def foo1():
+            return [1]
+
+        def foo2():
+            return [2]
+
+        m = t.ListMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_list_merge2(self):
+        async def foo1():
+            yield [1]
+
+        def foo2():
+            return [2]
+
+        m = t.ListMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_list_merge3(self):
+        def foo1():
+            return [1]
+
+        async def foo2():
+            yield [2]
+
+        m = t.ListMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_list_merge4(self):
+        async def foo1():
+            yield [1]
+
+        async def foo2():
+            yield [2]
+
+        m = t.ListMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_dict_merge1(self):
+        def foo1():
+            return {'a': 1}
+
+        def foo2():
+            return {'b': 2}
+
+        m = t.DictMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == {'a': 1, 'b': 2}
+
+    def test_dict_merge2(self):
+        async def foo1():
+            yield {'a': 1}
+
+        def foo2():
+            return {'b': 2}
+
+        m = t.DictMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == {'a': 1, 'b': 2}
+
+    def test_dict_merge3(self):
+        def foo1():
+            return {'a': 1}
+
+        async def foo2():
+            yield {'b': 2}
+
+        m = t.DictMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == {'a': 1, 'b': 2}
+
+    def test_dict_merge4(self):
+        async def foo1():
+            yield {'a': 1}
+
+        async def foo2():
+            yield {'b': 2}
+
+        m = t.DictMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == {'a': 1, 'b': 2}
+
+    def test_reduce(self):
+        pass
