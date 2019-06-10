@@ -8,7 +8,7 @@ class TestFunctional:
         pass
         # setup() before each test method
 
-    def test_1(self):
+    def test_general(self):
         import tributary as t
 
         def foo1(on_data):

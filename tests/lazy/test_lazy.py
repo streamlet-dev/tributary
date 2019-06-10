@@ -44,7 +44,7 @@ class TestConfig:
         pass
         # setup() before each test method
 
-    def test_1(self):
+    def test_add(self):
         f1 = Foo1()
         f2 = Foo2()
         z = f1.x + f2.y
@@ -54,7 +54,7 @@ class TestConfig:
         f2.y = 4
         assert z() == 6
 
-    def test_2(self):
+    def test_multi(self):
         f1 = Foo1()
         f2 = Foo1()
         f3 = Foo1()
@@ -66,42 +66,54 @@ class TestConfig:
         f3.x = 4
         assert z() == 2
 
-    def test_3(self):
+    def test_function(self):
         f1 = Foo1()
         f3 = Foo3()
         z = f1.x + f3.foo1()
+        assert z._dirty or z._subtree_dirty()
         print(z())  # should call foo1 and recompute
+        assert not (z._dirty or z._subtree_dirty())
         print(z())  # should call foo1 and recompute again
         f1.x = 10
+        assert z._dirty or z._subtree_dirty()
         print(z())  # should call foo1 and recompute again
+        assert not (z._dirty or z._subtree_dirty())
         print(z())  # should call foo1 and recompute again
 
-    def test_4(self):
+    def test_function2(self):
         f1 = Foo1()
         f3 = Foo3()
         z = f1.x + f3.foo3()
+        assert z._dirty or z._subtree_dirty()
         print(z())  # should call foo3 and recompute (first time)
+        assert not (z._dirty or z._subtree_dirty())
         print(z())  # should not recompute (foo3 unchanged)
         f1.x = 10
+        assert z._dirty or z._subtree_dirty()
         print(z())  # should call foo3 and recompute
+        assert not (z._dirty or z._subtree_dirty())
         print(z())  # should not recompute (x unchanged)
 
-    def test_5(self):
+    def test_method(self):
         f1 = Foo1()
         f3 = Foo3().foo3()
         z = f1.x + f3
+        assert z._dirty or z._subtree_dirty()
         print(z())  # should call foo3 and recompute (first time)
+        assert not (z._dirty or z._subtree_dirty())
         print(z())  # should not recompute (foo3 unchanged)
         f3.set(x=0)
+        assert z._dirty or z._subtree_dirty()
         print(z())  # should call foo3 and recompute (value changed)
+        assert not (z._dirty or z._subtree_dirty())
         print(z())  # should not recompute (value unchanged)
 
-    def test_6(self):
+    def test_method2(self):
         f4 = Foo4()
         z = f4.foo1()
-        print('recompute?')
+        assert z._dirty or z._subtree_dirty()
         print(z())
-        print('recompute?')
+        assert not (z._dirty or z._subtree_dirty())
         print(z())
 
     def test_misc(self):
