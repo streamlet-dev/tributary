@@ -1,7 +1,7 @@
 import tributary as t
 
 
-class TestOps:
+class TestRolling:
     def test_count(self):
         def foo():
             yield 1
