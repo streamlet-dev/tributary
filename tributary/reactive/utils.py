@@ -27,9 +27,9 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
     return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)
 
 
-def Delay(f_wrap, delay=1):
+def Delay(f_wrap, kwargs=None, delay=1):
     if not isinstance(f_wrap, FunctionWrapper):
-        raise Exception('Delay expects a tributary')
+        f_wrap = Foo(f_wrap, kwargs or {})
 
     def _delay(f_wrap, delay):
         for f in f_wrap():
@@ -81,38 +81,53 @@ def Window(foo, foo_kwargs=None, size=-1, full_only=True):
     return _wrap(_window, dict(foo=foo, size=size, full_only=full_only, accum=accum), name='Window', wraps=(foo,), share=foo)
 
 
-def Unroll(foo, foo_kwargs):
-    foo = Foo(foo, foo_kwargs or {})
+def Unroll(foo_or_val, kwargs=None):
+    if not isinstance(foo_or_val, types.FunctionType):
+        foo = Const(foo_or_val)
+    else:
+        foo = Foo(foo_or_val, kwargs or {})
 
     def _unroll(foo):
-        ret = foo()
-        if isinstance(ret, list) or isinstance(ret, types.GeneratorType):
-            for f in ret:
-                yield f
+        for ret in foo():
+            if isinstance(ret, list) or isinstance(ret, types.GeneratorType):
+                for f in ret:
+                    yield f
 
     return _wrap(_unroll, dict(foo=foo), name='Unroll', wraps=(foo,), share=foo)
 
 
-def UnrollDataFrame(df, json=True, wrap=False):
-    def _unrolldf(val):
-        for i in range(len(df)):
-            row = df.iloc[i]
-            if json:
-                data = row.to_dict()
-                data['index'] = row.name
-                yield data
-            else:
-                yield row
+def UnrollDataFrame(foo_or_val, kwargs=None, json=True, wrap=False):
+    if not isinstance(foo_or_val, types.FunctionType):
+        foo = Const(foo_or_val)
+    else:
+        foo = Foo(foo_or_val, kwargs or {})
 
-    return _wrap(_unrolldf, dict(val=df), name='UnrollDataFrame', wraps=(df,))
+    def _unrolldf(foo):
+        for df in foo():
+            for i in range(len(df)):
+                row = df.iloc[i]
+                if json:
+                    data = row.to_dict()
+                    data['index'] = row.name
+                    yield data
+                else:
+                    yield row
+
+    return _wrap(_unrolldf, dict(foo=foo), name='UnrollDataFrame', wraps=(foo,), share=foo)
 
 
 def Merge(f_wrap1, f_wrap2):
     if not isinstance(f_wrap1, FunctionWrapper):
-        raise Exception('Merge expects a tributary')
+        if not isinstance(f_wrap1, types.FunctionType):
+            f_wrap1 = Const(f_wrap1)
+        else:
+            f_wrap1 = Foo(f_wrap1)
 
     if not isinstance(f_wrap2, FunctionWrapper):
-        raise Exception('Merge expects a tributary')
+        if not isinstance(f_wrap2, types.FunctionType):
+            f_wrap2 = Const(f_wrap2)
+        else:
+            f_wrap2 = Foo(f_wrap2)
 
     def _merge(foo1, foo2):
         for gen1, gen2 in zip(foo1(), foo2()):
@@ -134,10 +149,16 @@ def Merge(f_wrap1, f_wrap2):
 
 def ListMerge(f_wrap1, f_wrap2):
     if not isinstance(f_wrap1, FunctionWrapper):
-        raise Exception('Merge expects a tributary')
+        if not isinstance(f_wrap1, types.FunctionType):
+            f_wrap1 = Const(f_wrap1)
+        else:
+            f_wrap1 = Foo(f_wrap1)
 
     if not isinstance(f_wrap2, FunctionWrapper):
-        raise Exception('Merge expects a tributary')
+        if not isinstance(f_wrap2, types.FunctionType):
+            f_wrap2 = Const(f_wrap2)
+        else:
+            f_wrap2 = Foo(f_wrap2)
 
     def _merge(foo1, foo2):
         for gen1, gen2 in zip(foo1(), foo2()):
@@ -171,10 +192,16 @@ def ListMerge(f_wrap1, f_wrap2):
 
 def DictMerge(f_wrap1, f_wrap2):
     if not isinstance(f_wrap1, FunctionWrapper):
-        raise Exception('Merge expects a tributary')
+        if not isinstance(f_wrap1, types.FunctionType):
+            f_wrap1 = Const(f_wrap1)
+        else:
+            f_wrap1 = Foo(f_wrap1)
 
     if not isinstance(f_wrap2, FunctionWrapper):
-        raise Exception('Merge expects a tributary')
+        if not isinstance(f_wrap2, types.FunctionType):
+            f_wrap2 = Const(f_wrap2)
+        else:
+            f_wrap2 = Foo(f_wrap2)
 
     def _merge(foo1, foo2):
         for gen1, gen2 in zip(foo1(), foo2()):
@@ -207,9 +234,12 @@ def DictMerge(f_wrap1, f_wrap2):
 
 
 def Reduce(*f_wraps):
-    for f_wrap in f_wraps:
-        if not isinstance(f_wrap, FunctionWrapper):
-            raise Exception('Reduce expects a tributary')
+    f_wraps = list(f_wraps)
+    for i, f_wrap in enumerate(f_wraps):
+        if not isinstance(f_wrap, types.FunctionType):
+            f_wraps[i] = Const(f_wrap)
+        else:
+            f_wraps[i] = Foo(f_wrap)
 
     def _reduce(foos):
         for all_gens in zip(*[foo() for foo in foos]):
