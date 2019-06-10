@@ -2,7 +2,7 @@ import tributary as t
 from datetime import datetime, timedelta
 
 
-class TestConfig:
+class TestUtils:
     def test_timer(self):
         def foo():
             return 1
