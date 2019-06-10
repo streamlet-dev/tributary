@@ -79,34 +79,145 @@ class TestUtils:
         out = t.run(w)
         assert len(out) == 30
 
-    def test_merge(self):
+    def test_merge1(self):
         def foo1():
             return 1
 
         def foo2():
             return 2
+
         m = t.Merge(foo1, foo2)
         out = t.run(m)
         assert len(out) == 1
         assert out[-1] == [1, 2]
 
-    def test_list_merge(self):
+    def test_merge2(self):
+        def foo1():
+            yield 1
+
+        def foo2():
+            return 2
+
+        m = t.Merge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_merge3(self):
+        def foo1():
+            return 1
+
+        def foo2():
+            yield 2
+
+        m = t.Merge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_merge4(self):
+        def foo1():
+            yield 1
+
+        def foo2():
+            yield 2
+
+        m = t.Merge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_list_merge1(self):
         def foo1():
             return [1]
 
         def foo2():
             return [2]
+
         m = t.ListMerge(foo1, foo2)
         out = t.run(m)
         assert len(out) == 1
         assert out[-1] == [1, 2]
 
-    def test_dict_merge(self):
+    def test_list_merge2(self):
+        def foo1():
+            yield [1]
+
+        def foo2():
+            return [2]
+
+        m = t.ListMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_list_merge3(self):
+        def foo1():
+            return [1]
+
+        def foo2():
+            yield [2]
+
+        m = t.ListMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_list_merge4(self):
+        def foo1():
+            yield [1]
+
+        def foo2():
+            yield [2]
+
+        m = t.ListMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == [1, 2]
+
+    def test_dict_merge1(self):
         def foo1():
             return {'a': 1}
 
         def foo2():
             return {'b': 2}
+
+        m = t.DictMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == {'a': 1, 'b': 2}
+
+    def test_dict_merge2(self):
+        def foo1():
+            yield {'a': 1}
+
+        def foo2():
+            return {'b': 2}
+
+        m = t.DictMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == {'a': 1, 'b': 2}
+
+    def test_dict_merge3(self):
+        def foo1():
+            return {'a': 1}
+
+        def foo2():
+            yield {'b': 2}
+
+        m = t.DictMerge(foo1, foo2)
+        out = t.run(m)
+        assert len(out) == 1
+        assert out[-1] == {'a': 1, 'b': 2}
+
+    def test_dict_merge4(self):
+        def foo1():
+            yield {'a': 1}
+
+        def foo2():
+            yield {'b': 2}
+
         m = t.DictMerge(foo1, foo2)
         out = t.run(m)
         assert len(out) == 1
@@ -114,11 +225,11 @@ class TestUtils:
 
     def test_reduce(self):
         def foo1():
-            return {'a': 1}
+            return {'b': 2}
 
         def foo2():
-            return {'b': 2}
-        m = t.Reduce(foo1, foo2)
-        out = t.run(m)
+            yield {'c': 3}
+
+        out = t.run(t.Reduce({'a': 1}, foo1, foo2))
         assert len(out) == 1
-        assert out[-1] == [{'a': 1}, {'b': 2}]
+        assert out[-1] == [{'a': 1}, {'b': 2}, {'c': 3}]
