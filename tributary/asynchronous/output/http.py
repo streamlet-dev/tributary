@@ -20,8 +20,12 @@ def AsyncHTTP(foo, foo_kwargs=None, url='', json=False, wrap=False, field=None, 
 
             msg = requests.post(url, data=data, cookies=cookies, proxies=proxies)
 
-            if msg is None or msg.status_code != 200:
+            if msg is None:
                 break
+
+            if msg.status_code != 200:
+                yield msg
+                continue
 
             if json:
                 msg = msg.json()

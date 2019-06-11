@@ -4,10 +4,10 @@ from ..base import _wrap
 
 
 def HTTP(foo, foo_kwargs=None, *args, **kwargs):
-    return SyncHTTP(foo, foo_kwargs, *args, **kwargs)
+    return AsyncHTTP(foo, foo_kwargs, *args, **kwargs)
 
 
-def SyncHTTP(foo, foo_kwargs=None, url='', json=False, wrap=False, field=None, proxies=None, cookies=None):
+def AsyncHTTP(foo, foo_kwargs=None, url='', json=False, wrap=False, field=None, proxies=None, cookies=None):
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs)
 
@@ -17,11 +17,18 @@ def SyncHTTP(foo, foo_kwargs=None, url='', json=False, wrap=False, field=None, p
                 data = [data]
             if json:
                 data = ujson.dumps(data)
-
+            print('*'*10)
+            print(url)
             msg = requests.post(url, data=data, cookies=cookies, proxies=proxies)
+            print(msg)
+            print('*'*10)
 
-            if msg is None or msg.status_code != 200:
+            if msg is None:
                 break
+
+            if msg.status_code != 200:
+                yield msg
+                continue
 
             if json:
                 msg = msg.json()

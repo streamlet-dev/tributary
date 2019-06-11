@@ -11,25 +11,30 @@ def SyncHTTP(url, interval=1, repeat=1, json=False, wrap=False, field=None, prox
     def _req(url, interval=1, repeat=1, json=False, wrap=False, field=None, proxies=None, cookies=None):
         count = 0
         while count < repeat:
-            msg = requests.get(url, cookies=cookies, proxies=proxies)
+            with requests.Session() as s:
+                msg = s.get(url, cookies=cookies, proxies=proxies)
 
-            if msg is None or msg.status_code != 200:
-                break
+                if msg is None:
+                    break
 
-            if json:
-                msg = msg.json()
+                if msg.status_code != 200:
+                    yield msg
+                    continue
 
-            if field:
-                msg = msg[field]
+                if json:
+                    msg = msg.json()
 
-            if wrap:
-                msg = [msg]
+                if field:
+                    msg = msg[field]
 
-            yield msg
+                if wrap:
+                    msg = [msg]
 
-            if interval:
-                time.sleep(interval)
-            if repeat >= 0:
-                count += 1
+                yield msg
+
+                if interval:
+                    time.sleep(interval)
+                if repeat >= 0:
+                    count += 1
 
     return _wrap(_req, dict(url=url, interval=interval, repeat=repeat, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies), name='HTTP')
