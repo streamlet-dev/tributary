@@ -18,11 +18,11 @@ else:
 
 setup(
     name='tributary',
-    version='0.0.5',
+    version='0.0.6',
     description='Analytics library',
     long_description=long_description,
     url='https://github.com/timkpaine/tributary',
-    download_url='https://github.com/timkpaine/tributary/archive/v0.0.5.tar.gz',
+    download_url='https://github.com/timkpaine/tributary/archive/v0.0.6.tar.gz',
     author='Tim Paine',
     author_email='timothy.k.paine@gmail.com',
     license='Apache 2.0',
