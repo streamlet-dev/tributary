@@ -28,6 +28,7 @@ These are functional streams, built by currying python functions (callbacks).
 These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
 
 ## Event Loop
+TODO
 These function as tornado based event-loop based streams similar to streamz.
 
 # Examples
@@ -37,9 +38,27 @@ These function as tornado based event-loop based streams similar to streamz.
 # Math
 `(Work in progress)`
 
+## Operations
+- unary operators/comparators
+- binary operators/comparators
+
+## Rolling
+- count
+- sum
+
 # Sources and Sinks
 `(Work in progress)`
 
+## Sources
+- file
 - kafka
 - websocket
 - http
+- socket io
+
+## Sinks
+- file
+- kafka
+- http
+- TODO websocket
+- TODO socket io
