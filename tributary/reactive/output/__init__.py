@@ -13,6 +13,7 @@ def Print(foo, foo_kwargs=None):
     def _print(foo):
         for r in foo():
             print(r)
+            yield r
 
     return _wrap(_print, dict(foo=foo), name='Print', wraps=(foo,), share=foo)
 

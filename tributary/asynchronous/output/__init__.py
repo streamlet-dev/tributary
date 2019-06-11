@@ -61,3 +61,20 @@ def GraphViz(f_wrap, name='Graph'):
         rec(d[k], k)
 
     return dot
+
+
+def Perspective(foo, foo_kwargs=None, **psp_kwargs):
+    foo = _wrap(foo, foo_kwargs or {})
+
+    from perspective import PerspectiveWidget
+    p = PerspectiveWidget([], **psp_kwargs)
+
+    async def _perspective(foo):
+        async for r in foo():
+            p.update(r)
+            yield r
+
+    from IPython.display import display
+    display(p)
+
+    return _wrap(_perspective, dict(foo=foo), name='Perspective', wraps=(foo,), share=foo)
