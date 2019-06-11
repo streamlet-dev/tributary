@@ -7,7 +7,6 @@ from .http import HTTP as HTTPSink  # noqa: F401
 from .kafka import Kafka as KafkaSink  # noqa: F401
 
 
-
 def Print(foo, foo_kwargs=None):
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs)
