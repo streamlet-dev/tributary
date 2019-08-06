@@ -31,7 +31,7 @@ clean: ## clean the repository
 	make -C ./docs clean
 
 install:  ## install to site-packages
-	python3 setup.py install
+	pip3 install .
 
 docs:  ## make documentation
 	make -C ./docs html
@@ -47,7 +47,10 @@ major:  ## steps before dist, defaults to previous tag + one micro
 	. scripts/deploy.sh MAJOR
 
 dist:  ## dist to pypi
-	python3 setup.py sdist upload -r pypi
+	rm -rf dist build
+	python3 setup.py sdist
+	python3 setup.py bdist_wheel
+	twine check dist/* && twine upload dist/*
 
 # Thanks to Francoise at marmelab.com for this
 .DEFAULT_GOAL := help
