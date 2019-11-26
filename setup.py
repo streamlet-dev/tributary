@@ -27,8 +27,7 @@ setup(
     author_email='timothy.k.paine@gmail.com',
     license='Apache 2.0',
     install_requires=requires,
-    extras_require={'dev': requires + ['pytest', 'pytest-cov', 'pylint', 'flake8']},
-
+    extras_require={'dev': requires + ['pytest', 'pytest-cov', 'flake8', 'codecov', 'mock', 'autopep8', 'bumpversion', 'pyEX']},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3',
@@ -40,7 +39,6 @@ setup(
     ],
 
     keywords='analytics tools plotting',
-
     packages=find_packages(exclude=['tests', ]),
     package_data={},
     include_package_data=True,

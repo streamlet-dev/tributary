@@ -5,20 +5,35 @@ matrix:
   include:
     - python: "2.7"
       env: PYTHONVER=2
-    - python: "3.6"
+    - python: "3.7"
       env: PYTHONVER=3
+
+addons:
+  apt:
+    update: true
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - graphviz
+  homebrew:
+    update: true
+    packages:
+      - python
+      - graphviz
+      - python2
 
 branches:
   only:
   - master
 
 install: 
-  - if [ "$PYTHONVER" = "2" ]; then python2 -m pip install -r requirements_py2.txt && python2 -m pip install -U pytest pytest-cov flake8 pylint codecov; fi
-  - if [ "$PYTHONVER" = "3" ]; then python3 -m pip install -r requirements.txt && python3 -m pip install -U pytest pytest-cov flake8 pylint codecov; fi
+  - if [ "$PYTHONVER" = "2" ]; then python2 -m pip install -r requirements_py2.txt && python2 -m pip install -e .[dev]; fi
+  - if [ "$PYTHONVER" = "3" ]; then python3 -m pip install -r requirements.txt && python3 -m pip install -e .[dev]; fi
 
 script: 
   # - if [ "$PYTHONVER" = "2" ]; then echo "Python2" && make testpy2; fi
   - if [ "$PYTHONVER" = "3" ]; then echo "Python3" && make test; fi
+  # - if [ "$PYTHONVER" = "3" ]; then make notebooks; fi
   - echo $PYTHONVER
 
 after_success: 

@@ -1,0 +1,22 @@
+branches:
+  only:
+    - master
+
+skip_tags: true
+max_jobs: 1
+
+image: 
+  - Visual Studio 2017
+
+install:
+  - C:\Python37-x64\python -m pip install -r requirements.txt
+  - C:\Python37-x64\python -m pip install -e .[dev]
+
+cache:
+  - '%LOCALAPPDATA%\pip\Cache'
+
+build_script:
+  - C:\Python37-x64\python setup.py build
+
+test_script:
+  - C:\Python37-x64\python -m pytest -v tests --cov=tributary
