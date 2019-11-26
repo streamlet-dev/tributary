@@ -10,11 +10,17 @@ tests: ## Clean and Make unit tests
 test: lint ## run the tests for travis CI
 	@ python3 -m pytest -v tests --cov=tributary
 
+notebooks:  ## test execute the notebooks
+	./scripts/test_notebooks.sh
+
 testpy2: ## run the tests for travis CI
 	@ python2 -m pytest -v tests --cov=tributary
 
 lint: ## run linter
 	flake8 tributary 
+
+fix:  ## run autopep8/tslint fix
+	autopep8 --in-place -r -a -a tributary/
 
 annotate: ## MyPy type annotation check
 	mypy -s tributary  
