@@ -6,11 +6,11 @@ from ...thread import run
 
 
 def WebSocket(url, *args, **kwargs):
-    return SyncWebSocket(url, *args, **kwargs)
+    return AsyncWebSocket(url, *args, **kwargs)
 
 
-def SyncWebSocket(url, json=False, wrap=False):
-    def _listen(url, json, wrap):
+def AsyncWebSocket(url, json=False, wrap=False):
+    async def _listen(url, json, wrap):
         ws = create_connection(url)
         for x in run(ws.recv):
             if isinstance(x, StreamNone):

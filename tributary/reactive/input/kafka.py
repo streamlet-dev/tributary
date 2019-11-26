@@ -4,10 +4,10 @@ from ..base import _wrap
 
 
 def Kafka(servers, group, topics, json=False, wrap=False, interval=1):
-    return SyncKafka(servers, group, topics, json=json, wrap=wrap, interval=interval)
+    return AsyncKafka(servers, group, topics, json=json, wrap=wrap, interval=interval)
 
 
-def SyncKafka(servers, group, topics, json=False, wrap=False, interval=1):
+def AsyncKafka(servers, group, topics, json=False, wrap=False, interval=1):
     c = Consumer({
         'bootstrap.servers': servers,
         'group.id': group,
@@ -20,7 +20,7 @@ def SyncKafka(servers, group, topics, json=False, wrap=False, interval=1):
         topics = [topics]
     c.subscribe(topics)
 
-    def _listen(consumer, json, wrap, interval):
+    async def _listen(consumer, json, wrap, interval):
         while True:
             msg = consumer.poll(interval)
 

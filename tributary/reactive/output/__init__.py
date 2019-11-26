@@ -1,5 +1,7 @@
+import asyncio
+import types
 from pprint import pprint
-from functools import partial
+from IPython.display import display
 
 from ..base import _wrap, FunctionWrapper
 from .file import File as FileSink  # noqa: F401
@@ -8,12 +10,21 @@ from .kafka import Kafka as KafkaSink  # noqa: F401
 
 
 def Print(foo, foo_kwargs=None):
-    foo = _wrap(foo, foo_kwargs or {})
+    foo_kwargs = foo_kwargs or {}
+    foo = _wrap(foo, foo_kwargs)
 
-    def _print(foo):
-        for r in foo():
-            print(r)
-            yield r
+    async def _print(foo):
+        async for r in foo():
+            if isinstance(r, types.AsyncGeneratorType):
+                async for x in r:
+                    print(x)
+                    yield x
+            elif isinstance(r, types.CoroutineType):
+                print(r)
+                yield await r
+            else:
+                print(r)
+                yield r
 
     return _wrap(_print, dict(foo=foo), name='Print', wraps=(foo,), share=foo)
 
@@ -30,6 +41,7 @@ def PPrint(f_wrap):
 
 def GraphViz(f_wrap, name='Graph'):
     d = Graph(f_wrap)
+
     from graphviz import Digraph
     dot = Digraph(name, strict=True)
     dot.format = 'png'
@@ -57,27 +69,17 @@ def Perspective(foo, foo_kwargs=None, **psp_kwargs):
     foo = _wrap(foo, foo_kwargs or {})
 
     from perspective import PerspectiveWidget
-    p = PerspectiveWidget([], **psp_kwargs)
+    p = PerspectiveWidget(psp_kwargs.pop('schema', []), **psp_kwargs)
 
-    def _perspective(foo):
-        for r in foo():
+    async def _perspective(foo):
+        async for r in foo():
+            if isinstance(r, dict):
+                r = [r]
             p.update(r)
+            # let PSP render
+            await asyncio.sleep(.1)
             yield r
 
-    from IPython.display import display
     display(p)
 
     return _wrap(_perspective, dict(foo=foo), name='Perspective', wraps=(foo,), share=foo)
-
-
-def FunctionalSink(f_wrap, callback, callback_kwargs):
-    if not isinstance(f_wrap, FunctionWrapper):
-        raise Exception('Functional expects tributary')
-
-    callback = partial(callback, **callback_kwargs)
-
-    def _foo(foo, callback_):
-        for x in foo():
-            yield callback(foo)
-
-    return _wrap(_foo, dict(foo=f_wrap), name='Functional', wraps=(f_wrap,))
