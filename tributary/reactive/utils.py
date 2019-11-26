@@ -22,7 +22,7 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
 
             if interval > 0:
                 # sleep for rest of time that _p didnt take
-                await asyncio.sleep(max(0, interval-(t2-t1)))
+                await asyncio.sleep(max(0, interval - (t2 - t1)))
             repeat -= 1
 
     return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)

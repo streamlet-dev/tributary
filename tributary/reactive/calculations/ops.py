@@ -72,11 +72,11 @@ def Noop(foo, foo_kwargs=None):
 
 
 def Negate(foo, foo_kwargs=None):
-    return unary(lambda x: -1*x, foo, foo_kwargs, _name='Negate')
+    return unary(lambda x: -1 * x, foo, foo_kwargs, _name='Negate')
 
 
 def Invert(foo, foo_kwargs=None):
-    return unary(lambda x: 1/x, foo, foo_kwargs, _name='Invert')
+    return unary(lambda x: 1 / x, foo, foo_kwargs, _name='Invert')
 
 
 def Not(foo, foo_kwargs=None):
@@ -84,19 +84,19 @@ def Not(foo, foo_kwargs=None):
 
 
 def Add(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
-    return bin(lambda x, y: x+y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Add')
+    return bin(lambda x, y: x + y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Add')
 
 
 def Sub(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
-    return bin(lambda x, y: x-y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Sub')
+    return bin(lambda x, y: x - y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Sub')
 
 
 def Mult(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
-    return bin(lambda x, y: x*y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Mult')
+    return bin(lambda x, y: x * y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Mult')
 
 
 def Div(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
-    return bin(lambda x, y: x/y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Div')
+    return bin(lambda x, y: x / y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Div')
 
 
 def Mod(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):

@@ -62,6 +62,7 @@ def _inc_ref(f_wrapped, f_wrapping):
 
 class FunctionWrapper(object):
     '''Generic streaming wrapper for a function'''
+
     def __init__(self, foo, foo_kwargs, name='', wraps=(), share=None, state=None):
         '''
             Args:

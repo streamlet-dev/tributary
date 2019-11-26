@@ -24,4 +24,3 @@ def AsyncWebSocket(url, json=False, wrap=False):
                 yield x
 
     return _wrap(_listen, dict(url=url, json=json, wrap=wrap), name='WebSocket')
-

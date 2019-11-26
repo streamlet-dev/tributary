@@ -84,4 +84,3 @@ def construct_streaming(expr, modules=None):
     syms = list(symbols(expr))
     names = [s.name for s in syms]
     modules = modules or ["scipy", "numpy"]
-

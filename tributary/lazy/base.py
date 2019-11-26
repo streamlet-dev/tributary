@@ -113,11 +113,11 @@ class _Node(object):
     def _gennode(self, name, foo, foo_args, trace=False):
         if name not in self._node_op_cache:
             self._node_op_cache[name] = \
-                    _Node(name=name,
-                          derived=True,
-                          callable=foo,
-                          callable_args=foo_args,
-                          trace=trace)
+                _Node(name=name,
+                      derived=True,
+                      callable=foo,
+                      callable_args=foo_args,
+                      trace=trace)
         return self._node_op_cache[name]
 
     def _tonode(self, other, trace=False):
@@ -125,10 +125,10 @@ class _Node(object):
             return other
         if str(other) not in self._node_op_cache:
             self._node_op_cache[str(other)] = \
-               _Node(name='var(' + str(other)[:5] + ')',
-                     derived=True,
-                     default_or_starting_value=other,
-                     trace=trace)
+                _Node(name='var(' + str(other)[:5] + ')',
+                      derived=True,
+                      default_or_starting_value=other,
+                      trace=trace)
         return self._node_op_cache[str(other)]
 
     def set(self, **kwargs):
