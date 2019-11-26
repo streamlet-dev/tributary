@@ -33,7 +33,7 @@ install:
 script: 
   # - if [ "$PYTHONVER" = "2" ]; then echo "Python2" && make testpy2; fi
   - if [ "$PYTHONVER" = "3" ]; then echo "Python3" && make test; fi
-  - if [ "$PYTHONVER" = "3" ]; then make notebooks; fi
+  # - if [ "$PYTHONVER" = "3" ]; then make notebooks; fi
   - echo $PYTHONVER
 
 after_success: 
