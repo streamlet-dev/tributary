@@ -1,15 +1,13 @@
-import time
+import asyncio
 import math
 import numpy as np
 
-from ...thread import run  # noqa: F401
-from ...base import StreamNone, StreamEnd  # noqa: F401
-from ..base import _wrap, FunctionWrapper  # noqa: F401
+from ..base import _wrap
 from .file import File  # noqa: F401
-from .http import HTTP, SyncHTTP  # noqa: F401
-from .kafka import Kafka, SyncKafka  # noqa: F401
-from .socketio import SocketIO, SyncSocketIO  # noqa: F401
-from .ws import WebSocket, SyncWebSocket  # noqa: F401
+from .http import HTTP, AsyncHTTP  # noqa: F401
+from .kafka import Kafka, AsyncKafka  # noqa: F401
+from .socketio import SocketIO, AsyncSocketIO  # noqa: F401
+from .ws import WebSocket, AsyncWebSocket  # noqa: F401
 
 
 def _gen():
@@ -25,7 +23,7 @@ def _gen():
 
 def Random(size=10, interval=0.1):
 
-    def _random(size, interval):
+    async def _random(size, interval):
         step = 0
         while step < size:
             x = {y: _gen() for y in ('A', 'B', 'C', 'D')}
@@ -36,7 +34,7 @@ def Random(size=10, interval=0.1):
                        'B': x['B'][i],
                        'C': x['C'][i],
                        'D': x['D'][i]}
-                time.sleep(interval)
+                await asyncio.sleep(interval)
                 step += 1
 
     return _wrap(_random, dict(size=size, interval=interval), name='Random')

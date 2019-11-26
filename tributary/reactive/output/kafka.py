@@ -12,9 +12,9 @@ def AsyncKafka(foo, foo_kwargs=None, servers='', topic='', json=False, wrap=Fals
 
     p = Producer({'bootstrap.servers': servers})
 
-    def _send(foo, producer, topic, json, wrap):
+    async def _send(foo, producer, topic, json, wrap):
         ret = []
-        for data in foo():
+        async for data in foo():
             # Trigger any available delivery report callbacks from previous produce() calls
             producer.poll(0)
 

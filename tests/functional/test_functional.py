@@ -21,7 +21,7 @@ class TestFunctional:
         def foo2(data, callback):
             callback([{'a': data['a'] * 1000, 'b': data['b'], 'c': 'AAPL', 'x': data['x']}])
 
-        p = PerspectiveWidget([], view='y_line', columns=['a', 'b'], rowpivots=['x'], colpivots=['c'])
+        p = PerspectiveWidget([], plugin='y_line', columns=['a', 'b'], row_pivots=['x'], column_pivots=['c'])
 
         t.pipeline([foo1, foo2], ['on_data', 'callback'], on_data=p.update)
         time.sleep(10)

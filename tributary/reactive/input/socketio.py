@@ -7,16 +7,16 @@ from ..base import _wrap
 
 
 def SocketIO(url, *args, **kwargs):
-    return SyncSocketIO(url, *args, **kwargs)
+    return AsyncSocketIO(url, *args, **kwargs)
 
 
-def SyncSocketIO(url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
+def AsyncSocketIO(url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
     o = urlparse(url)
     socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
     if sendinit:
         socketIO.emit(sendinit)
 
-    def _sio(url, channel, field='', json=False, wrap=False, interval=1):
+    async def _sio(url, channel, field='', json=False, wrap=False, interval=1):
         while True:
             _data = []
             socketIO.on(channel, lambda data: _data.append(data))

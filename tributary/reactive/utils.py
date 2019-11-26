@@ -1,27 +1,28 @@
+import asyncio
 import time
 import types
+from aiostream.stream import zip
 from .base import _wrap, FunctionWrapper, Foo, Const
-try:
-    from itertools import izip as zip
-except ImportError:
-    pass
 
 
 def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
+    kwargs = kwargs or {}
+
     if not isinstance(foo_or_val, types.FunctionType):
         foo = Const(foo_or_val)
     else:
-        foo = Foo(foo_or_val, kwargs or {})
+        foo = Foo(foo_or_val, kwargs)
 
-    def _repeater(foo, repeat, interval):
+    async def _repeater(foo, repeat, interval):
         while repeat > 0:
             t1 = time.time()
-            yield foo()
+            f = foo()
+            yield f
             t2 = time.time()
 
             if interval > 0:
                 # sleep for rest of time that _p didnt take
-                time.sleep(max(0, interval-(t2-t1)))
+                await asyncio.sleep(max(0, interval-(t2-t1)))
             repeat -= 1
 
     return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)
@@ -31,40 +32,42 @@ def Delay(f_wrap, kwargs=None, delay=1):
     if not isinstance(f_wrap, FunctionWrapper):
         f_wrap = Foo(f_wrap, kwargs or {})
 
-    def _delay(f_wrap, delay):
-        for f in f_wrap():
+    async def _delay(f_wrap, delay):
+        async for f in f_wrap():
             yield f
-            time.sleep(delay)
+            await asyncio.sleep(delay)
 
     return _wrap(_delay, dict(f_wrap=f_wrap, delay=delay), name='Delay', wraps=(f_wrap,), share=f_wrap)
 
 
 def State(foo, foo_kwargs=None, **state):
-    foo = _wrap(foo, foo_kwargs or {}, name=foo.__name__, wraps=(foo,), state=state)
+    foo_kwargs = foo_kwargs or {}
+    foo = _wrap(foo, foo_kwargs, name=foo.__name__, wraps=(foo,), state=state)
     return foo
 
 
 def Apply(foo, f_wrap, foo_kwargs=None):
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('Apply expects a tributary')
-
-    foo = Foo(foo, foo_kwargs or {})
+    foo_kwargs = foo_kwargs or {}
+    foo = Foo(foo, foo_kwargs)
     foo._wraps = foo._wraps + (f_wrap, )
 
-    def _apply(foo):
-        for f in f_wrap():
+    async def _apply(foo):
+        async for f in f_wrap():
             yield foo(f)
 
     return _wrap(_apply, dict(foo=foo), name='Apply', wraps=(foo,), share=foo)
 
 
 def Window(foo, foo_kwargs=None, size=-1, full_only=True):
-    foo = Foo(foo, foo_kwargs or {})
+    foo_kwargs = foo_kwargs or {}
+    foo = Foo(foo, foo_kwargs)
 
     accum = []
 
-    def _window(foo, size, full_only, accum):
-        for x in foo():
+    async def _window(foo, size, full_only, accum):
+        async for x in foo():
             if size == 0:
                 yield x
             else:
@@ -87,10 +90,13 @@ def Unroll(foo_or_val, kwargs=None):
     else:
         foo = Foo(foo_or_val, kwargs or {})
 
-    def _unroll(foo):
-        for ret in foo():
-            if isinstance(ret, list) or isinstance(ret, types.GeneratorType):
+    async def _unroll(foo):
+        async for ret in foo():
+            if isinstance(ret, list):
                 for f in ret:
+                    yield f
+            elif isinstance(ret, types.AsyncGeneratorType):
+                async for f in ret:
                     yield f
 
     return _wrap(_unroll, dict(foo=foo), name='Unroll', wraps=(foo,), share=foo)
@@ -102,8 +108,8 @@ def UnrollDataFrame(foo_or_val, kwargs=None, json=True, wrap=False):
     else:
         foo = Foo(foo_or_val, kwargs or {})
 
-    def _unrolldf(foo):
-        for df in foo():
+    async def _unrolldf(foo):
+        async for df in foo():
             for i in range(len(df)):
                 row = df.iloc[i]
                 if json:
@@ -129,17 +135,17 @@ def Merge(f_wrap1, f_wrap2):
         else:
             f_wrap2 = Foo(f_wrap2)
 
-    def _merge(foo1, foo2):
-        for gen1, gen2 in zip(foo1(), foo2()):
-            if isinstance(gen1, types.GeneratorType) and \
-               isinstance(gen2, types.GeneratorType):
-                for f1, f2 in zip(gen1, gen2):
+    async def _merge(foo1, foo2):
+        async for gen1, gen2 in zip(foo1(), foo2()):
+            if isinstance(gen1, types.AsyncGeneratorType) and \
+               isinstance(gen2, types.AsyncGeneratorType):
+                async for f1, f2 in zip(gen1, gen2):
                     yield [f1, f2]
-            elif isinstance(gen1, types.GeneratorType):
-                for f1 in gen1:
+            elif isinstance(gen1, types.AsyncGeneratorType):
+                async for f1 in gen1:
                     yield [f1, gen2]
-            elif isinstance(gen2, types.GeneratorType):
-                for f2 in gen2:
+            elif isinstance(gen2, types.AsyncGeneratorType):
+                async for f2 in gen2:
                     yield [gen1, f2]
             else:
                 yield [gen1, gen2]
@@ -160,23 +166,23 @@ def ListMerge(f_wrap1, f_wrap2):
         else:
             f_wrap2 = Foo(f_wrap2)
 
-    def _merge(foo1, foo2):
-        for gen1, gen2 in zip(foo1(), foo2()):
-            if isinstance(gen1, types.GeneratorType) and \
-               isinstance(gen2, types.GeneratorType):
-                for f1, f2 in zip(gen1, gen2):
+    async def _merge(foo1, foo2):
+        async for gen1, gen2 in zip(foo1(), foo2()):
+            if isinstance(gen1, types.AsyncGeneratorType) and \
+               isinstance(gen2, types.AsyncGeneratorType):
+                async for f1, f2 in zip(gen1, gen2):
                     ret = []
                     ret.extend(f1)
                     ret.extend(f1)
                     yield ret
-            elif isinstance(gen1, types.GeneratorType):
-                for f1 in gen1:
+            elif isinstance(gen1, types.AsyncGeneratorType):
+                async for f1 in gen1:
                     ret = []
                     ret.extend(f1)
                     ret.extend(gen2)
                     yield ret
-            elif isinstance(gen2, types.GeneratorType):
-                for f2 in gen2:
+            elif isinstance(gen2, types.AsyncGeneratorType):
+                async for f2 in gen2:
                     ret = []
                     ret.extend(gen1)
                     ret.extend(f2)
@@ -203,23 +209,23 @@ def DictMerge(f_wrap1, f_wrap2):
         else:
             f_wrap2 = Foo(f_wrap2)
 
-    def _merge(foo1, foo2):
-        for gen1, gen2 in zip(foo1(), foo2()):
-            if isinstance(gen1, types.GeneratorType) and \
-               isinstance(gen2, types.GeneratorType):
-                for f1, f2 in zip(gen1, gen2):
+    async def _merge(foo1, foo2):
+        async for gen1, gen2 in zip(foo1(), foo2()):
+            if isinstance(gen1, types.AsyncGeneratorType) and \
+               isinstance(gen2, types.AsyncGeneratorType):
+                async for f1, f2 in zip(gen1, gen2):
                     ret = {}
                     ret.update(f1)
                     ret.update(f1)
                     yield ret
-            elif isinstance(gen1, types.GeneratorType):
-                for f1 in gen1:
+            elif isinstance(gen1, types.AsyncGeneratorType):
+                async for f1 in gen1:
                     ret = {}
                     ret.update(f1)
                     ret.update(gen2)
                     yield ret
-            elif isinstance(gen2, types.GeneratorType):
-                for f2 in gen2:
+            elif isinstance(gen2, types.AsyncGeneratorType):
+                async for f2 in gen2:
                     ret = {}
                     ret.update(gen1)
                     ret.update(f2)
@@ -241,8 +247,8 @@ def Reduce(*f_wraps):
         else:
             f_wraps[i] = Foo(f_wrap)
 
-    def _reduce(foos):
-        for all_gens in zip(*[foo() for foo in foos]):
+    async def _reduce(foos):
+        async for all_gens in zip(*[foo() for foo in foos]):
             gens = []
             vals = []
             for gen in all_gens:

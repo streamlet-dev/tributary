@@ -11,17 +11,14 @@ def AsyncHTTP(foo, foo_kwargs=None, url='', json=False, wrap=False, field=None, 
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs)
 
-    def _send(foo, url, json=False, wrap=False, field=None, proxies=None, cookies=None):
-        for data in foo():
+    async def _send(foo, url, json=False, wrap=False, field=None, proxies=None, cookies=None):
+        async for data in foo():
             if wrap:
                 data = [data]
             if json:
                 data = ujson.dumps(data)
-            print('*'*10)
-            print(url)
+
             msg = requests.post(url, data=data, cookies=cookies, proxies=proxies)
-            print(msg)
-            print('*'*10)
 
             if msg is None:
                 break

@@ -70,3 +70,18 @@ def construct_lazy(expr, modules=None):
             return self._function(*self._nodes)
 
     return Lazy
+
+
+def construct_streaming(expr, modules=None):
+    '''Construct Lazy tributary class from sympy expression
+
+    Args:
+        expr (sympy expression): A Sympy expression
+        modules (list): a list of modules to use for sympy's lambdify function
+    Returns:
+
+    '''
+    syms = list(symbols(expr))
+    names = [s.name for s in syms]
+    modules = modules or ["scipy", "numpy"]
+

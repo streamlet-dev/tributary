@@ -4,6 +4,19 @@ from six import iteritems
 
 
 def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
+    '''wrap a function in a streaming variant
+
+    Args:
+        foo (callable): function to wrap
+        foo_kwargs (dict): kwargs of function
+        name (str): name of function to call
+        wraps (tuple): functions or FunctionWrappers that this is wrapping
+        share:
+        state: state context
+
+    Returns:
+        FunctionWrapper: wrapped function
+    '''
     if isinstance(foo, FunctionWrapper):
         ret = foo
     else:
@@ -18,12 +31,25 @@ def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
 
 
 def _call_if_function(f):
+    '''call f if it is a function
+    Args:
+        f (any): a function or value
+    Returns:
+        any: return either f() or f
+    '''
     if isinstance(f, types.FunctionType):
         return f()
-    return f
+    else:
+        return f
 
 
 def _inc_ref(f_wrapped, f_wrapping):
+    '''Increment reference count for wrapped f
+
+    Args:
+        f_wrapped (FunctionWrapper): function that is wrapped
+        f_wrapping (FunctionWrapper): function that wants to use f_wrapped
+    '''
     if f_wrapped == f_wrapping:
         raise Exception('Internal Error')
 
@@ -35,7 +61,21 @@ def _inc_ref(f_wrapped, f_wrapping):
 
 
 class FunctionWrapper(object):
+    '''Generic streaming wrapper for a function'''
     def __init__(self, foo, foo_kwargs, name='', wraps=(), share=None, state=None):
+        '''
+            Args:
+        foo (callable): function to wrap
+        foo_kwargs (dict): kwargs of function
+        name (str): name of function to call
+        wraps (tuple): functions or FunctionWrappers that this is wrapping
+        share:
+        state: state context
+
+    Returns:
+        FunctionWrapper: wrapped function
+
+        '''
         state = state or {}
 
         if len(foo.__code__.co_varnames) > 0 and \
@@ -58,6 +98,7 @@ class FunctionWrapper(object):
         self._share = share if share else self
 
     def get_last(self):
+        '''Get last call value'''
         if not hasattr(self, '_last'):
             raise Exception('Never called!!')
 
@@ -68,16 +109,19 @@ class FunctionWrapper(object):
         return self._last
 
     def set_last(self, val):
+        '''Set last call value'''
         self._refs = self._refs_orig
         self._last = val
 
     last = property(get_last, set_last)
 
     def inc(self):
+        '''incremenet reference count'''
         self._refs_orig += 1
         self._refs += 1
 
     def view(self, _id=0, _idmap=None):
+        '''Return tree representation of data stream'''
         _idmap = _idmap or {}
         ret = {}
 
@@ -105,11 +149,25 @@ class FunctionWrapper(object):
                 ret[key].append(str(f))
         return ret, _id
 
-    def __call__(self, *args, **kwargs):
+    async def __call__(self, *args, **kwargs):
         while(self._refs == self._refs_orig):
             kwargs.update(self._foo_kwargs)
             ret = self._foo(*args, **kwargs)
-            if isinstance(ret, types.GeneratorType):
+            if isinstance(ret, types.AsyncGeneratorType):
+                async for r in ret:
+                    tmp = _call_if_function(r)
+                    if isinstance(tmp, types.CoroutineType):
+                        tmp = await tmp
+
+                    if isinstance(tmp, types.AsyncGeneratorType):
+                        async for rr in tmp:
+                            self.last = rr
+                            yield self.last
+
+                    else:
+                        self.last = tmp
+                        yield self.last
+            elif isinstance(ret, types.GeneratorType):
                 for r in ret:
                     tmp = _call_if_function(r)
 
@@ -124,8 +182,8 @@ class FunctionWrapper(object):
             else:
                 tmp = _call_if_function(ret)
 
-                if isinstance(tmp, types.GeneratorType):
-                    for rr in tmp:
+                if isinstance(tmp, types.AsyncGeneratorType):
+                    async for rr in tmp:
                         self.last = rr
                         yield self.last
 
@@ -148,17 +206,40 @@ class FunctionWrapper(object):
 
 
 def Const(val):
-    def _always(val):
+    '''Streaming wrapper around scalar val
+
+    Arguments:
+        val (any): a scalar
+    Returns:
+        FunctionWrapper: a streaming wrapper
+    '''
+    async def _always(val):
         yield val
 
     return _wrap(_always, dict(val=val), name='Const', wraps=(val,))
 
 
 def Foo(foo, foo_kwargs=None):
+    '''Streaming wrapper around function call
+
+    Arguments:
+        foo (callable): a function or callable
+        foo_kwargs (dict): kwargs for the function or callable foo
+    Returns:
+        FunctionWrapper: a streaming wrapper around foo
+    '''
     return _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))
 
 
 def Share(f_wrap):
+    '''Function to increment dataflow node reference count
+
+    Arguments:
+        f_wrap (FunctionWrapper): a streaming function
+    Returns:
+        FunctionWrapper: the same
+    '''
+
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('Share expects a tributary')
     f_wrap.inc()
