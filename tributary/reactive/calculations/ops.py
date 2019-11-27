@@ -151,6 +151,7 @@ def Cos(foo, foo_kwargs=None):
 def Tan(foo, foo_kwargs=None):
     return unary(lambda x: math.tan(x), foo, foo_kwargs, _name='Tan')
 
+
 # Arithmetic
 FunctionWrapper.__add__ = Add
 FunctionWrapper.__radd__ = Add

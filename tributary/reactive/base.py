@@ -124,7 +124,8 @@ class FunctionWrapper(object):
         state = state or {}
 
         if not (isinstance(foo, types.FunctionType) or isinstance(foo, types.CoroutineType)):
-            foo = lambda f=foo: f  # bind to f so foo isnt referenced
+            # bind to f so foo isnt referenced
+            foo = lambda f=foo: f  # noqa: E731
 
         if len(foo.__code__.co_varnames) > 0 and \
            foo.__code__.co_varnames[0] == 'state':
