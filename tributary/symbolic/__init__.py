@@ -1,4 +1,5 @@
 import tributary.lazy as tl
+import tributary.reactive as tr
 
 from sympy.utilities.lambdify import lambdify
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations as _st, implicit_multiplication_application as _ima
@@ -84,3 +85,20 @@ def construct_streaming(expr, modules=None):
     syms = list(symbols(expr))
     names = [s.name for s in syms]
     modules = modules or ["scipy", "numpy"]
+
+    class Streaming(tr.BaseClass):
+        def __init__(self, **kwargs):
+            self._kwargs = {}
+            for n in names:
+                if n not in kwargs:
+                    raise Exception("Must provide input source for: {}".format(n))
+                setattr(self, n, kwargs.get(n))
+                self._kwargs[n] = kwargs.get(n)
+
+            self._nodes = [getattr(self, n) for n in names]
+            self._function = tr.Foo(lambdify(syms, expr, modules=modules)(**self._kwargs))
+            self._expr = expr
+
+            super(Streaming, self).__init__(self._function)
+
+    return Streaming

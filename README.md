@@ -16,10 +16,7 @@ Python Data Streams
 Tributary offers several kinds of streams:
 
 ## Reactive
-These are synchronous, reactive data streams, built using python generators. They are designed to mimic complex event processors in terms of event ordering.
-
-## Asynchronous
-These are synchronous, reactive data streams, built using asynchronous python generators. They are a variant of the reactive streams, but should offer performance improvements over the non-asynchronous variants. 
+These are synchronous, reactive data streams, built using asynchronous python generators. They are designed to mimic complex event processors in terms of event ordering.
 
 ## Functional
 These are functional streams, built by currying python functions (callbacks). 

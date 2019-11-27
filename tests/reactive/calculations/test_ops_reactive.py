@@ -54,7 +54,7 @@ class TestOps:
         def foo():
             return True
 
-        inv = t.Not(foo)
+        inv = not t.Foo(foo)
         out = t.run(inv)
         assert len(out) == 1
         assert out[-1] == False
@@ -66,7 +66,7 @@ class TestOps:
         def foo2():
             return 1
 
-        add = t.Add(foo1, foo2)
+        add = t.Add(foo1, t.Foo(foo2))
         out = t.run(add)
         assert len(out) == 1
         assert out[-1] == 2
@@ -90,7 +90,7 @@ class TestOps:
         def foo2():
             return 3
 
-        mult = t.Mult(foo1, foo2)
+        mult = t.Foo(foo1) * foo2
         out = t.run(mult)
         assert len(out) == 1
         assert out[-1] == 6
@@ -102,7 +102,7 @@ class TestOps:
         def foo2():
             return 2
 
-        div = t.Div(foo1, foo2)
+        div = foo1 / t.Foo(foo2)
         out = t.run(div)
         assert len(out) == 1
         assert out[-1] == 1.5
@@ -126,7 +126,7 @@ class TestOps:
         def foo2():
             return 2
 
-        pow = t.Pow(foo1, foo2)
+        pow = t.Pow(foo1, t.Foo(foo2))
         out = t.run(pow)
         assert len(out) == 1
         assert out[-1] == 9
@@ -138,7 +138,7 @@ class TestOps:
         def foo2():
             return False
 
-        out = t.run(t.And(foo1, foo2))
+        out = t.run(t.Foo(foo1) and t.Foo(foo2))
         assert len(out) == 1
         assert out[-1] == False
 
@@ -149,7 +149,7 @@ class TestOps:
         def foo2():
             return False
 
-        out = t.run(t.Or(foo1, foo2))
+        out = t.run(foo1 or t.Foo(foo2))
         assert len(out) == 1
         assert out[-1] == True
 
@@ -160,8 +160,9 @@ class TestOps:
         def foo2():
             return True
 
-        out = t.run(t.Equal(foo1, foo2))
+        out = t.run(t.Foo(foo1) == foo2)
         assert len(out) == 1
+        print(out)
         assert out[-1] == True
 
     def test_less(self):
@@ -171,7 +172,8 @@ class TestOps:
         def foo2():
             return 3
 
-        out = t.run(t.Less(foo1, foo2))
+        f = t.Foo(foo2)
+        out = t.run(foo1 < f)
         assert len(out) == 1
         assert out[-1] == True
 
@@ -182,6 +184,6 @@ class TestOps:
         def foo2():
             return 3
 
-        out = t.run(t.More(foo1, foo2))
+        out = t.run(foo1 > t.Foo(foo2))
         assert len(out) == 1
         assert out[-1] == False

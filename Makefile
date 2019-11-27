@@ -13,9 +13,6 @@ test: lint ## run the tests for travis CI
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
 
-testpy2: ## run the tests for travis CI
-	@ python2 -m pytest -v tests --cov=tributary
-
 lint: ## run linter
 	flake8 tributary 
 

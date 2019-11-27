@@ -1,4 +1,5 @@
 import types
+import math
 from aiostream.stream import zip
 from ..base import _wrap, FunctionWrapper
 
@@ -33,7 +34,6 @@ def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
         # TODO replace with merge
         async for gen1, gen2 in zip(foo1(), foo2()):
             if isinstance(gen1, types.AsyncGeneratorType) and isinstance(gen2, types.AsyncGeneratorType):
-                print(1)
                 async for f1, f2 in zip(gen1, gen2):
                     if isinstance(f1, types.CoroutineType):
                         f1 = await f1
@@ -48,14 +48,11 @@ def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
                         gen2 = await gen2
                     yield lam(f1, gen2)
             elif isinstance(gen2, types.AsyncGeneratorType):
-                print(3)
                 async for f2 in gen2:
-                    print(31)
                     if isinstance(gen1, types.CoroutineType):
                         gen1 = await gen1
                     if isinstance(f2, types.CoroutineType):
                         f2 = await f2
-
                     yield lam(gen1, f2)
             else:
                 if isinstance(gen1, types.CoroutineType):
@@ -99,6 +96,10 @@ def Div(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x / y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Div')
 
 
+def RDiv(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: y / x, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Div')
+
+
 def Mod(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x % y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Mod')
 
@@ -119,22 +120,53 @@ def Equal(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x == y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Equal')
 
 
-def Less(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+def NotEqual(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: x == y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='NotEqual')
+
+
+def Lt(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x < y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Less')
 
 
-def More(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
-    return bin(lambda x, y: x > y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='More')
+def Le(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: x <= y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Less-than-or-equal')
 
+
+def Gt(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: x > y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Greater')
+
+
+def Ge(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
+    return bin(lambda x, y: x >= y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Greater-than-or-equal')
+
+
+def Sin(foo, foo_kwargs=None):
+    return unary(lambda x: math.sin(x), foo, foo_kwargs, _name='Sin')
+
+
+def Cos(foo, foo_kwargs=None):
+    return unary(lambda x: math.cos(x), foo, foo_kwargs, _name='Cos')
+
+
+def Tan(foo, foo_kwargs=None):
+    return unary(lambda x: math.tan(x), foo, foo_kwargs, _name='Tan')
 
 # Arithmetic
 FunctionWrapper.__add__ = Add
+FunctionWrapper.__radd__ = Add
 FunctionWrapper.__sub__ = Sub
+FunctionWrapper.__rsub__ = Sub
 FunctionWrapper.__mul__ = Mult
+FunctionWrapper.__rmul__ = Mult
 FunctionWrapper.__div__ = Div
+FunctionWrapper.__rdiv__ = RDiv
 FunctionWrapper.__truediv__ = Div
+FunctionWrapper.__rtruediv__ = RDiv
+
 FunctionWrapper.__pow__ = Pow
+FunctionWrapper.__rpow__ = Pow
 FunctionWrapper.__mod__ = Mod
+FunctionWrapper.__rmod__ = Mod
 
 # Logical
 # FunctionWrapper.__and__ = And
@@ -142,6 +174,32 @@ FunctionWrapper.__mod__ = Mod
 # FunctionWrapper.__invert__ = Not
 # TODO use __bool__ operator
 
+# Converters
+# FunctionWrapper.int = Int
+# FunctionWrapper.float = Float
+
 # Comparator
-FunctionWrapper.__lt__ = Less
-FunctionWrapper.__gt__ = More
+FunctionWrapper.__lt__ = Lt
+FunctionWrapper.__le__ = Le
+FunctionWrapper.__gt__ = Gt
+FunctionWrapper.__ge__ = Ge
+FunctionWrapper.__eq__ = Equal
+FunctionWrapper.__ne__ = NotEqual
+FunctionWrapper.__neg__ = Negate
+# FunctionWrapper.__nonzero__ = Bool  # Py2 compat
+# FunctionWrapper.__len__ = Len
+
+# Numpy
+# FunctionWrapper.__array_ufunc__ = __array_ufunc__
+
+# Math
+# FunctionWrapper.log = Log
+FunctionWrapper.sin = Sin
+FunctionWrapper.cos = Cos
+FunctionWrapper.tan = Tan
+# FunctionWrapper.arcsin = Arcsin
+# FunctionWrapper.arccos = Arccos
+# FunctionWrapper.arctan = Arctan
+# FunctionWrapper.sqrt = Sqrt
+# FunctionWrapper.exp = Exp
+# FunctionWrapper.erf = Erf

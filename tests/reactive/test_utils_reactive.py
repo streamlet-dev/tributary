@@ -233,3 +233,23 @@ class TestUtils:
         out = t.run(t.Reduce({'a': 1}, foo1, foo2))
         assert len(out) == 1
         assert out[-1] == [{'a': 1}, {'b': 2}, {'c': 3}]
+
+    def test_ensure_count(self):
+        import tributary.reactive as tr
+
+        def myfoo(state, data):
+            state.count = state.count + 1
+            return data + state.count
+
+        def myfoo2(data):
+            return data + 1
+
+        out1 = tr.run(tr.Const(1))
+        out2 = tr.run(tr.Apply(myfoo2, tr.Const(1)))
+        out3 = tr.run(tr.Apply(tr.State(myfoo, count=0), tr.Const(1)))
+        print(out1)
+        print(out2)
+        print(out3)
+        assert len(out1) == 1
+        assert len(out2) == 1
+        assert len(out3) == 1

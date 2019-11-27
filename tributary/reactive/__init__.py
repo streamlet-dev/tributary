@@ -34,3 +34,19 @@ def run(foo, **kwargs):
         # block until done
         x = loop.run_until_complete(_run(foo, **kwargs))
     return x
+
+
+class BaseClass(object):
+    def __init__(self, run=None, *args, **kwargs):
+        self._run = run
+
+    def run(self, **kwargs):
+        if not hasattr(self, "_run") or not self._run:
+            raise Exception("Reactive class improperly constructed, did you forget a super()?")
+        return run(self._run, **kwargs)
+
+    def pprint(self):
+        return PPrint(self._run)
+
+    def graphviz(self):
+        return GraphViz(self._run)

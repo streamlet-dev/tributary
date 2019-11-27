@@ -1,6 +1,7 @@
 import types
 import sys
 from six import iteritems
+DEBUG = False
 
 
 def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
@@ -24,7 +25,7 @@ def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
 
     for wrap in wraps:
         if isinstance(wrap, FunctionWrapper):
-            if wrap == foo:
+            if wrap._foo == ret._foo:
                 continue
             _inc_ref(wrap, ret)
     return ret
@@ -50,7 +51,7 @@ def _inc_ref(f_wrapped, f_wrapping):
         f_wrapped (FunctionWrapper): function that is wrapped
         f_wrapping (FunctionWrapper): function that wants to use f_wrapped
     '''
-    if f_wrapped == f_wrapping:
+    if f_wrapped._id == f_wrapping._id:
         raise Exception('Internal Error')
 
     if f_wrapped._using is None or f_wrapped._using == id(f_wrapping):
@@ -60,8 +61,49 @@ def _inc_ref(f_wrapped, f_wrapping):
     f_wrapped._using = id(f_wrapping)
 
 
+def Const(val):
+    '''Streaming wrapper around scalar val
+
+    Arguments:
+        val (any): a scalar
+    Returns:
+        FunctionWrapper: a streaming wrapper
+    '''
+    async def _always(val):
+        yield val
+
+    return _wrap(_always, dict(val=val), name='Const', wraps=(val,))
+
+
+def Foo(foo, foo_kwargs=None):
+    '''Streaming wrapper around function call
+
+    Arguments:
+        foo (callable): a function or callable
+        foo_kwargs (dict): kwargs for the function or callable foo
+    Returns:
+        FunctionWrapper: a streaming wrapper around foo
+    '''
+    return _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))
+
+
+def Share(f_wrap):
+    '''Function to increment dataflow node reference count
+
+    Arguments:
+        f_wrap (FunctionWrapper): a streaming function
+    Returns:
+        FunctionWrapper: the same
+    '''
+    if not isinstance(f_wrap, FunctionWrapper):
+        raise Exception('Share expects a tributary')
+    f_wrap.inc()
+    return f_wrap
+
+
 class FunctionWrapper(object):
     '''Generic streaming wrapper for a function'''
+    _id_ref = 0
 
     def __init__(self, foo, foo_kwargs, name='', wraps=(), share=None, state=None):
         '''
@@ -77,11 +119,16 @@ class FunctionWrapper(object):
         FunctionWrapper: wrapped function
 
         '''
+        self._id = FunctionWrapper._id_ref
+        FunctionWrapper._id_ref += 1
         state = state or {}
+
+        if not (isinstance(foo, types.FunctionType) or isinstance(foo, types.CoroutineType)):
+            foo = lambda f=foo: f  # bind to f so foo isnt referenced
 
         if len(foo.__code__.co_varnames) > 0 and \
            foo.__code__.co_varnames[0] == 'state':
-            self._foo = foo.__get__(self, FunctionWrapper)
+            self._foo = foo.__get__(self, FunctionWrapper)  # TODO: remember what this line does
             for k, v in iteritems(state):
                 if k not in ('_foo', '_foo_kwargs', '_refs_orig', '_name', '_wraps', '_share'):
                     setattr(self, k, v)
@@ -151,9 +198,13 @@ class FunctionWrapper(object):
         return ret, _id
 
     async def __call__(self, *args, **kwargs):
+        if DEBUG:
+            print("calling: {}".format(self._foo))
+
         while(self._refs == self._refs_orig):
             kwargs.update(self._foo_kwargs)
             ret = self._foo(*args, **kwargs)
+
             if isinstance(ret, types.AsyncGeneratorType):
                 async for r in ret:
                     tmp = _call_if_function(r)
@@ -171,6 +222,8 @@ class FunctionWrapper(object):
             elif isinstance(ret, types.GeneratorType):
                 for r in ret:
                     tmp = _call_if_function(r)
+                    if isinstance(tmp, types.CoroutineType):
+                        tmp = await tmp
 
                     if isinstance(tmp, types.GeneratorType):
                         for rr in tmp:
@@ -182,66 +235,22 @@ class FunctionWrapper(object):
                         yield self.last
             else:
                 tmp = _call_if_function(ret)
+                if isinstance(tmp, types.CoroutineType):
+                    tmp = await tmp
 
                 if isinstance(tmp, types.AsyncGeneratorType):
                     async for rr in tmp:
                         self.last = rr
                         yield self.last
-
                 else:
                     self.last = tmp
                     yield self.last
-        while(0 < self._refs < self._refs_orig):
+
+        while(0 < self._refs and self._refs < self._refs_orig):
             yield self.last
 
         # reset state to be called again
         self._refs = self._refs_orig
 
     def __iter__(self):
-        c_gen = self.__call__()
-        for c in c_gen:
-            yield c
-
-    def __add__(self, other):
-        pass
-
-
-def Const(val):
-    '''Streaming wrapper around scalar val
-
-    Arguments:
-        val (any): a scalar
-    Returns:
-        FunctionWrapper: a streaming wrapper
-    '''
-    async def _always(val):
-        yield val
-
-    return _wrap(_always, dict(val=val), name='Const', wraps=(val,))
-
-
-def Foo(foo, foo_kwargs=None):
-    '''Streaming wrapper around function call
-
-    Arguments:
-        foo (callable): a function or callable
-        foo_kwargs (dict): kwargs for the function or callable foo
-    Returns:
-        FunctionWrapper: a streaming wrapper around foo
-    '''
-    return _wrap(foo, foo_kwargs or {}, name='Foo', wraps=(foo,))
-
-
-def Share(f_wrap):
-    '''Function to increment dataflow node reference count
-
-    Arguments:
-        f_wrap (FunctionWrapper): a streaming function
-    Returns:
-        FunctionWrapper: the same
-    '''
-
-    if not isinstance(f_wrap, FunctionWrapper):
-        raise Exception('Share expects a tributary')
-    f_wrap.inc()
-    return f_wrap
+        yield from self.__call__()

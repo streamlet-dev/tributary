@@ -18,13 +18,10 @@ def Print(foo, foo_kwargs=None):
         async for r in foo():
             if isinstance(r, types.AsyncGeneratorType):
                 async for x in r:
-                    print(x)
                     yield x
             elif isinstance(r, types.CoroutineType):
-                print(r)
                 yield await r
             else:
-                print(r)
                 yield r
 
     return _wrap(_print, dict(foo=foo), name='Print', wraps=(foo,), share=foo)
