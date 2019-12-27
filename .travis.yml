@@ -24,7 +24,9 @@ addons:
 install: 
   - python3 -m pip install -e .[dev]
 
-script: make test
+script:
+  - make lint
+  - make tests
 
 after_success: 
   - python3 -m codecov --token 2b1a0cc9-52e4-4942-8816-8554a1f5d0f1

@@ -7,9 +7,6 @@ buildpy2:
 tests: ## Clean and Make unit tests
 	python3 -m pytest -v tributary/tests --cov=tributary
 
-test: lint ## run the tests for travis CI
-	@ python3 -m pytest -v tributary/tests --cov=tributary
-
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
 

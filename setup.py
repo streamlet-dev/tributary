@@ -20,9 +20,6 @@ version = get_version(pjoin(here, name, '_version.py'))
 with open(pjoin(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open(pjoin(here, 'requirements.txt'), encoding='utf-8') as f:
-    requires = f.read().split()
-
 
 requires = [
     'aiohttp>=3.5.4',
