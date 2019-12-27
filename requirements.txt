@@ -8,7 +8,7 @@ graphviz>=0.10.1
 ipython>=7.0.1
 networkx>=2.2
 numpy>=1.15.3
-perspective-python>=0.4.0
+perspective-python>=0.4.0rc6
 pygraphviz>=1.5
 scipy>1.2.0
 six>=1.11.0
