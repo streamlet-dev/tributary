@@ -1,2 +1,18 @@
-prune tests/
-include requirements.txt
+graft tributary
+include LICENSE
+include README.md
+
+include setup.cfg
+include pyproject.toml
+include .bumpversion.cfg
+include Makefile
+
+graft tributary/tests
+
+# Patterns to exclude from any directory
+global-exclude *~
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .git
+global-exclude .ipynb_checkpoints
+global-exclude .DS_Store
