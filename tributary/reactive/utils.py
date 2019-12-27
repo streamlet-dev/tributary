@@ -7,7 +7,6 @@ from .base import _wrap, FunctionWrapper, Foo, Const
 
 def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
     kwargs = kwargs or {}
-
     if not isinstance(foo_or_val, types.FunctionType):
         foo = Const(foo_or_val)
     else:
@@ -22,7 +21,7 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
 
             if interval > 0:
                 # sleep for rest of time that _p didnt take
-                await asyncio.sleep(max(0, interval-(t2-t1)))
+                await asyncio.sleep(max(0, interval - (t2 - t1)))
             repeat -= 1
 
     return _wrap(_repeater, dict(foo=foo, repeat=repeat, interval=interval), name='Timer', wraps=(foo,), share=foo)
@@ -55,8 +54,14 @@ def Apply(foo, f_wrap, foo_kwargs=None):
 
     async def _apply(foo):
         async for f in f_wrap():
-            yield foo(f)
-
+            item = foo(f)
+            if isinstance(item, types.AsyncGeneratorType):
+                async for i in item:
+                    yield i
+            elif isinstance(item, types.CoroutineType):
+                yield await item
+            else:
+                yield item
     return _wrap(_apply, dict(foo=foo), name='Apply', wraps=(foo,), share=foo)
 
 
@@ -209,7 +214,7 @@ def DictMerge(f_wrap1, f_wrap2):
         else:
             f_wrap2 = Foo(f_wrap2)
 
-    async def _merge(foo1, foo2):
+    async def _dictmerge(foo1, foo2):
         async for gen1, gen2 in zip(foo1(), foo2()):
             if isinstance(gen1, types.AsyncGeneratorType) and \
                isinstance(gen2, types.AsyncGeneratorType):
@@ -236,7 +241,7 @@ def DictMerge(f_wrap1, f_wrap2):
                 ret.update(gen2)
                 yield ret
 
-    return _wrap(_merge, dict(foo1=f_wrap1, foo2=f_wrap2), name='DictMerge', wraps=(f_wrap1, f_wrap2), share=None)
+    return _wrap(_dictmerge, dict(foo1=f_wrap1, foo2=f_wrap2), name='DictMerge', wraps=(f_wrap1, f_wrap2), share=None)
 
 
 def Reduce(*f_wraps):
@@ -252,7 +257,7 @@ def Reduce(*f_wraps):
             gens = []
             vals = []
             for gen in all_gens:
-                if isinstance(gen, types.GeneratorType):
+                if isinstance(gen, types.AsyncGeneratorType):
                     gens.append(gen)
                 else:
                     vals.append(gen)

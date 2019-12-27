@@ -73,7 +73,7 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
         function_to_call = lambdas[i]
         kwargs[cb] = function_to_call
 
-        if i != len(assembled)-1:
+        if i != len(assembled) - 1:
             lambdas.append(lambda d, kw=kwargs, f=foo: run_submit(f, function_to_call, d, **kw))
             lambdas[-1].__name__ = foo.__name__
         else:

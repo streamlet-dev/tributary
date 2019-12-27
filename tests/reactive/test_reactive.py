@@ -15,7 +15,7 @@ class TestConfig:
         ''')
         test = t.Timer(foo, {}, 0, 5)
         test2 = t.Negate(test)
-        res2 = t.Add(test, test2)
+        res2 = test + test2
         p2 = t.Print(res2)
         t.run(p2)
 
@@ -41,10 +41,10 @@ class TestConfig:
 
         neg_rand = t.Negate(rand)
 
-        x1 = t.Add(rand, five)  # 5 + rand
-        x2 = t.Sub(x1, five2)  # rand
-        x3 = t.Add(x2, neg_rand)  # 0
-        res2 = t.Add(x3, one)  # 1
+        x1 = rand + five  # 5 + rand
+        x2 = x1 - five2  # rand
+        x3 = x2 + neg_rand  # 0
+        res2 = x3 + one  # 1
         p2 = t.Print(res2)  # 1
 
         t.PPrint(p2)
@@ -64,7 +64,7 @@ class TestConfig:
         f = t.Foo(stream)
         sum = t.Sum(f)
         count = t.Count(f)
-        f3 = t.Div(sum, count)
+        f3 = sum / count
         p3 = t.Print(f3)
 
         t.PPrint(p3)

@@ -3,11 +3,11 @@ import math
 import numpy as np
 
 from ..base import _wrap
-from .file import File  # noqa: F401
-from .http import HTTP, AsyncHTTP  # noqa: F401
-from .kafka import Kafka, AsyncKafka  # noqa: F401
-from .socketio import SocketIO, AsyncSocketIO  # noqa: F401
-from .ws import WebSocket, AsyncWebSocket  # noqa: F401
+from .file import File, File as FileSource  # noqa: F401
+from .http import HTTP, HTTP as HTTPSource  # noqa: F401
+from .kafka import Kafka, Kafka as KafkaSource  # noqa: F401
+from .socketio import SocketIO, SocketIO as SocketIOSource  # noqa: F401
+from .ws import WebSocket, WebSocket as WebSocketSource  # noqa: F401
 
 
 def _gen():
