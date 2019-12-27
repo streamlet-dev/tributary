@@ -1,19 +1,32 @@
 from setuptools import setup, find_packages
 from codecs import open
-from os import path
+import os.path
+import io
 
-here = path.abspath(path.dirname(__file__))
+pjoin = os.path.join
+here = os.path.abspath(os.path.dirname(__file__))
+name = 'tributary'
 
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+
+def get_version(file, name='__version__'):
+    path = os.path.realpath(file)
+    version_ns = {}
+    with io.open(path, encoding="utf8") as f:
+        exec(f.read(), {}, version_ns)
+    return version_ns[name]
+
+version = get_version(pjoin(here, name, '_version.py'))
+
+with open(pjoin(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+with open(pjoin(here, 'requirements.txt'), encoding='utf-8') as f:
     requires = f.read().split()
 
 
 setup(
-    name='tributary',
-    version='0.0.7',
+    name=name,
+    version=version,
     description='Analytics library',
     long_description=long_description,
     url='https://github.com/timkpaine/tributary',
