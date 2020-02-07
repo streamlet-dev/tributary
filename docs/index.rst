@@ -110,15 +110,15 @@ Kafka
    :target: https://pypi.python.org/pypi/tributary
 .. |Docs| image:: https://img.shields.io/readthedocs/tributary.svg
    :target: https://tributary.readthedocs.io
-.. |image7| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example.gif
-.. |image8| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example1.png
-.. |image9| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example2.png
-.. |image10| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example3.png
-.. |image11| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/example4.png
-.. |image12| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/ws.png
-.. |image13| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/http.png
-.. |image14| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/sio.png
-.. |image15| image:: https://raw.githubusercontent.com/timkpaine/tributary/master/docs/kafka.png
+.. |image7| image:: img/example.gif
+.. |image8| image:: img/reactive/example1.png
+.. |image9| image:: img/reactive/example2.png
+.. |image10| image:: img/reactive/example3.png
+.. |image11| image:: img/reactive/example4.png
+.. |image12| image:: img/reactive/ws.png
+.. |image13| image:: img/reactive/http.png
+.. |image14| image:: img/reactive/sio.png
+.. |image15| image:: img/reactive/kafka.png
 
 .. toctree::
    :maxdepth: 2
