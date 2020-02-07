@@ -1,11 +1,11 @@
-from .node import _Node
+from .node import _Node, node  # noqa: F401
 
 
 class BaseClass(object):
     def __init__(self, *args, **kwargs):
         pass
 
-    def node(self, name, readonly=False, nullable=True, default_or_starting_value=None, trace=False):
+    def node(self, name, readonly=False, nullable=True, default_or_starting_value=None, trace=False):  # noqa: F811
         if not hasattr(self, '_BaseClass__nodes'):
             self.__nodes = {}
 
