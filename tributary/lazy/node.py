@@ -1,15 +1,16 @@
+import gc
 import six
 import inspect
 from ..utils import _either_type
 
 
-class _Node(object):
+class BaseNode(object):
     def __init__(self,
-                 name,
+                 name="?",
                  derived=False,
                  readonly=False,
                  nullable=False,
-                 default_or_starting_value=None,
+                 value=None,
                  callable=None,
                  callable_args=None,
                  callable_kwargs=None,
@@ -17,9 +18,9 @@ class _Node(object):
                  always_dirty=False,
                  trace=False,
                  ):
-        self._callable = callable
         self._name = name
-        self._value = default_or_starting_value
+        self._callable = callable
+        self._value = value
         self._readonly = readonly
         self._trace = trace
         self._callable = callable
@@ -81,7 +82,7 @@ class _Node(object):
             else:
                 new_value = k(*self._dependencies[k][0], **self._dependencies[k][1])
 
-            if isinstance(new_value, _Node):
+            if isinstance(new_value, BaseNode):
                 k._node_wrapper = new_value
                 new_value = new_value()  # get value
 
@@ -132,7 +133,7 @@ class _Node(object):
     def _gennode(self, name, foo, foo_args, trace=False):
         if name not in self._node_op_cache:
             self._node_op_cache[name] = \
-                _Node(name=name,
+                BaseNode(name=name,
                       derived=True,
                       callable=foo,
                       callable_args=foo_args,
@@ -140,17 +141,22 @@ class _Node(object):
         return self._node_op_cache[name]
 
     def _tonode(self, other, trace=False):
-        if isinstance(other, _Node):
+        if isinstance(other, BaseNode):
             return other
         if str(other) not in self._node_op_cache:
             self._node_op_cache[str(other)] = \
-                _Node(name='var(' + str(other)[:5] + ')',
+                BaseNode(name='var(' + str(other)[:5] + ')',
                       derived=True,
-                      default_or_starting_value=other,
+                      value=other,
                       trace=trace)
         return self._node_op_cache[str(other)]
 
-    def set(self, **kwargs):
+    def setValue(self, value):
+        if value != self._value:
+            self._dirty = True
+        self._value = value
+
+    def set(self, *args, **kwargs):
         for k, v in six.iteritems(kwargs):
             _set = False
             for deps in six.itervalues(self._dependencies):
@@ -319,25 +325,25 @@ def node(meth, memoize=True, trace=False):
 
         if (is_method and len(argspec.defaults or []) >= i) or \
            (not is_method and len(argspec.defaults or []) > i):
-            default_or_starting_value = argspec.defaults[0]
+            value = argspec.defaults[0]
             nullable = True
         else:
-            default_or_starting_value = None
+            value = None
             nullable = False
 
-        node_args.append(_Node(name=arg,
+        node_args.append(BaseNode(name=arg,
                                derived=True,
                                readonly=False,
                                nullable=nullable,
-                               default_or_starting_value=default_or_starting_value,
+                               value=value,
                                trace=trace))
 
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
-        node_kwargs[k] = _Node(name=k,
+        node_kwargs[k] = BaseNode(name=k,
                                derived=True,
                                readonly=False,
                                nullable=True,
-                               default_or_starting_value=v,
+                               value=v,
                                trace=trace)
 
     def meth_wrapper(self, *args, **kwargs):
@@ -353,7 +359,7 @@ def node(meth, memoize=True, trace=False):
             val = meth(*(arg.value() for arg in args), **kwargs)
         return val
 
-    new_node = _Node(name=meth.__name__,
+    new_node = BaseNode(name=meth.__name__,
                      derived=True,
                      callable=meth_wrapper,
                      callable_args=node_args,

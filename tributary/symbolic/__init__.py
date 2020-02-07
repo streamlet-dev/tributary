@@ -51,16 +51,16 @@ def construct_lazy(expr, modules=None):
         expr (sympy expression): A Sympy expression
         modules (list): a list of modules to use for sympy's lambdify function
     Returns:
-        tributary.lazy.BaseClass
+        tributary.lazy.BaseGraph
     '''
     syms = list(symbols(expr))
     names = [s.name for s in syms]
     modules = modules or ["scipy", "numpy"]
 
-    class Lazy(tl.BaseClass):
+    class Lazy(tl.BaseGraph):
         def __init__(self, **kwargs):
             for n in names:
-                setattr(self, n, self.node(name=n, default_or_starting_value=kwargs.get(n, None)))
+                setattr(self, n, self.node(name=n, value=kwargs.get(n, None)))
 
             self._nodes = [getattr(self, n) for n in names]
             self._function = lambdify(syms, expr, modules=modules)
@@ -86,7 +86,7 @@ def construct_streaming(expr, modules=None):
     names = [s.name for s in syms]
     modules = modules or ["scipy", "numpy"]
 
-    class Streaming(tr.BaseClass):
+    class Streaming(tr.BaseGraph):
         def __init__(self, **kwargs):
             self._kwargs = {}
             for n in names:

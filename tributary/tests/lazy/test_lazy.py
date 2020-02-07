@@ -2,21 +2,21 @@ import tributary.lazy as t
 import random
 
 
-class Foo1(t.BaseClass):
+class Foo1(t.BaseGraph):
     def __init__(self, *args, **kwargs):
-        self.x = self.node('x', readonly=False, default_or_starting_value=1, trace=True)
+        self.x = self.node('x', readonly=False, value=1, trace=True)
 
 
-class Foo2(t.BaseClass):
+class Foo2(t.BaseGraph):
     def __init__(self, *args, **kwargs):
-        self.y = self.node('y', readonly=False, default_or_starting_value=2, trace=True)
+        self.y = self.node('y', readonly=False, value=2, trace=True)
 
         # ensure no __nodes clobber
-        self.test = self.node('test', readonly=False, default_or_starting_value=2, trace=True)
-        self.x = self.node('x', readonly=False, default_or_starting_value=2, trace=True)
+        self.test = self.node('test', readonly=False, value=2, trace=True)
+        self.x = self.node('x', readonly=False, value=2, trace=True)
 
 
-class Foo3(t.BaseClass):
+class Foo3(t.BaseGraph):
     @t.node(trace=True)
     def foo1(self):
         return self.random()  # test self access
@@ -28,7 +28,7 @@ class Foo3(t.BaseClass):
     def foo3(self, x=4):
         return 3 + x
 
-class Foo4(t.BaseClass):
+class Foo4(t.BaseGraph):
     @t.node(trace=True)
     def foo1(self):
         return self.foo2() + 1
@@ -38,7 +38,7 @@ class Foo4(t.BaseClass):
         return random.random()
 
 
-class Foo5(t.BaseClass):
+class Foo5(t.BaseGraph):
     @t.node()
     def z(self):
         return self.x | self.y()
@@ -51,7 +51,7 @@ class Foo5(t.BaseClass):
         self.x = None
 
     def __init__(self):
-        self.x = self.node(name="x", default_or_starting_value=None)
+        self.x = self.node(name="x", value=None)
 
 
 class TestLazy:
@@ -129,3 +129,12 @@ class TestDirtyPropogation:
 
         assert f.x() == None
         assert f.z()() == 10
+
+
+class TestDeclarative:
+    def test_simple_declarative(self):
+        n = t.BaseNode(value=1)
+        z = n + 5
+        assert z() == 6
+        n.setValue(2)
+        assert z() == 7

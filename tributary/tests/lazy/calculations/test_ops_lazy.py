@@ -1,20 +1,20 @@
 import tributary.lazy as t
 
-class Foo1(t.BaseClass):
+class Foo1(t.BaseGraph):
     def __init__(self, *args, **kwargs):
-        self.x = self.node('x', readonly=False, default_or_starting_value=1, trace=True)
+        self.x = self.node('x', readonly=False, value=1, trace=True)
 
 
-class Foo2(t.BaseClass):
+class Foo2(t.BaseGraph):
     def __init__(self, *args, **kwargs):
-        self.y = self.node('y', readonly=False, default_or_starting_value=2, trace=True)
+        self.y = self.node('y', readonly=False, value=2, trace=True)
 
         # ensure no __nodes clobber
-        self.test = self.node('test', readonly=False, default_or_starting_value=2, trace=True)
-        self.x = self.node('x', readonly=False, default_or_starting_value=2, trace=True)
+        self.test = self.node('test', readonly=False, value=2, trace=True)
+        self.x = self.node('x', readonly=False, value=2, trace=True)
 
 
-class Foo3(t.BaseClass):
+class Foo3(t.BaseGraph):
     @t.node()
     def z(self):
         return self.x | self.y()
@@ -27,7 +27,7 @@ class Foo3(t.BaseClass):
         self.x = None
 
     def __init__(self):
-        self.x = self.node(name="x", default_or_starting_value=None)
+        self.x = self.node(name="x", value=None)
 
 
 class TestLazyOps:

@@ -37,7 +37,7 @@ def run(foo, **kwargs):
     return x
 
 
-class BaseClass(object):
+class BaseGraph(object):
     def __init__(self, run=None, *args, **kwargs):
         self._run = run
 

@@ -1,47 +1,47 @@
 import math
 import numpy as np
 import scipy as sp
-from ..base import _Node
+from ..base import BaseNode
 
 
 def Add(self, other):
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '+' + other._name, (lambda x, y: x.value() + y.value()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '+' + other._name, (lambda x, y: x.value() + y.value()), [self, other], self._trace or other._trace)
 
 
 def Sub(self, other):
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '-' + other._name, (lambda x, y: x.value() - y.value()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '-' + other._name, (lambda x, y: x.value() - y.value()), [self, other], self._trace or other._trace)
 
 
 def Mult(self, other):
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '*' + other._name, (lambda x, y: x.value() * y.value()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '*' + other._name, (lambda x, y: x.value() * y.value()), [self, other], self._trace or other._trace)
 
 
 def Div(self, other):
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '/' + other._name, (lambda x, y: x.value() / y.value()), [self, other], self._trace or other._trace)
 
 
 def Pow(self, other):
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
 
 
 def Or(self, other):
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '||' + other._name, (lambda x, y: x.value() or y.value()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '||' + other._name, (lambda x, y: x.value() or y.value()), [self, other], self._trace or other._trace)
 
@@ -100,22 +100,22 @@ def Len(self):
 
 def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
     if ufunc == np.add:
-        if isinstance(inputs[0], _Node):
+        if isinstance(inputs[0], BaseNode):
             return inputs[0].__add__(inputs[1])
         else:
             return inputs[1].__add__(inputs[0])
     elif ufunc == np.subtract:
-        if isinstance(inputs[0], _Node):
+        if isinstance(inputs[0], BaseNode):
             return inputs[0].__sub__(inputs[1])
         else:
             return inputs[1].__sub__(inputs[0])
     elif ufunc == np.multiply:
-        if isinstance(inputs[0], _Node):
+        if isinstance(inputs[0], BaseNode):
             return inputs[0].__mul__(inputs[1])
         else:
             return inputs[1].__mul__(inputs[0])
     elif ufunc == np.divide:
-        if isinstance(inputs[0], _Node):
+        if isinstance(inputs[0], BaseNode):
             return inputs[0].__truedivide__(inputs[1])
         else:
             return inputs[1].__truedivide__(inputs[0])
@@ -150,113 +150,113 @@ def Bool(self):
 
 
 def Equal(self, other):
-    if isinstance(other, _Node) and super(_Node, self).__eq__(other):
+    if isinstance(other, BaseNode) and super(BaseNode, self).__eq__(other):
         return True
 
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '==' + other._name, (lambda x, y: x() == y()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '==' + other._name, (lambda x, y: x() == y()), [self, other], self._trace or other._trace)
 
 
 def NotEqual(self, other):
-    if isinstance(other, _Node) and super(_Node, self).__eq__(other):
+    if isinstance(other, BaseNode) and super(BaseNode, self).__eq__(other):
         return False
 
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '!=' + other._name, (lambda x, y: x() != y()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '!=' + other._name, (lambda x, y: x() != y()), [self, other], self._trace or other._trace)
 
 
 def Ge(self, other):
-    if isinstance(other, _Node) and super(_Node, self).__eq__(other):
+    if isinstance(other, BaseNode) and super(BaseNode, self).__eq__(other):
         return True
 
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '>=' + other._name, (lambda x, y: x() >= y()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '>=' + other._name, (lambda x, y: x() >= y()), [self, other], self._trace or other._trace)
 
 
 def Gt(self, other):
-    if isinstance(other, _Node) and super(_Node, self).__eq__(other):
+    if isinstance(other, BaseNode) and super(BaseNode, self).__eq__(other):
         return False
 
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '>' + other._name, (lambda x, y: x() > y()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '>' + other._name, (lambda x, y: x() > y()), [self, other], self._trace or other._trace)
 
 
 def Le(self, other):
-    if isinstance(other, _Node) and super(_Node, self).__eq__(other):
+    if isinstance(other, BaseNode) and super(BaseNode, self).__eq__(other):
         return True
 
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '<=' + other._name, (lambda x, y: x() <= y()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '<=' + other._name, (lambda x, y: x() <= y()), [self, other], self._trace or other._trace)
 
 
 def Lt(self, other):
-    if isinstance(other, _Node) and super(_Node, self).__eq__(other):
+    if isinstance(other, BaseNode) and super(BaseNode, self).__eq__(other):
         return False
     other = self._tonode(other)
-    if isinstance(self._self_reference, _Node):
+    if isinstance(self._self_reference, BaseNode):
         return self._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self._self_reference, other], self._trace or other._trace)
     return self._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self, other], self._trace or other._trace)
 
 
 # Arithmetic
-_Node.__add__ = Add
-_Node.__radd__ = Add
-_Node.__sub__ = Sub
-_Node.__rsub__ = Sub
-_Node.__mul__ = Mult
-_Node.__rmul__ = Mult
-_Node.__div__ = Div
-_Node.__rdiv__ = Div
-_Node.__truediv__ = Div
-_Node.__rtruediv__ = Div
+BaseNode.__add__ = Add
+BaseNode.__radd__ = Add
+BaseNode.__sub__ = Sub
+BaseNode.__rsub__ = Sub
+BaseNode.__mul__ = Mult
+BaseNode.__rmul__ = Mult
+BaseNode.__div__ = Div
+BaseNode.__rdiv__ = Div
+BaseNode.__truediv__ = Div
+BaseNode.__rtruediv__ = Div
 
-_Node.__pow__ = Pow
-_Node.__rpow__ = Pow
-# _Node.__mod__ = Mod
-# _Node.__rmod__ = Mod
+BaseNode.__pow__ = Pow
+BaseNode.__rpow__ = Pow
+# BaseNode.__mod__ = Mod
+# BaseNode.__rmod__ = Mod
 
 # Logical
-# _Node.__and__ = And
-_Node.__or__ = Or
-# _Node.__invert__ = Not
-_Node.__bool__ = Bool
+# BaseNode.__and__ = And
+BaseNode.__or__ = Or
+# BaseNode.__invert__ = Not
+BaseNode.__bool__ = Bool
 
 # Converters
-_Node.int = Int
-_Node.float = Float
+BaseNode.int = Int
+BaseNode.float = Float
 
 # Comparator
-_Node.__lt__ = Lt
-_Node.__le__ = Le
-_Node.__gt__ = Gt
-_Node.__ge__ = Ge
-_Node.__eq__ = Equal
-_Node.__ne__ = NotEqual
-_Node.__neg__ = Negate
-_Node.__nonzero__ = Bool  # Py2 compat
-_Node.__len__ = Len
+BaseNode.__lt__ = Lt
+BaseNode.__le__ = Le
+BaseNode.__gt__ = Gt
+BaseNode.__ge__ = Ge
+BaseNode.__eq__ = Equal
+BaseNode.__ne__ = NotEqual
+BaseNode.__neg__ = Negate
+BaseNode.__nonzero__ = Bool  # Py2 compat
+BaseNode.__len__ = Len
 
 # Numpy
-_Node.__array_ufunc__ = __array_ufunc__
+BaseNode.__array_ufunc__ = __array_ufunc__
 
 # Functions
-_Node.log = Log
-_Node.sin = Sin
-_Node.cos = Cos
-_Node.tan = Tan
-_Node.arcsin = Arcsin
-_Node.arccos = Arccos
-_Node.arctan = Arctan
-_Node.sqrt = Sqrt
-_Node.exp = Exp
-_Node.erf = Erf
+BaseNode.log = Log
+BaseNode.sin = Sin
+BaseNode.cos = Cos
+BaseNode.tan = Tan
+BaseNode.arcsin = Arcsin
+BaseNode.arccos = Arccos
+BaseNode.arctan = Arctan
+BaseNode.sqrt = Sqrt
+BaseNode.exp = Exp
+BaseNode.erf = Erf
