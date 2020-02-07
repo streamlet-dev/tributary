@@ -39,33 +39,7 @@ class Foo4(t.BaseClass):
         return random.random()
 
 
-class TestConfig:
-    def setup(self):
-        pass
-        # setup() before each test method
-
-    def test_add(self):
-        f1 = Foo1()
-        f2 = Foo2()
-        z = f1.x + f2.y
-        assert z() == 3
-        f1.x = 2
-        assert z() == 4
-        f2.y = 4
-        assert z() == 6
-
-    def test_multi(self):
-        f1 = Foo1()
-        f2 = Foo1()
-        f3 = Foo1()
-        z = f1.x + f2.x - f3.x
-        assert z() == 1
-        f1.x = 2
-        assert z() == 2
-        f2.x = 4
-        f3.x = 4
-        assert z() == 2
-
+class TestLazy:
     def test_function(self):
         f1 = Foo1()
         f3 = Foo3()

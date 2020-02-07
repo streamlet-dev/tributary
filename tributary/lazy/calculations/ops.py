@@ -39,6 +39,13 @@ def Pow(self, other):
     return self._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
 
 
+def Or(self, other):
+    other = self._tonode(other)
+    if isinstance(self._self_reference, _Node):
+        return self._gennode(self._name + '||' + other._name, (lambda x, y: x.value() or y.value()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(self._name + '||' + other._name, (lambda x, y: x.value() or y.value()), [self, other], self._trace or other._trace)
+
+
 def Sin(self):
     return self._gennode('sin(' + self._name + ')', (lambda x: math.sin(self.value())), [self], self._trace)
 
@@ -139,7 +146,7 @@ def Negate(self):
 def Bool(self):
     if self.value() is None:
         return False
-    return self.value()
+    return bool(self.value())
 
 
 def Equal(self, other):
@@ -220,7 +227,7 @@ _Node.__rpow__ = Pow
 
 # Logical
 # _Node.__and__ = And
-# _Node.__or__ = Or
+_Node.__or__ = Or
 # _Node.__invert__ = Not
 _Node.__bool__ = Bool
 

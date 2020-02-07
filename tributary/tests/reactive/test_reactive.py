@@ -3,7 +3,7 @@ import random
 import time
 
 
-class TestConfig:
+class TestReactive:
     def test_1(self):
         def foo():
             return random.random()
