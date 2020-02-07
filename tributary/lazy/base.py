@@ -1,7 +1,4 @@
-import six
-import inspect
-import functools
-from .node import _Node, node
+from .node import _Node
 
 
 class BaseClass(object):

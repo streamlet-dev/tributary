@@ -28,7 +28,6 @@ class Foo3(t.BaseClass):
     def foo3(self, x=4):
         return 3 + x
 
-
 class Foo4(t.BaseClass):
     @t.node(trace=True)
     def foo1(self):
@@ -37,6 +36,22 @@ class Foo4(t.BaseClass):
     @t.node(trace=True)
     def foo2(self):
         return random.random()
+
+
+class Foo5(t.BaseClass):
+    @t.node()
+    def z(self):
+        return self.x | self.y()
+
+    @t.node()
+    def y(self):
+        return 10
+
+    def reset(self):
+        self.x = None
+
+    def __init__(self):
+        self.x = self.node(name="x", default_or_starting_value=None)
 
 
 class TestLazy:
@@ -97,3 +112,20 @@ class TestLazy:
         assert z.graph()
         assert z.graphviz()
         assert z.networkx()
+
+
+class TestDirtyPropogation:
+    def test_or_dirtypropogation(self):
+        f = Foo5()
+        assert f.z()() == 10
+        assert f.x() == None
+
+        f.x = 5
+
+        assert f.x() == 5
+        assert f.z()() == 5
+
+        f.reset()
+
+        assert f.x() == None
+        assert f.z()() == 10

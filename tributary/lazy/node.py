@@ -1,6 +1,5 @@
 import six
 import inspect
-import functools
 from ..utils import _either_type
 
 
@@ -72,8 +71,8 @@ class _Node(object):
                     kwarg._recompute()
 
                     # Set yourself as parent
-                    if self not in kwargs._parents:
-                        kwargs._parents.append(self)
+                    if self not in kwarg._parents:
+                        kwarg._parents.append(self)
 
             k = list(self._dependencies.keys())[0]
 

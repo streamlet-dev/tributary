@@ -53,7 +53,7 @@ class TestLazyOps:
         f3.x = 4
         assert z() == 2
 
-    def test_or_dirtypropogation(self):
+    def test_or(self):
         f = Foo3()
         assert f.z()() == 10
         assert f.x() == None
