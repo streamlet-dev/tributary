@@ -1,6 +1,5 @@
 import time
 import random
-from perspective import PerspectiveWidget
 
 
 class TestFunctional:
@@ -21,8 +20,6 @@ class TestFunctional:
         def foo2(data, callback):
             callback([{'a': data['a'] * 1000, 'b': data['b'], 'c': 'AAPL', 'x': data['x']}])
 
-        p = PerspectiveWidget([], plugin='y_line', columns=['a', 'b'], row_pivots=['x'], column_pivots=['c'])
-
-        t.pipeline([foo1, foo2], ['on_data', 'callback'], on_data=p.update)
+        t.pipeline([foo1, foo2], ['on_data', 'callback'], on_data=lambda x: None)
         time.sleep(10)
         t.stop()
