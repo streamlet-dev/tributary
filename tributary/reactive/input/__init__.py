@@ -22,7 +22,12 @@ def _gen():
 
 
 def Random(size=10, interval=0.1):
+    '''Yield a random dctionary of data
 
+    Args:
+        size (int): number of elements to yield
+        interval (float): interval to wait between yields
+    '''
     async def _random(size, interval):
         step = 0
         while step < size:

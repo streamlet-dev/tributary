@@ -1,14 +1,21 @@
+import functools
 import ujson
 import websockets
 from ..base import _wrap
 from ...base import StreamNone, StreamEnd
 
 
-def WebSocket(foo, foo_kwargs=None, *args, **kwargs):
-    return AsyncWebSocket(foo, foo_kwargs, *args, **kwargs)
-
 
 def AsyncWebSocket(foo, foo_kwargs=None, url='', json=False, wrap=False, field=None, response=False):
+    '''Connect to websocket and send data
+
+    Args:
+        foo (callable): input stream
+        foo_kwargs (dict): kwargs for the input stream
+        url (str): websocket url to connect to
+        json (bool): dump data as json
+        wrap (bool): wrap result in a list
+    '''
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs)
 
@@ -45,3 +52,8 @@ def AsyncWebSocket(foo, foo_kwargs=None, url='', json=False, wrap=False, field=N
                 yield msg
 
     return _wrap(_send, dict(foo=foo, url=url, json=json, wrap=wrap, field=field, response=response), name='WebSocket')
+
+
+@functools.wraps(AsyncWebSocket)
+def WebSocket(foo, foo_kwargs=None, *args, **kwargs):
+    return AsyncWebSocket(foo, foo_kwargs, *args, **kwargs)

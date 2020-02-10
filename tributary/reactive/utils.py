@@ -6,6 +6,16 @@ from .base import _wrap, FunctionWrapper, Foo, Const
 
 
 def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
+    '''Streaming wrapper to repeat a value or calls to a function
+
+    Arguments:
+        foo_or_val (any): function to call or value to return
+        kwargs (dict): kwargs for foo_or_val if its a function
+        interval (int): time between queries
+        repeat (int): number of times to repeat
+    Returns:
+        FunctionWrapper: a streaming wrapper
+    '''
     kwargs = kwargs or {}
     if not isinstance(foo_or_val, types.FunctionType):
         foo = Const(foo_or_val)
@@ -28,6 +38,15 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
 
 
 def Delay(f_wrap, kwargs=None, delay=1):
+    '''Streaming wrapper to delay a stream
+
+    Arguments:
+        f_wrap (callable): input stream
+        kwargs (dict): kwargs for input stream
+        delay (float): time to delay input stream
+    Returns:
+        FunctionWrapper: a streaming wrapper
+    '''
     if not isinstance(f_wrap, FunctionWrapper):
         f_wrap = Foo(f_wrap, kwargs or {})
 
@@ -40,12 +59,30 @@ def Delay(f_wrap, kwargs=None, delay=1):
 
 
 def State(foo, foo_kwargs=None, **state):
+    '''Streaming wrapper to maintain state
+
+    Arguments:
+        foo (callable): input stream
+        foo_kwargs (dict): kwargs for input stream
+        state (dict): state dictionary of values to hold
+    Returns:
+        FunctionWrapper: a streaming wrapper
+    '''
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs, name=foo.__name__, wraps=(foo,), state=state)
     return foo
 
 
 def Apply(foo, f_wrap, foo_kwargs=None):
+    '''Streaming wrapper to apply a function to an input stream
+
+    Arguments:
+        foo (callable): function to apply
+        f_wrap (callable): input stream
+        foo_kwargs (dict): kwargs for function
+    Returns:
+        FunctionWrapper: a streaming wrapper
+    '''
     if not isinstance(f_wrap, FunctionWrapper):
         raise Exception('Apply expects a tributary')
     foo_kwargs = foo_kwargs or {}

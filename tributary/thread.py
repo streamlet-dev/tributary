@@ -3,6 +3,14 @@ from gevent import spawn
 
 
 def run(target, timeout=1):
+    '''Helper for running a thread
+
+    Args:
+        target (function): function to run on a thread
+        timeout (int): how long to wait for target to return
+    Returns:
+        data: result of the function
+    '''
     last = None
     done = False
 

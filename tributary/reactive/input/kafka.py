@@ -1,13 +1,20 @@
+import functools
 import ujson
 from confluent_kafka import Consumer, KafkaError
 from ..base import _wrap
 
 
-def Kafka(servers, group, topics, json=False, wrap=False, interval=1):
-    return AsyncKafka(servers, group, topics, json=json, wrap=wrap, interval=interval)
-
-
 def AsyncKafka(servers, group, topics, json=False, wrap=False, interval=1):
+    '''Connect to kafka server and yield back results
+
+    Args:
+        servers (list): kafka bootstrap servers
+        group (str): kafka group id
+        topics (list): list of kafka topics to connect to
+        json (bool): load input data as json
+        wrap (bool): wrap result in a list
+        interval (int): kafka poll interval
+    '''
     c = Consumer({
         'bootstrap.servers': servers,
         'group.id': group,
@@ -44,3 +51,8 @@ def AsyncKafka(servers, group, topics, json=False, wrap=False, interval=1):
             yield msg
 
     return _wrap(_listen, dict(consumer=c, json=json, wrap=wrap, interval=interval), name='Kafka')
+
+
+@functools.wraps(AsyncKafka)
+def Kafka(*args, **kwargs):
+    return AsyncKafka(*args, **kwargs)

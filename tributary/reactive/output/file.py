@@ -4,6 +4,14 @@ from ..base import _wrap  # noqa: F401
 
 
 def File(foo, foo_kwargs=None, filename='', json=True):
+    '''Open up a file and write lines to the file
+
+    Args:
+        foo (callable): input stream
+        foo_kwargs (dict): kwargs for the input stream
+        filename (str): filename to write
+        json (bool): load file line as json
+    '''
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs)
 

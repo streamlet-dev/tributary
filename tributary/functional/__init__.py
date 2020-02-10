@@ -18,6 +18,13 @@ _EXECUTOR = ThreadPoolExecutor(max_workers=10)
 
 
 def submit(fn, *args, **kwargs):
+    '''Submit a function to be run on the executor (internal)
+
+    Args:
+        fn (callable): function to call
+        args (tuple): args to pass to function
+        kwargs (dict): kwargs to pass to function
+    '''
     if _EXECUTOR is None:
         raise RuntimeError('Already stopped!')
     self = _EXECUTOR
@@ -51,6 +58,15 @@ def run_submit(fn, function_to_call, *args, **kwargs):
 
 
 def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs=None):
+    '''Pipeline a sequence of functions together via callbacks
+
+    Args:
+        foos (list of callables): list of functions to pipeline
+        foo_callbacks (List[str]): list of strings indicating the callback names (kwargs of the foos)
+        foo_kwargs (List[dict]): 
+        on_data (callable): callable to call at the end of the pipeline
+        on_data_kwargs (dict): kwargs to pass to the on_data function>?
+    '''
     global _EXECUTOR
     if _EXECUTOR is None:
         _EXECUTOR = ThreadPoolExecutor(max_workers=2)
@@ -85,6 +101,7 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
 
 
 def stop():
+    '''Stop the executor for the pipeline runtime'''
     global _EXECUTOR
     _EXECUTOR.shutdown(False)
     _EXECUTOR._threads.clear()
@@ -93,6 +110,7 @@ def stop():
 
 
 def wrap(function, *args, **kwargs):
+    '''wrap a function in a partial'''
     foo = partial(function, *args, **kwargs)
     foo.__name__ = function.__name__
     return foo

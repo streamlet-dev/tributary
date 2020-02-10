@@ -26,6 +26,11 @@ Input
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: tributary.reactive.input.file
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: tributary.reactive.input.http
     :members:
     :undoc-members:
@@ -89,102 +94,6 @@ Calculations
     :show-inheritance:
 
 .. automodule:: tributary.reactive.calculations.rolling
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Asynchronous
-------------
-
-.. automodule:: tributary.asynchronous
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Input
-~~~~~~~
-
-.. automodule:: tributary.asynchronous.input
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.input.http
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.input.kafka
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.input.socketio
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.input.ws
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Output
-~~~~~~~
-
-
-.. automodule:: tributary.asynchronous.output
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.output.http
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.output.kafka
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.output.socketio
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.output.ws
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Calculations
-~~~~~~~~~~~~
-
-
-.. automodule:: tributary.asynchronous.calculations
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.calculations.ops
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.asynchronous.calculations.rolling
     :members:
     :undoc-members:
     :show-inheritance:

@@ -15,6 +15,14 @@ from ..thread import run
 
 
 def ws(url, callback, json=False, wrap=False):
+    '''Connect to websocket and pipe results through the callback
+
+    Args:
+        url (str): websocket url to connect to
+        callback (callable): function to call on websocket data
+        json (bool): load websocket data as json
+        wrap (bool): wrap result in a list
+    '''
     ws = create_connection(url)
     for x in run(ws.recv):
         if isinstance(x, StreamNone):
@@ -30,6 +38,19 @@ def ws(url, callback, json=False, wrap=False):
 
 
 def http(url, callback, interval=1, repeat=1, json=False, wrap=False, field=None, proxies=None, cookies=None):
+    '''Connect to url and pipe results through the callback
+
+    Args:
+        url (str): url to connect to
+        callback (callable): function to call on websocket data
+        interval (int): interval to re-query
+        repeat (int): number of times to request
+        json (bool): load websocket data as json
+        wrap (bool): wrap result in a list
+        field (str): field to index result by
+        proxies (list): list of URL proxies to pass to requests.get
+        cookies (list): list of cookies to pass to requests.get
+    '''
     count = 0
     while count < repeat:
         msg = requests.get(url, cookies=cookies, proxies=proxies)
@@ -55,6 +76,18 @@ def http(url, callback, interval=1, repeat=1, json=False, wrap=False, field=None
 
 
 def socketio(url, callback, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
+    '''Connect to socketIO server and pipe results through the callback
+
+    Args:
+        url (str): url to connect to
+        callback (callable): function to call on websocket data
+        channel (str): socketio channel to connect through
+        field (str): field to index result by
+        sendinit (list): data to send on socketio connection open
+        json (bool): load websocket data as json
+        wrap (bool): wrap result in a list
+        interval (int): socketio wai interval
+    '''
     o = urlparse(url)
     socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
     if sendinit:
@@ -78,6 +111,17 @@ def socketio(url, callback, channel='', field='', sendinit=None, json=False, wra
 
 
 def kafka(callback, servers, group, topics, json=False, wrap=False, interval=1):
+    '''Connect to kafka server and pipe results through the callback
+
+    Args:
+        callback (callable): function to call on websocket data
+        servers (list): kafka bootstrap servers
+        group (str): kafka group id
+        topics (list): list of kafka topics to connect to
+        json (bool): load websocket data as json
+        wrap (bool): wrap result in a list
+        interval (int): socketio wai interval
+    '''
     c = Consumer({
         'bootstrap.servers': servers,
         'group.id': group,
