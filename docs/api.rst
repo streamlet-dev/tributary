@@ -1,24 +1,6 @@
 API
 ====
 
-
-Common
-------
-.. automodule:: tributary.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.thread
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: tributary.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Reactive
 ---------
 .. automodule:: tributary.reactive
@@ -35,6 +17,9 @@ Reactive
     :members:
     :undoc-members:
     :show-inheritance:
+
+Input
+~~~~~~
 
 .. automodule:: tributary.reactive.input
     :members:
@@ -61,6 +46,9 @@ Reactive
     :undoc-members:
     :show-inheritance:
 
+Output
+~~~~~~~
+
 .. automodule:: tributary.reactive.output
     :members:
     :undoc-members:
@@ -86,6 +74,10 @@ Reactive
     :undoc-members:
     :show-inheritance:
 
+
+Calculations
+~~~~~~~~~~~~~
+
 .. automodule:: tributary.reactive.calculations
     :members:
     :undoc-members:
@@ -100,6 +92,7 @@ Reactive
     :members:
     :undoc-members:
     :show-inheritance:
+
 
 Asynchronous
 ------------
@@ -118,6 +111,9 @@ Asynchronous
     :members:
     :undoc-members:
     :show-inheritance:
+
+Input
+~~~~~~~
 
 .. automodule:: tributary.asynchronous.input
     :members:
@@ -144,6 +140,10 @@ Asynchronous
     :undoc-members:
     :show-inheritance:
 
+Output
+~~~~~~~
+
+
 .. automodule:: tributary.asynchronous.output
     :members:
     :undoc-members:
@@ -169,6 +169,11 @@ Asynchronous
     :undoc-members:
     :show-inheritance:
 
+
+Calculations
+~~~~~~~~~~~~
+
+
 .. automodule:: tributary.asynchronous.calculations
     :members:
     :undoc-members:
@@ -192,17 +197,23 @@ Functional
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: tributary.functional.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Input
+~~~~~~~
+
 .. automodule:: tributary.functional.input
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: tributary.functional.output
-    :members:
-    :undoc-members:
-    :show-inheritance:
+Output
+~~~~~~~
 
-.. automodule:: tributary.functional.utils
+.. automodule:: tributary.functional.output
     :members:
     :undoc-members:
     :show-inheritance:
@@ -220,6 +231,26 @@ Lazy
     :undoc-members:
     :show-inheritance:
 
+Input
+~~~~~~
+
+Output
+~~~~~~
+
+Calculations
+~~~~~~~~~~~~~
+
+.. automodule:: tributary.lazy.calculations
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+.. automodule:: tributary.lazy.calculations.ops
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Symbolic
 --------
@@ -229,3 +260,19 @@ Symbolic
     :undoc-members:
     :show-inheritance:
 
+Common
+------
+.. automodule:: tributary.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: tributary.thread
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: tributary.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:

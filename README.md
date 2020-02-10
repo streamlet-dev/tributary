@@ -21,12 +21,12 @@ These are synchronous, reactive data streams, built using asynchronous python ge
 ## Functional
 These are functional streams, built by currying python functions (callbacks). 
 
-## Lazy
-These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
-
 ## Event Loop
 TODO
 These function as tornado based event-loop based streams similar to streamz.
+
+## Lazy
+These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
 
 # Examples
 - [Reactive](docs/examples/reactive.md)
