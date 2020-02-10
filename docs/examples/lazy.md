@@ -2,14 +2,6 @@
 
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example.gif)
 
-```python
-# if we update a dependent variable without recalculating, we see the dependencies
-f2.y = 4
-
-z.graphviz().render()
-```
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/example2.png)
-
 ## Symbolic Example
 Here we will construct a lazy pricer for a vanilla european option
 
