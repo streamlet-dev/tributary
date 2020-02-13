@@ -184,6 +184,9 @@ def run_copyreadme(_):
     api = os.path.abspath(os.path.join(os.path.dirname(__file__), 'api.md'))
     with open(out, 'w') as fp1:
         with open(readme, 'r') as fp2:
+            # Skip img
+            fp2.readline()
+            fp1.write("# Tributary\n")
             for line in fp2:
                 if 'src=' in line:
                     # <img>
