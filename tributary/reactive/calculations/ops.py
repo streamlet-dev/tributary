@@ -64,6 +64,9 @@ def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
     return _wrap(_bin, dict(foo1=foo1, foo2=foo2), name=_name or 'Binary', wraps=(foo1, foo2), share=None)
 
 
+########################
+# Arithmetic Operators #
+########################
 def Noop(foo, foo_kwargs=None):
     return unary(lambda x: x, foo, foo_kwargs, _name='Noop')
 
@@ -74,11 +77,6 @@ def Negate(foo, foo_kwargs=None):
 
 def Invert(foo, foo_kwargs=None):
     return unary(lambda x: 1 / x, foo, foo_kwargs, _name='Invert')
-
-
-def Not(foo, foo_kwargs=None):
-    return unary(lambda x: not x, foo, foo_kwargs, _name='Not')
-
 
 def Add(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x + y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Add')
@@ -108,6 +106,13 @@ def Pow(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x**y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Pow')
 
 
+#####################
+# Logical Operators #
+#####################
+def Not(foo, foo_kwargs=None):
+    return unary(lambda x: not x, foo, foo_kwargs, _name='Not')
+
+
 def And(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x and y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='And')
 
@@ -116,6 +121,9 @@ def Or(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x or y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Or')
 
 
+###############
+# Comparators #
+###############
 def Equal(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x == y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Equal')
 
@@ -140,6 +148,9 @@ def Ge(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x >= y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Greater-than-or-equal')
 
 
+##########################
+# Mathematical Functions #
+##########################
 def Sin(foo, foo_kwargs=None):
     return unary(lambda x: math.sin(x), foo, foo_kwargs, _name='Sin')
 
@@ -152,7 +163,30 @@ def Tan(foo, foo_kwargs=None):
     return unary(lambda x: math.tan(x), foo, foo_kwargs, _name='Tan')
 
 
-# Arithmetic
+##############
+# Converters #
+##############
+def Int(foo, foo_kwargs=None):
+    return unary(lambda x: int(x), foo, foo_kwargs=foo_kwargs, _name="Int")
+
+
+def Float(foo, foo_kwargs=None):
+    return unary(lambda x: float(x), foo, foo_kwargs=foo_kwargs, _name="Float")
+
+
+def Bool(foo, foo_kwargs=None):
+    return unary(lambda x: bool(x), foo, foo_kwargs=foo_kwargs, _name="Bool")
+
+
+###################
+# Python Builtins #
+###################
+def Len(foo, foo_kwargs=None):
+    return unary(lambda x: len(x), foo, foo_kwargs=foo_kwargs, _name="Len")
+
+########################
+# Arithmetic Operators #
+########################
 FunctionWrapper.__add__ = Add
 FunctionWrapper.__radd__ = Add
 FunctionWrapper.__sub__ = Sub
@@ -169,17 +203,24 @@ FunctionWrapper.__rpow__ = Pow
 FunctionWrapper.__mod__ = Mod
 FunctionWrapper.__rmod__ = Mod
 
-# Logical
+#####################
+# Logical Operators #
+#####################
 # FunctionWrapper.__and__ = And
 # FunctionWrapper.__or__ = Or
 # FunctionWrapper.__invert__ = Not
+# FunctionWrapper.__bool__ = Bool
 # TODO use __bool__ operator
 
-# Converters
+##############
+# Converters #
+##############
 # FunctionWrapper.int = Int
 # FunctionWrapper.float = Float
 
-# Comparator
+###############
+# Comparators #
+###############
 FunctionWrapper.__lt__ = Lt
 FunctionWrapper.__le__ = Le
 FunctionWrapper.__gt__ = Gt
@@ -188,12 +229,21 @@ FunctionWrapper.__eq__ = Equal
 FunctionWrapper.__ne__ = NotEqual
 FunctionWrapper.__neg__ = Negate
 # FunctionWrapper.__nonzero__ = Bool  # Py2 compat
+
+###################
+# Python Builtins #
+###################
 # FunctionWrapper.__len__ = Len
 
-# Numpy
+###################
+# Numpy Functions #
+###################
 # FunctionWrapper.__array_ufunc__ = __array_ufunc__
 
-# Math
+
+##########################
+# Mathematical Functions #
+##########################
 # FunctionWrapper.log = Log
 FunctionWrapper.sin = Sin
 FunctionWrapper.cos = Cos

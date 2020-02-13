@@ -4,6 +4,9 @@ import scipy as sp
 from ..base import BaseNode
 
 
+########################
+# Arithmetic Operators #
+########################
 def Add(self, other):
     other = self._tonode(other)
     if isinstance(self._self_reference, BaseNode):
@@ -39,6 +42,13 @@ def Pow(self, other):
     return self._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
 
 
+def Negate(self):
+    return self._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
+
+
+#####################
+# Logical Operators #
+#####################
 def Or(self, other):
     other = self._tonode(other)
     if isinstance(self._self_reference, BaseNode):
@@ -46,6 +56,20 @@ def Or(self, other):
     return self._gennode(self._name + '||' + other._name, (lambda x, y: x.value() or y.value()), [self, other], self._trace or other._trace)
 
 
+def And(self, other):
+    other = self._tonode(other)
+    if isinstance(self._self_reference, BaseNode):
+        return self._gennode(self._name + '&&' + other._name, (lambda x, y: x.value() or y.value()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(self._name + '&&' + other._name, (lambda x, y: x.value() and y.value()), [self, other], self._trace or other._trace)
+
+
+def Not(self):
+    return self._gennode('!' + self._name, (lambda x: not x.value()), [self], self._trace)
+
+
+##########################
+# Mathematical Functions #
+##########################
 def Sin(self):
     return self._gennode('sin(' + self._name + ')', (lambda x: math.sin(self.value())), [self], self._trace)
 
@@ -86,6 +110,9 @@ def Erf(self):
     return self._gennode('erf(' + self._name + ')', (lambda x: math.erf(self.value())), [self], self._trace)
 
 
+##############
+# Converters #
+##############
 def Float(self):
     return self._gennode('float(' + self._name + ')', (lambda x: float(self.value())), [self], self._trace)
 
@@ -94,10 +121,22 @@ def Int(self):
     return self._gennode('int(' + self._name + ')', (lambda x: int(self.value())), [self], self._trace)
 
 
+def Bool(self):
+    if self.value() is None:
+        return False
+    return bool(self.value())
+
+
+###################
+# Python Builtins #
+###################
 def Len(self):
     return self._gennode('len(' + self._name + ')', (lambda x: len(self.value())), [self], self._trace)
 
 
+###################
+# Numpy Functions #
+###################
 def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
     if ufunc == np.add:
         if isinstance(inputs[0], BaseNode):
@@ -139,16 +178,9 @@ def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         raise NotImplementedError('Not Implemented!')
 
 
-def Negate(self):
-    return self._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
-
-
-def Bool(self):
-    if self.value() is None:
-        return False
-    return bool(self.value())
-
-
+###############
+# Comparators #
+###############
 def Equal(self, other):
     if isinstance(other, BaseNode) and super(BaseNode, self).__eq__(other):
         return True
@@ -208,7 +240,9 @@ def Lt(self, other):
     return self._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self, other], self._trace or other._trace)
 
 
-# Arithmetic
+########################
+# Arithmetic Operators #
+########################
 BaseNode.__add__ = Add
 BaseNode.__radd__ = Add
 BaseNode.__sub__ = Sub
@@ -225,17 +259,23 @@ BaseNode.__rpow__ = Pow
 # BaseNode.__mod__ = Mod
 # BaseNode.__rmod__ = Mod
 
-# Logical
-# BaseNode.__and__ = And
+#####################
+# Logical Operators #
+#####################
+BaseNode.__and__ = And
 BaseNode.__or__ = Or
-# BaseNode.__invert__ = Not
-BaseNode.__bool__ = Bool
+BaseNode.__invert__ = Not
 
-# Converters
+##############
+# Converters #
+##############
 BaseNode.int = Int
 BaseNode.float = Float
+BaseNode.__bool__ = Bool
 
-# Comparator
+###############
+# Comparators #
+###############
 BaseNode.__lt__ = Lt
 BaseNode.__le__ = Le
 BaseNode.__gt__ = Gt
@@ -244,12 +284,20 @@ BaseNode.__eq__ = Equal
 BaseNode.__ne__ = NotEqual
 BaseNode.__neg__ = Negate
 BaseNode.__nonzero__ = Bool  # Py2 compat
+
+###################
+# Python Builtins #
+###################
 BaseNode.__len__ = Len
 
-# Numpy
+###################
+# Numpy Functions #
+###################
 BaseNode.__array_ufunc__ = __array_ufunc__
 
-# Functions
+##########################
+# Mathematical Functions #
+##########################
 BaseNode.log = Log
 BaseNode.sin = Sin
 BaseNode.cos = Cos
