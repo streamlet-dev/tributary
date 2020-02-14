@@ -5,7 +5,6 @@ from ..base import _wrap
 from ...base import StreamNone, StreamEnd
 
 
-
 def AsyncWebSocket(url, json=False, wrap=False):
     '''Connect to websocket and yield back results
 

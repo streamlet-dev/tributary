@@ -5,7 +5,7 @@ buildpy2:
 	python2 setup.py build 
 
 tests: ## Clean and Make unit tests
-	python3 -m pytest -v tributary/tests --cov=tributary
+	python3 -m pytest -v tributary/tests --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh

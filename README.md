@@ -12,7 +12,6 @@ Python Data Streams
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/example.gif)
 
 
-
 # Installation
 Install from pip:
 
@@ -21,7 +20,6 @@ Install from pip:
 or from source
 
 `python setup.py install`
-
 
 # Stream Types
 Tributary offers several kinds of streams:

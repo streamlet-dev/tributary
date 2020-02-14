@@ -1,11 +1,12 @@
 import tributary.lazy as t
 
-class Foo1(t.BaseGraph):
+
+class Foo1(t.LazyGraph):
     def __init__(self, *args, **kwargs):
         self.x = self.node('x', readonly=False, value=1, trace=True)
 
 
-class Foo2(t.BaseGraph):
+class Foo2(t.LazyGraph):
     def __init__(self, *args, **kwargs):
         self.y = self.node('y', readonly=False, value=2, trace=True)
 
@@ -14,7 +15,7 @@ class Foo2(t.BaseGraph):
         self.x = self.node('x', readonly=False, value=2, trace=True)
 
 
-class Foo3(t.BaseGraph):
+class Foo3(t.LazyGraph):
     @t.node()
     def z(self):
         return self.x | self.y()
@@ -56,15 +57,14 @@ class TestLazyOps:
     def test_or(self):
         f = Foo3()
         assert f.z()() == 10
-        assert f.x() == None
+        assert f.x() is None
 
         f.x = 5
 
         assert f.x() == 5
         assert f.z()() == 5
 
-
         f.reset()
 
-        assert f.x() == None
+        assert f.x() is None
         assert f.z()() == 10

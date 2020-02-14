@@ -7,7 +7,6 @@ except ImportError:
 from ..base import _wrap
 
 
-
 def AsyncSocketIO(url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
     '''Connect to socketIO server and yield back results
 

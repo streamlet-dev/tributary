@@ -8,4 +8,3 @@ if not _PATCHED:
 
 from ._version import __version__  # noqa: F401
 from .functional import pipeline, stop  # noqa: F401
-from .reactive import *  # noqa: F401, F403

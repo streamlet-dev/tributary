@@ -1,6 +1,5 @@
 import asyncio
-import types
-from .base import _wrap, Foo, Const, Share  # noqa: F401
+from .base import _wrap, Foo, Const, Share, FunctionWrapper  # noqa: F401
 from .calculations import *  # noqa: F401, F403
 from .input import *  # noqa: F401, F403
 from .output import *  # noqa: F401, F403
@@ -13,14 +12,7 @@ async def _run(foo, **kwargs):
     ret = []
     try:
         async for item in foo():
-            if isinstance(item, types.AsyncGeneratorType):
-                async for i in item:
-                    ret.append(i)
-            elif isinstance(item, types.CoroutineType):
-                ret.append(await item)
-            else:
-                ret.append(item)
-
+            ret.append(item)
     except KeyboardInterrupt:
         print('Terminating...')
     return ret
@@ -37,7 +29,7 @@ def run(foo, **kwargs):
     return x
 
 
-class BaseGraph(object):
+class StreamingGraph(object):
     def __init__(self, run=None, *args, **kwargs):
         self._run = run
 

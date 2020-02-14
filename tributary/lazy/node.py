@@ -1,10 +1,9 @@
-import gc
 import six
 import inspect
 from ..utils import _either_type
 
 
-class BaseNode(object):
+class Node(object):
     '''Class to represent an operation that is lazy'''
     def __init__(self,
                  name="?",
@@ -98,7 +97,7 @@ class BaseNode(object):
             else:
                 new_value = k(*self._dependencies[k][0], **self._dependencies[k][1])
 
-            if isinstance(new_value, BaseNode):
+            if isinstance(new_value, Node):
                 k._node_wrapper = new_value
                 new_value = new_value()  # get value
 
@@ -149,22 +148,22 @@ class BaseNode(object):
     def _gennode(self, name, foo, foo_args, trace=False):
         if name not in self._node_op_cache:
             self._node_op_cache[name] = \
-                BaseNode(name=name,
-                      derived=True,
-                      callable=foo,
-                      callable_args=foo_args,
-                      trace=trace)
+                Node(name=name,
+                     derived=True,
+                     callable=foo,
+                     callable_args=foo_args,
+                     trace=trace)
         return self._node_op_cache[name]
 
     def _tonode(self, other, trace=False):
-        if isinstance(other, BaseNode):
+        if isinstance(other, Node):
             return other
         if str(other) not in self._node_op_cache:
             self._node_op_cache[str(other)] = \
-                BaseNode(name='var(' + str(other)[:5] + ')',
-                      derived=True,
-                      value=other,
-                      trace=trace)
+                Node(name='var(' + str(other)[:5] + ')',
+                     derived=True,
+                     value=other,
+                     trace=trace)
         return self._node_op_cache[str(other)]
 
     def setValue(self, value):
@@ -197,114 +196,6 @@ class BaseNode(object):
 
     def value(self):
         return self._value
-
-    def _print(self, counter=0, cache=None):
-        if cache is None:
-            cache = {}
-
-        key = cache.get(id(self), str(self) + ' (#' + str(counter) + ')')
-        cache[id(self)] = key
-
-        if self._dirty or self._subtree_dirty() or self._always_dirty:
-            key += '(dirty)'
-
-        ret = {key: []}
-        counter += 1
-
-        if self._dependencies:
-            for call, deps in six.iteritems(self._dependencies):
-                # callable node
-                if hasattr(call, '_node_wrapper') and \
-                   call._node_wrapper is not None:
-                    val, counter = call._node_wrapper._print(counter, cache)
-                    ret[key].append(val)
-
-                # args
-                for arg in deps[0]:
-                    val, counter = arg._print(counter, cache)
-                    ret[key].append(val)
-
-                # kwargs
-                for kwarg in six.itervalues(deps[1]):
-                    val, counter = kwarg._print(counter, cache)
-                    ret[key].append(val)
-
-        return ret, counter
-
-    def print(self):
-        return self._print(0, {})[0]
-
-    def graph(self):
-        return self.print()
-
-    def graphviz(self):
-        d = self.graph()
-
-        from graphviz import Digraph
-        dot = Digraph(self._name, strict=True)
-        dot.format = 'png'
-
-        def rec(nodes, parent):
-            for d in nodes:
-                if not isinstance(d, dict):
-                    if '(dirty)' in d:
-                        dot.node(d.replace('(dirty)', ''), color='red')
-                        dot.edge(d.replace('(dirty)', ''), parent.replace('(dirty)', ''), color='red')
-                    else:
-                        dot.node(d)
-                        dot.edge(d, parent.replace('(dirty)', ''))
-                else:
-                    for k in d:
-                        if '(dirty)' in k:
-                            dot.node(k.replace('(dirty)', ''), color='red')
-                            rec(d[k], k)
-                            dot.edge(k.replace('(dirty)', ''), parent.replace('(dirty)', ''), color='red')
-                        else:
-                            dot.node(k)
-                            rec(d[k], k)
-                            dot.edge(k, parent.replace('(dirty)', ''))
-
-        for k in d:
-            if '(dirty)' in k:
-                dot.node(k.replace('(dirty)', ''), color='red')
-            else:
-                dot.node(k)
-            rec(d[k], k)
-        return dot
-
-    def networkx(self):
-        d = self.graph()
-        # FIXME deduplicate
-        from pygraphviz import AGraph
-        import networkx as nx
-        dot = AGraph(strict=True, directed=True)
-
-        def rec(nodes, parent):
-            for d in nodes:
-                if not isinstance(d, dict):
-                    if '(dirty)' in d:
-                        d = d.replace('(dirty)', '')
-                        dot.add_node(d, label=d, color='red')
-                        dot.add_edge(d, parent, color='red')
-                    else:
-                        dot.add_node(d, label=d)
-                        dot.add_edge(d, parent)
-                else:
-                    for k in d:
-                        if '(dirty)' in k:
-                            k = k.replace('(dirty)', '')
-                            dot.add_node(k, label=k, color='red')
-                            rec(d[k], k)
-                            dot.add_edge(k, parent, color='red')
-                        else:
-                            dot.add_node(k, label=k)
-                            rec(d[k], k)
-                            dot.add_edge(k, parent)
-
-        for k in d:
-            dot.add_node(k, label=k)
-            rec(d[k], k)
-        return nx.nx_agraph.from_agraph(dot)
 
     def __call__(self):
         self._recompute()
@@ -347,20 +238,20 @@ def node(meth, memoize=True, trace=False):
             value = None
             nullable = False
 
-        node_args.append(BaseNode(name=arg,
-                               derived=True,
-                               readonly=False,
-                               nullable=nullable,
-                               value=value,
-                               trace=trace))
+        node_args.append(Node(name=arg,
+                              derived=True,
+                              readonly=False,
+                              nullable=nullable,
+                              value=value,
+                              trace=trace))
 
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
-        node_kwargs[k] = BaseNode(name=k,
-                               derived=True,
-                               readonly=False,
-                               nullable=True,
-                               value=v,
-                               trace=trace)
+        node_kwargs[k] = Node(name=k,
+                              derived=True,
+                              readonly=False,
+                              nullable=True,
+                              value=v,
+                              trace=trace)
 
     def meth_wrapper(self, *args, **kwargs):
         if len(args) > len(node_args):
@@ -375,14 +266,14 @@ def node(meth, memoize=True, trace=False):
             val = meth(*(arg.value() for arg in args), **kwargs)
         return val
 
-    new_node = BaseNode(name=meth.__name__,
-                     derived=True,
-                     callable=meth_wrapper,
-                     callable_args=node_args,
-                     callable_kwargs=node_kwargs,
-                     callable_is_method=is_method,
-                     always_dirty=not memoize,
-                     trace=trace)
+    new_node = Node(name=meth.__name__,
+                    derived=True,
+                    callable=meth_wrapper,
+                    callable_args=node_args,
+                    callable_kwargs=node_kwargs,
+                    callable_is_method=is_method,
+                    always_dirty=not memoize,
+                    trace=trace)
 
     if is_method:
         ret = lambda self, *args, **kwargs: new_node._with_self(self)  # noqa: E731

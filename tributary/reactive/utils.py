@@ -25,10 +25,8 @@ def Timer(foo_or_val, kwargs=None, interval=1, repeat=0):
     async def _repeater(foo, repeat, interval):
         while repeat > 0:
             t1 = time.time()
-            f = foo()
-            yield f
+            yield foo()
             t2 = time.time()
-
             if interval > 0:
                 # sleep for rest of time that _p didnt take
                 await asyncio.sleep(max(0, interval - (t2 - t1)))

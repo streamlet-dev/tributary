@@ -31,19 +31,6 @@ def _wrap(foo, foo_kwargs, name='', wraps=(), share=None, state=None):
     return ret
 
 
-def _call_if_function(f):
-    '''call f if it is a function
-    Args:
-        f (any): a function or value
-    Returns:
-        any: return either f() or f
-    '''
-    if isinstance(f, types.FunctionType):
-        return f()
-    else:
-        return f
-
-
 def _inc_ref(f_wrapped, f_wrapping):
     '''Increment reference count for wrapped f
 
@@ -54,11 +41,10 @@ def _inc_ref(f_wrapped, f_wrapping):
     if f_wrapped._id == f_wrapping._id:
         raise Exception('Internal Error')
 
-    if f_wrapped._using is None or f_wrapped._using == id(f_wrapping):
+    if f_wrapped._using is None:
         f_wrapped._using = id(f_wrapping)
         return
     Share(f_wrapped)
-    f_wrapped._using = id(f_wrapping)
 
 
 def Const(val):
@@ -69,10 +55,7 @@ def Const(val):
     Returns:
         FunctionWrapper: a streaming wrapper
     '''
-    async def _always(val):
-        yield val
-
-    return _wrap(_always, dict(val=val), name='Const', wraps=(val,))
+    return _wrap(val, dict(), name='Const', wraps=(val,))
 
 
 def Foo(foo, foo_kwargs=None):
@@ -125,7 +108,10 @@ class FunctionWrapper(object):
 
         if not (isinstance(foo, types.FunctionType) or isinstance(foo, types.CoroutineType)):
             # bind to f so foo isnt referenced
-            foo = lambda f=foo: f  # noqa: E731
+            def _always(val=foo):
+                while True:
+                    yield val
+            foo = _always
 
         if len(foo.__code__.co_varnames) > 0 and \
            foo.__code__.co_varnames[0] == 'state':
@@ -202,56 +188,36 @@ class FunctionWrapper(object):
         if DEBUG:
             print("calling: {}".format(self._foo))
 
-        while(self._refs == self._refs_orig):
-            kwargs.update(self._foo_kwargs)
-            ret = self._foo(*args, **kwargs)
+        kwargs.update(self._foo_kwargs)
 
-            if isinstance(ret, types.AsyncGeneratorType):
-                async for r in ret:
-                    tmp = _call_if_function(r)
-                    if isinstance(tmp, types.CoroutineType):
-                        tmp = await tmp
-
-                    if isinstance(tmp, types.AsyncGeneratorType):
-                        async for rr in tmp:
-                            self.last = rr
-                            yield self.last
-
-                    else:
-                        self.last = tmp
-                        yield self.last
-            elif isinstance(ret, types.GeneratorType):
-                for r in ret:
-                    tmp = _call_if_function(r)
-                    if isinstance(tmp, types.CoroutineType):
-                        tmp = await tmp
-
-                    if isinstance(tmp, types.GeneratorType):
-                        for rr in tmp:
-                            self.last = rr
-                            yield self.last
-
-                    else:
-                        self.last = tmp
-                        yield self.last
-            else:
-                tmp = _call_if_function(ret)
-                if isinstance(tmp, types.CoroutineType):
-                    tmp = await tmp
-
-                if isinstance(tmp, types.AsyncGeneratorType):
-                    async for rr in tmp:
-                        self.last = rr
-                        yield self.last
-                else:
-                    self.last = tmp
-                    yield self.last
-
-        while(0 < self._refs and self._refs < self._refs_orig):
+        async for item in _extract(self._foo, *args, **kwargs):
+            self.last = item
+            # while 0 < self._refs <= self._refs_orig:
             yield self.last
-
-        # reset state to be called again
-        self._refs = self._refs_orig
 
     def __iter__(self):
         yield from self.__call__()
+
+
+async def _extract(item, *args, **kwargs):
+    while isinstance(item, FunctionWrapper) or isinstance(item, types.FunctionType) or isinstance(item, types.CoroutineType):
+        if isinstance(item, FunctionWrapper):
+            item = item()
+
+        if isinstance(item, types.FunctionType):
+            item = item(*args, **kwargs)
+
+        if isinstance(item, types.CoroutineType):
+            item = await item
+
+    if isinstance(item, types.AsyncGeneratorType):
+        async for subitem in item:
+            async for extracted in _extract(subitem):
+                yield extracted
+
+    elif isinstance(item, types.GeneratorType):
+        for subitem in item:
+            async for extracted in _extract(subitem):
+                yield extracted
+    else:
+        yield item

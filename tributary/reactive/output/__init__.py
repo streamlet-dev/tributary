@@ -1,28 +1,25 @@
 import asyncio
-import types
 from pprint import pprint
 from IPython.display import display
 
-from ..base import _wrap, FunctionWrapper
+from ..base import _wrap, _extract, FunctionWrapper
 from .file import File as FileSink  # noqa: F401
 from .http import HTTP as HTTPSink  # noqa: F401
 from .kafka import Kafka as KafkaSink  # noqa: F401
 from .ws import WebSocket as WebSocketSink  # noqa: F401
 
 
-def Print(foo, foo_kwargs=None):
+def Print(foo, foo_kwargs=None, text=''):
     foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs)
 
     async def _print(foo):
-        async for r in foo():
-            if isinstance(r, types.AsyncGeneratorType):
-                async for x in r:
-                    yield x
-            elif isinstance(r, types.CoroutineType):
-                yield await r
+        async for r in _extract(foo):
+            if text:
+                print(text, r)
             else:
-                yield r
+                print(r)
+            yield r
 
     return _wrap(_print, dict(foo=foo), name='Print', wraps=(foo,), share=foo)
 

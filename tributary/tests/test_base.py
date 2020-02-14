@@ -6,4 +6,4 @@ class TestBase:
 
     def test_1(self):
         from tributary.base import StreamNone
-        assert StreamNone('test')
+        assert not StreamNone('test')

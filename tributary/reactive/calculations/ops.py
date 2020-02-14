@@ -1,64 +1,32 @@
-import types
 import math
 from aiostream.stream import zip
+
 from ..base import _wrap, FunctionWrapper
 
 
 def unary(lam, foo, foo_kwargs=None, _name=''):
-    foo_kwargs = None or {}
+    foo_kwargs = foo_kwargs or {}
     foo = _wrap(foo, foo_kwargs)
 
     async def _unary(foo):
-        async for gen in foo():
-            if isinstance(gen, types.AsyncGeneratorType):
-                async for f in gen:
-                    if isinstance(f, types.CoroutineType):
-                        yield lam(await f)
-                    else:
-                        yield lam(f)
-            elif isinstance(gen, types.CoroutineType):
-                yield lam(await gen)
-            else:
-                yield lam(gen)
-
+        async for val in foo():
+            yield lam(val)
     return _wrap(_unary, dict(foo=foo), name=_name or 'Unary', wraps=(foo,), share=None)
 
 
 def bin(lam, foo1, foo2, foo1_kwargs=None, foo2_kwargs=None, _name=''):
-    foo1_kwargs = None or {}
-    foo2_kwargs = None or {}
+    foo1_kwargs = foo1_kwargs or {}
+    foo2_kwargs = foo2_kwargs or {}
     foo1 = _wrap(foo1, foo1_kwargs)
     foo2 = _wrap(foo2, foo2_kwargs)
 
     async def _bin(foo1, foo2):
         # TODO replace with merge
-        async for gen1, gen2 in zip(foo1(), foo2()):
-            if isinstance(gen1, types.AsyncGeneratorType) and isinstance(gen2, types.AsyncGeneratorType):
-                async for f1, f2 in zip(gen1, gen2):
-                    if isinstance(f1, types.CoroutineType):
-                        f1 = await f1
-                    if isinstance(f2, types.CoroutineType):
-                        f2 = await f2
-                    yield lam(f1, f2)
-            elif isinstance(gen1, types.AsyncGeneratorType):
-                async for f1 in gen1:
-                    if isinstance(f1, types.CoroutineType):
-                        f1 = await f1
-                    if isinstance(gen2, types.CoroutineType):
-                        gen2 = await gen2
-                    yield lam(f1, gen2)
-            elif isinstance(gen2, types.AsyncGeneratorType):
-                async for f2 in gen2:
-                    if isinstance(gen1, types.CoroutineType):
-                        gen1 = await gen1
-                    if isinstance(f2, types.CoroutineType):
-                        f2 = await f2
-                    yield lam(gen1, f2)
-            else:
-                if isinstance(gen1, types.CoroutineType):
-                    gen1 = await gen1
-                if isinstance(gen2, types.CoroutineType):
-                    gen2 = await gen2
+        if foo1 == foo2:
+            async for gen in foo1():
+                yield lam(gen, gen)
+        else:
+            async for gen1, gen2 in zip(foo1(), foo2()):
                 yield lam(gen1, gen2)
 
     return _wrap(_bin, dict(foo1=foo1, foo2=foo2), name=_name or 'Binary', wraps=(foo1, foo2), share=None)
@@ -77,6 +45,7 @@ def Negate(foo, foo_kwargs=None):
 
 def Invert(foo, foo_kwargs=None):
     return unary(lambda x: 1 / x, foo, foo_kwargs, _name='Invert')
+
 
 def Add(foo1, foo2, foo1_kwargs=None, foo2_kwargs=None):
     return bin(lambda x, y: x + y, foo1, foo2, foo1_kwargs, foo2_kwargs, _name='Add')
@@ -183,6 +152,7 @@ def Bool(foo, foo_kwargs=None):
 ###################
 def Len(foo, foo_kwargs=None):
     return unary(lambda x: len(x), foo, foo_kwargs=foo_kwargs, _name="Len")
+
 
 ########################
 # Arithmetic Operators #
