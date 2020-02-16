@@ -5,6 +5,7 @@ from ..utils import _either_type
 
 
 class BaseNode(object):
+    '''Class to represent an operation that is lazy'''
     def __init__(self,
                  name="?",
                  derived=False,
@@ -18,6 +19,21 @@ class BaseNode(object):
                  always_dirty=False,
                  trace=False,
                  ):
+        '''Construct a new lazy node, wrapping a callable or a value
+
+        Args:
+            name (str): name to use to represent the node
+            derived (bool):
+            readonly (bool): whether a node is settable
+            nullable (bool): whether a node can have value None
+            value (any): initial value of the node
+            callable (callable): function or other callable that the node is wrapping
+            callable_args (tuple): args for the wrapped callable
+            callable_kwargs (dict): kwargs for the wrapped callable
+            callable_is_method (bool): is the callable a method of an object
+            always_dirty (bool): node should not be lazy - always access underlying value
+            trace (bool): trace when the node is called
+        '''
         self._name = name
         self._callable = callable
         self._value = value

@@ -2,10 +2,22 @@ from .node import BaseNode, node  # noqa: F401
 
 
 class BaseGraph(object):
+    '''Wrapper class around a collection of lazy nodes.'''
     def __init__(self, *args, **kwargs):
         pass
 
     def node(self, name, readonly=False, nullable=True, value=None, trace=False):  # noqa: F811
+        '''method to create a lazy node attached to a graph.
+
+        Args:
+            name (str): name to represent the node
+            readonly (bool): whether the node should be settable
+            nullable (bool): whether node can have value None
+            value (any): initial value for node
+            trace (bool): trace the calls for a node
+        Returns:
+            BaseNode: the newly constructed lazy node
+        '''
         if not hasattr(self, '_BaseGraph__nodes'):
             self.__nodes = {}
 
