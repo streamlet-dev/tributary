@@ -2,7 +2,6 @@ import asyncio
 import types
 from aiostream.aiter_utils import anext
 from asyncio import Queue, QueueEmpty as Empty
-from copy import deepcopy
 from ..base import StreamEnd, StreamNone, StreamRepeat
 
 

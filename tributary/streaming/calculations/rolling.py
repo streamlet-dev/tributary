@@ -1,5 +1,6 @@
 from ..base import Node
 
+
 class Count(Node):
     '''Node to count inputs'''
     def __init__(self, node, text=''):
@@ -13,6 +14,7 @@ class Count(Node):
 
         node._downstream.append((self, 0))
         self._upstream.append(node)
+
 
 class Sum(Node):
     '''Node to sum inputs'''
