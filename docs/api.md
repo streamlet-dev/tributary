@@ -1,23 +1,23 @@
 # API
 
-## Reactive
+## Streaming
 
 ```eval_rst
-.. automodule:: tributary.reactive
+.. automodule:: tributary.streaming
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.base
+.. automodule:: tributary.streaming.base
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.utils
+.. automodule:: tributary.streaming.utils
     :members:
     :undoc-members:
     :show-inheritance:
@@ -27,42 +27,42 @@
 
 
 ```eval_rst
-.. automodule:: tributary.reactive.input
+.. automodule:: tributary.streaming.input
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.input.file
+.. automodule:: tributary.streaming.input.file
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.input.http
+.. automodule:: tributary.streaming.input.http
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.input.kafka
+.. automodule:: tributary.streaming.input.kafka
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.input.socketio
+.. automodule:: tributary.streaming.input.socketio
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.input.ws
+.. automodule:: tributary.streaming.input.ws
     :members:
     :undoc-members:
     :show-inheritance:
@@ -72,35 +72,35 @@
 
 
 ```eval_rst
-.. automodule:: tributary.reactive.output
+.. automodule:: tributary.streaming.output
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.output.http
+.. automodule:: tributary.streaming.output.http
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.output.kafka
+.. automodule:: tributary.streaming.output.kafka
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.output.socketio
+.. automodule:: tributary.streaming.output.socketio
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.output.ws
+.. automodule:: tributary.streaming.output.ws
     :members:
     :undoc-members:
     :show-inheritance:
@@ -111,21 +111,21 @@
 
 
 ```eval_rst
-.. automodule:: tributary.reactive.calculations
+.. automodule:: tributary.streaming.calculations
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.calculations.ops
+.. automodule:: tributary.streaming.calculations.ops
     :members:
     :undoc-members:
     :show-inheritance:
 ```
 
 ```eval_rst
-.. automodule:: tributary.reactive.calculations.rolling
+.. automodule:: tributary.streaming.calculations.rolling
     :members:
     :undoc-members:
     :show-inheritance:

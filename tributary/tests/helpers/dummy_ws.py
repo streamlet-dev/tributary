@@ -2,7 +2,7 @@ import tornado.websocket
 import tornado.web
 import tornado.ioloop
 import time
-from tributary.reactive.input import _gen
+from tributary.streaming.input import _gen
 
 
 class DummyWebSocket(tornado.websocket.WebSocketHandler):

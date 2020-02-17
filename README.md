@@ -24,21 +24,17 @@ or from source
 # Stream Types
 Tributary offers several kinds of streams:
 
-## Reactive
+## Streaming
 These are synchronous, reactive data streams, built using asynchronous python generators. They are designed to mimic complex event processors in terms of event ordering.
 
 ## Functional
 These are functional streams, built by currying python functions (callbacks). 
 
-## Event Loop
-TODO
-These function as tornado based event-loop based streams similar to streamz.
-
 ## Lazy
 These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
 
 # Examples
-- [Reactive](docs/examples/reactive.md)
+- [Streaming](docs/examples/streaming.md)
 - [Lazy](docs/examples/lazy.md)
 
 # Math
