@@ -95,7 +95,15 @@ jobs:
       versionSpec: '$(python.version)'
     displayName: 'Use Python $(python.version)'
 
-  - script: |
+    - script: |
+      which python > python.txt
+      set /p PYTHON=<python.txt
+      ln -s %PYTHON% %PYTHON%$(python.version)
+      python --version
+      which python$(python.version)
+    displayName: "Which python"
+
+    - script: |
       python -m pip install --upgrade pip
       pip install -e .[dev]
     displayName: 'Install dependencies'
