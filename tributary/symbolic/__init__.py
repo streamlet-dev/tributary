@@ -1,5 +1,4 @@
 import tributary.lazy as tl
-import tributary.reactive as tr
 
 from sympy.utilities.lambdify import lambdify
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations as _st, implicit_multiplication_application as _ima
@@ -51,13 +50,13 @@ def construct_lazy(expr, modules=None):
         expr (sympy expression): A Sympy expression
         modules (list): a list of modules to use for sympy's lambdify function
     Returns:
-        tributary.lazy.BaseGraph
+        tributary.lazy.LazyGraph
     '''
     syms = list(symbols(expr))
     names = [s.name for s in syms]
     modules = modules or ["scipy", "numpy"]
 
-    class Lazy(tl.BaseGraph):
+    class Lazy(tl.LazyGraph):
         def __init__(self, **kwargs):
             for n in names:
                 setattr(self, n, self.node(name=n, value=kwargs.get(n, None)))
@@ -73,32 +72,32 @@ def construct_lazy(expr, modules=None):
     return Lazy
 
 
-def construct_streaming(expr, modules=None):
-    '''Construct Lazy tributary class from sympy expression
+# def construct_streaming(expr, modules=None):
+#     '''Construct Lazy tributary class from sympy expression
 
-    Args:
-        expr (sympy expression): A Sympy expression
-        modules (list): a list of modules to use for sympy's lambdify function
-    Returns:
+#     Args:
+#         expr (sympy expression): A Sympy expression
+#         modules (list): a list of modules to use for sympy's lambdify function
+#     Returns:
 
-    '''
-    syms = list(symbols(expr))
-    names = [s.name for s in syms]
-    modules = modules or ["scipy", "numpy"]
+#     '''
+#     syms = list(symbols(expr))
+#     names = [s.name for s in syms]
+#     modules = modules or ["scipy", "numpy"]
 
-    class Streaming(tr.BaseGraph):
-        def __init__(self, **kwargs):
-            self._kwargs = {}
-            for n in names:
-                if n not in kwargs:
-                    raise Exception("Must provide input source for: {}".format(n))
-                setattr(self, n, kwargs.get(n))
-                self._kwargs[n] = kwargs.get(n)
+#     class Streaming(tr.StreamingGraph):
+#         def __init__(self, **kwargs):
+#             self._kwargs = {}
+#             for n in names:
+#                 if n not in kwargs:
+#                     raise Exception("Must provide input source for: {}".format(n))
+#                 setattr(self, n, kwargs.get(n))
+#                 self._kwargs[n] = kwargs.get(n)
 
-            self._nodes = [getattr(self, n) for n in names]
-            self._function = tr.Foo(lambdify(syms, expr, modules=modules)(**self._kwargs))
-            self._expr = expr
+#             self._nodes = [getattr(self, n) for n in names]
+# #             self._function = tr.Foo(lambdify(syms, expr, modules=modules)(**self._kwargs))
+#             self._expr = expr
 
-            super(Streaming, self).__init__(self._function)
+#             super(Streaming, self).__init__(self._foo)
 
-    return Streaming
+#     return Streaming

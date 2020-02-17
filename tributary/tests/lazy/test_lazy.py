@@ -2,12 +2,12 @@ import tributary.lazy as t
 import random
 
 
-class Foo1(t.BaseGraph):
+class Foo1(t.LazyGraph):
     def __init__(self, *args, **kwargs):
         self.x = self.node('x', readonly=False, value=1, trace=True)
 
 
-class Foo2(t.BaseGraph):
+class Foo2(t.LazyGraph):
     def __init__(self, *args, **kwargs):
         self.y = self.node('y', readonly=False, value=2, trace=True)
 
@@ -16,7 +16,7 @@ class Foo2(t.BaseGraph):
         self.x = self.node('x', readonly=False, value=2, trace=True)
 
 
-class Foo3(t.BaseGraph):
+class Foo3(t.LazyGraph):
     @t.node(trace=True)
     def foo1(self):
         return self.random()  # test self access
@@ -28,7 +28,8 @@ class Foo3(t.BaseGraph):
     def foo3(self, x=4):
         return 3 + x
 
-class Foo4(t.BaseGraph):
+
+class Foo4(t.LazyGraph):
     @t.node(trace=True)
     def foo1(self):
         return self.foo2() + 1
@@ -38,7 +39,7 @@ class Foo4(t.BaseGraph):
         return random.random()
 
 
-class Foo5(t.BaseGraph):
+class Foo5(t.LazyGraph):
     @t.node()
     def z(self):
         return self.x | self.y()
@@ -111,14 +112,13 @@ class TestLazy:
         assert z.print()
         assert z.graph()
         assert z.graphviz()
-        assert z.networkx()
 
 
 class TestDirtyPropogation:
     def test_or_dirtypropogation(self):
         f = Foo5()
         assert f.z()() == 10
-        assert f.x() == None
+        assert f.x() is None
 
         f.x = 5
 
@@ -127,13 +127,13 @@ class TestDirtyPropogation:
 
         f.reset()
 
-        assert f.x() == None
+        assert f.x() is None
         assert f.z()() == 10
 
 
 class TestDeclarative:
     def test_simple_declarative(self):
-        n = t.BaseNode(value=1)
+        n = t.Node(value=1)
         z = n + 5
         assert z() == 6
         n.setValue(2)

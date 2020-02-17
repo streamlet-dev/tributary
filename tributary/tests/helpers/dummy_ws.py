@@ -2,7 +2,7 @@ import tornado.websocket
 import tornado.web
 import tornado.ioloop
 import time
-from tributary.reactive.input import _gen
+from tributary.streaming.input import _gen
 
 
 class DummyWebSocket(tornado.websocket.WebSocketHandler):
@@ -34,6 +34,7 @@ def main():
     app.listen(8899)
     print('listening on %d' % 8899)
     tornado.ioloop.IOLoop.current().start()
+
 
 if __name__ == '__main__':
     main()

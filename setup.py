@@ -39,7 +39,6 @@ requires = [
     'socketIO-client-nexus>=0.7.6',
     'sympy>=1.3',
     'tornado>=5.1.1',
-    'ujson>=1.35',
     'websockets>=8.0',
 ]
 
@@ -69,7 +68,6 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],

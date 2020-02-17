@@ -1,7 +1,7 @@
 import requests
 import time
 from confluent_kafka import Consumer, KafkaError
-from ujson import loads as load_json
+from json import loads as load_json
 from websocket import create_connection
 from socketIO_client_nexus import SocketIO as SIO
 try:

@@ -63,7 +63,7 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
     Args:
         foos (list of callables): list of functions to pipeline
         foo_callbacks (List[str]): list of strings indicating the callback names (kwargs of the foos)
-        foo_kwargs (List[dict]): 
+        foo_kwargs (List[dict]):
         on_data (callable): callable to call at the end of the pipeline
         on_data_kwargs (dict): kwargs to pass to the on_data function>?
     '''
