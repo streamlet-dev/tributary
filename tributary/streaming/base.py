@@ -2,7 +2,8 @@ import asyncio
 import types
 from aiostream.aiter_utils import anext
 from asyncio import Queue, QueueEmpty as Empty
-from ..base import StreamEnd, StreamNone
+from copy import deepcopy
+from ..base import StreamEnd, StreamNone, StreamRepeat
 
 
 def _gen_to_foo(generator):
@@ -47,7 +48,13 @@ class Node(object):
         if asyncio.iscoroutine(self._foo):
             _last = await self._foo(*self._active, **self._foo_kwargs)
         elif isinstance(self._foo, types.FunctionType):
-            _last = self._foo(*self._active, **self._foo_kwargs)
+            try:
+                _last = self._foo(*self._active, **self._foo_kwargs)
+            except ValueError:
+                # Swap back to function
+                self._foo = self._old_foo
+                _last = self._foo(*self._active, **self._foo_kwargs)
+
         else:
             raise Exception('Cannot use type:{}'.format(type(self._foo)))
 
@@ -56,10 +63,12 @@ class Node(object):
                 return await _agen_to_foo(g)
             self._foo = _foo
             _last = await self._foo()
-
         elif isinstance(_last, types.GeneratorType):
+            # Swap to generator unroller
+            self._old_foo = self._foo
             self._foo = lambda g=_last: _gen_to_foo(g)
             _last = self._foo()
+
         elif asyncio.iscoroutine(_last):
             _last = await _last
 
@@ -73,9 +82,21 @@ class Node(object):
         self._last = StreamEnd()
         await self._output(self._last)
 
+    def _backpressure(self):
+        '''check if _downstream are all empty'''
+        ret = not all(n._input[i].empty() for n, i in self._downstream)
+        if ret:
+            print('backpressure!')
+        return ret
+
     async def __call__(self):
+        if self._backpressure():
+            return StreamNone()
+
         if self._finished:
             return await self._finish()
+
+        print(self._input)
 
         ready = True
         # iterate through inputs
@@ -85,12 +106,17 @@ class Node(object):
                 try:
                     # get from input queue
                     val = inp.get_nowait()
+                    while isinstance(val, StreamRepeat):
+                        # Skip entry
+                        val = inp.get_nowait()
 
                     if isinstance(val, StreamEnd):
+                        print('here')
                         return await self._finish()
 
                     # set as active
                     self._active[i] = val
+
                 except Empty:
                     # wait for value
                     ready = False

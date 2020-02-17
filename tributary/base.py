@@ -4,6 +4,12 @@ class StreamEnd:
     pass
 
 
+class StreamRepeat:
+    '''Indicates that a stream has a gap, this object should be ignored
+    and the previous action repeated'''
+    pass
+
+
 class StreamNone:
     '''indicates that a stream does not have a value'''
 

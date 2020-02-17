@@ -5,7 +5,6 @@ from ..base import Node
 class Print(Node):
     def __init__(self, node, text=''):
         def foo(val):
-            print(text + str(val))
             return val
         super().__init__(foo=foo, foo_kwargs=None, name='Print', inputs=1)
 
