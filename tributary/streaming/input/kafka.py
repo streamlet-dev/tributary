@@ -1,5 +1,4 @@
 import json as JSON
-import time
 from confluent_kafka import Consumer, KafkaError
 from .input import Foo
 
@@ -54,4 +53,3 @@ class Kafka(Foo):
 
         super().__init__(foo=_listen)
         self._name = 'Kafka'
-

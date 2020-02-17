@@ -1,5 +1,4 @@
 import json as JSON
-import time
 from socketIO_client_nexus import SocketIO as SIO
 from urllib.parse import urlparse
 
@@ -33,7 +32,7 @@ class SocketIO(Foo):
                 for msg in _data:
                     # FIXME clear _data
                     if json:
-                        msg = json.loads(msg)
+                        msg = JSON.loads(msg)
 
                     if field:
                         msg = msg[field]

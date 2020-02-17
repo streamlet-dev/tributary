@@ -1,6 +1,5 @@
 import json as JSON
 import websockets
-import time
 
 from .input import Foo
 from ...base import StreamNone, StreamEnd
@@ -32,4 +31,3 @@ class WebSocket(Foo):
 
         super().__init__(foo=_listen)
         self._name = 'WebSocket'
-

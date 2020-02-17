@@ -47,4 +47,3 @@ class HTTP(Foo):
 
         super().__init__(foo=_req)
         self._name = 'Http'
-
