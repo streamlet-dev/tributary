@@ -39,7 +39,6 @@ requires = [
     'socketIO-client-nexus>=0.7.6',
     'sympy>=1.3',
     'tornado>=5.1.1',
-    'ujson>=1.35',
     'websockets>=8.0',
 ]
 
