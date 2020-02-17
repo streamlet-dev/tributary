@@ -18,35 +18,46 @@ def _gen():
 
 
 class Timer(Node):
+    '''Streaming wrapper to periodically call a callable `count` times
+       with a delay of `interval` in between
+
+    Arguments:
+        foo (callable): callable to call
+        foo_kwargs (dict): kwargs for callable
+        count (int): number of times to call, 0 means infinite (or until generator is complete)
+        interval (int/float): minimum delay between calls (can be more due to async scheduling)
+    '''
     def __init__(self, foo, foo_kwargs=None, count=1, interval=0):
-        self._count = count
-        self._executed = 0
-        self._interval = interval
-
-        super().__init__(foo=foo, foo_kwargs=foo_kwargs, name='Timer[{}]'.format(foo.__name__), inputs=0)
-
-    async def _execute(self):
-        self._executed += 1
-        await super()._execute()
-
-    async def __call__(self):
-        # sleep if needed
-        if self._interval:
-            await asyncio.sleep(self._interval)
-
-        if self._count > 0 and self._executed >= self._count:
-            self._foo = lambda: StreamEnd()
-
-        return await self._execute()
+        super().__init__(foo=foo,
+                         foo_kwargs=foo_kwargs,
+                         name='Timer[{}]'.format(foo.__name__),
+                         inputs=0,
+                         execution_max=count,
+                         delay_interval=interval)
 
 
 class Const(Timer):
+    '''Streaming wrapper to return a scalar value
+
+    Arguments:
+        value (any): value to return
+        count (int): number of times to call, 0 means infinite
+    '''
     def __init__(self, value, count=0):
         super().__init__(foo=lambda: value, count=count, interval=0)
         self._name = 'Const[{}]'.format(value)
 
 
 class Foo(Timer):
+    '''Streaming wrapper to periodically call a function `count` times
+       with a delay of `interval` in between
+
+    Arguments:
+        foo (callable): callable to call
+        foo_kwargs (dict): kwargs for callable
+        count (int): number of times to call, 0 means infinite (or until generator is complete)
+        interval (int/float): minimum delay between calls (can be more due to async scheduling)
+    '''
     def __init__(self, foo, foo_kwargs=None, count=0, interval=0):
         super().__init__(foo=foo, foo_kwargs=foo_kwargs, count=count, interval=interval)
         self._name = 'Foo[{}]'.format(foo.__name__)
@@ -59,7 +70,6 @@ class Random(Foo):
         count (int): number of elements to yield
         interval (float): interval to wait between yields
     '''
-
     def __init__(self, count=10, interval=0.1):
         def _random(count=count, interval=interval):
             step = 0

@@ -20,42 +20,98 @@ async def _agen_to_foo(generator):
 
 
 class Node(object):
+    '''A representation of a node in the forward propogating graph.
+
+    Args:
+        foo (callable): the python callable to wrap in a forward propogating node, can be:
+                            - function
+                            - generator
+                            - async function
+                            - async generator
+        foo_kwargs (dict): kwargs for the wrapped callables, should be static call-to-call
+        name (str): name of the node
+        inputs (int): number of upstream inputs
+        kwargs (dict): extra kwargs:
+                        - delay_interval (int/float): rate limit
+                        - execution_max (int): max number of times to execute callable
+    '''
     _id_ref = 0
 
-    def __init__(self, foo, foo_kwargs=None, name=None, inputs=1):
+    def __init__(self, foo, foo_kwargs=None, name=None, inputs=1, **kwargs):
+        # Instances get an id but one id tracker for all nodes so we can
+        # uniquely identify them
+        # TODO different scheme
         self._id = Node._id_ref
         Node._id_ref += 1
 
+        # Every node gets a name so it can be uniquely identified in the graph
         self._name = '{}#{}'.format(name or self.__class__.__name__, self._id)
+
+        # Inputs are async queues from upstream nodes
         self._input = [Queue() for _ in range(inputs)]
+
+        # Active are currently valid inputs, since inputs
+        # may come at different rates
         self._active = [StreamNone() for _ in range(inputs)]
+
+        # Downstream nodes so we can traverse graph, push
+        # results to downstream nodes
         self._downstream = []
+
+        # Upstream nodes so we can traverse graph, plot and optimize
         self._upstream = []
 
+        # The function we are wrapping, can be:
+        #    - vanilla function
+        #    - vanilla generator
+        #    - async function
+        #    - async generator
         self._foo = foo
+
+        # Any kwargs necessary for the function.
+        # These should be static call-to-call.
         self._foo_kwargs = foo_kwargs or {}
+
+        # Delay between executions, useful for rate-limiting
+        # default is no rate limiting
+        self._delay_interval = kwargs.get('delay_interval', 0)
+
+        # max number of times to execute callable
+        self._execution_max = kwargs.get('execution_max', 0)
+
+        # current execution count
+        self._execution_count = 0
+
+        # last value pushed downstream
         self._last = StreamNone()
+
+        # stream is in a finished state, will only propogate StreamEnd instances
         self._finished = False
 
     def __repr__(self):
         return '{}'.format(self._name)
 
     async def _push(self, inp, index):
+        '''push value to downstream nodes'''
         await self._input[index].put(inp)
 
     async def _execute(self):
-        if asyncio.iscoroutine(self._foo):
-            _last = await self._foo(*self._active, **self._foo_kwargs)
-        elif isinstance(self._foo, types.FunctionType):
-            try:
-                _last = self._foo(*self._active, **self._foo_kwargs)
-            except ValueError:
-                # Swap back to function
-                self._foo = self._old_foo
-                _last = self._foo(*self._active, **self._foo_kwargs)
-
-        else:
-            raise Exception('Cannot use type:{}'.format(type(self._foo)))
+        '''execute callable'''
+        valid = False
+        while not valid:
+            if asyncio.iscoroutine(self._foo):
+                _last = await self._foo(*self._active, **self._foo_kwargs)
+            elif isinstance(self._foo, types.FunctionType):
+                try:
+                    _last = self._foo(*self._active, **self._foo_kwargs)
+                except ValueError:
+                    # Swap back to function
+                    self._foo = self._old_foo
+                    continue
+            else:
+                raise Exception('Cannot use type:{}'.format(type(self._foo)))
+            valid = True
+            self._execution_count += 1
 
         if isinstance(_last, types.AsyncGeneratorType):
             async def _foo(g=_last):
@@ -77,25 +133,34 @@ class Node(object):
             self._active[i] = StreamNone()
 
     async def _finish(self):
+        '''mark this node as finished'''
         self._finished = True
         self._last = StreamEnd()
         await self._output(self._last)
 
     def _backpressure(self):
-        '''check if _downstream are all empty'''
+        '''check if _downstream are all empty, if not then don't propogate'''
         ret = not all(n._input[i].empty() for n, i in self._downstream)
-        if ret:
-            print('backpressure!')
         return ret
 
     async def __call__(self):
+        '''execute the callable if possible, and propogate values downstream'''
+        # Downstream nodes can't process
         if self._backpressure():
             return StreamNone()
 
+        # Previously ended stream
         if self._finished:
             return await self._finish()
 
-        print(self._input)
+        # Sleep if needed
+        if self._delay_interval:
+            await asyncio.sleep(self._delay_interval)
+
+        # Stop executing
+        if self._execution_max > 0 and self._execution_count >= self._execution_max:
+            self._foo = lambda: StreamEnd()
+            self._old_foo = lambda: StreamEnd()
 
         ready = True
         # iterate through inputs
@@ -110,7 +175,6 @@ class Node(object):
                         val = inp.get_nowait()
 
                     if isinstance(val, StreamEnd):
-                        print('here')
                         return await self._finish()
 
                     # set as active
@@ -125,12 +189,23 @@ class Node(object):
             return await self._execute()
 
     async def _output(self, ret):
+        '''output value to downstream nodes'''
         # if downstreams, output
         for down, i in self._downstream:
             await down._push(ret, i)
         return ret
 
     def _deep_bfs(self, reverse=True):
+        '''get nodes by level in tree, reversed relative to output node.
+           e.g. given a tree that looks like:
+        A -> B -> D -> F
+         \-> C -> E /
+         the result will be: [[A], [B, C], [D, E], [F]]
+
+         This will be the order we synchronously execute, so that within a
+         level nodes' execution will be asynchronous but from level to level
+         they will be synchronous
+        '''
         nodes = []
         nodes.append([self])
 
@@ -147,4 +222,5 @@ class Node(object):
         return nodes
 
     def value(self):
+        '''get value from node'''
         return self._last

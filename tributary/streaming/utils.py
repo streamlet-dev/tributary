@@ -101,7 +101,6 @@ class Unroll(Node):
         self._count = 0
 
         async def foo(value):
-            print('foo got:', value)
             # unrolled
             if self._count > 0:
                 self._count -= 1
@@ -111,7 +110,6 @@ class Unroll(Node):
             try:
                 for v in value:
                     self._count += 1
-                    print('pushing:', v)
                     await self._push(v, 0)
             except TypeError:
                 return value
@@ -122,169 +120,112 @@ class Unroll(Node):
         node._downstream.append((self, 0))
         self._upstream.append(node)
 
-# class UnrollDataFrame(Node):
-#     '''Streaming wrapper to unroll an iterable stream
+class UnrollDataFrame(Node):
+    '''Streaming wrapper to unroll a dataframe into a stream
 
-#     Arguments:
-#         node (node): input stream
-#     '''
-#     def __init__(self, node, json=False, wrap=False):
-#         def foo(value, json=json, wrap=wrap):
-#             for i in range(len(value)):
-#                 row = df.iloc[i]
-#                 if json:
-#                     data = row.to_dict()
-#                     data['index'] = row.name
-#                     yield data
-#                 else:
-#                     yield row
+    Arguments:
+        node (node): input stream
+    '''
+    def __init__(self, node, json=False, wrap=False):
+        self._count = 0
 
-#         super().__init__(foo=foo, name='Unroll', inputs=1)
-#         node._downstream.append((self, 0))
-#         self._upstream.append(node)
+        async def foo(value, json=json, wrap=wrap):
+            # unrolled
+            if self._count > 0:
+                self._count -= 1
+                return value
 
+            # unrolling
+            try:
+                for i in range(len(value)):
+                    row = value.iloc[i]
 
-# def Merge(f_wrap1, f_wrap2):
-#     if not isinstance(f_wrap1, FunctionWrapper):
-#         if not isinstance(f_wrap1, types.FunctionType):
-#             f_wrap1 = Const(f_wrap1)
-#         else:
-#             f_wrap1 = Foo(f_wrap1)
+                    if json:
+                        data = row.to_dict()
+                        data['index'] = row.name
+                    else:
+                        data = row
+                    self._count += 1
+                    await self._push(data, 0)
 
-#     if not isinstance(f_wrap2, FunctionWrapper):
-#         if not isinstance(f_wrap2, types.FunctionType):
-#             f_wrap2 = Const(f_wrap2)
-#         else:
-#             f_wrap2 = Foo(f_wrap2)
+            except TypeError:
+                return value
+            else:
+                return StreamRepeat()
 
-#     async def _merge(foo1, foo2):
-#         async for gen1, gen2 in zip(foo1(), foo2()):
-#             if isinstance(gen1, types.AsyncGeneratorType) and \
-#                isinstance(gen2, types.AsyncGeneratorType):
-#                 async for f1, f2 in zip(gen1, gen2):
-#                     yield [f1, f2]
-#             elif isinstance(gen1, types.AsyncGeneratorType):
-#                 async for f1 in gen1:
-#                     yield [f1, gen2]
-#             elif isinstance(gen2, types.AsyncGeneratorType):
-#                 async for f2 in gen2:
-#                     yield [gen1, f2]
-#             else:
-#                 yield [gen1, gen2]
-
-#     return _wrap(_merge, dict(foo1=f_wrap1, foo2=f_wrap2), name='Merge', wraps=(f_wrap1, f_wrap2), share=None)
+        super().__init__(foo=foo, name='UnrollDF', inputs=1)
+        node._downstream.append((self, 0))
+        self._upstream.append(node)
 
 
-# def ListMerge(f_wrap1, f_wrap2):
-#     if not isinstance(f_wrap1, FunctionWrapper):
-#         if not isinstance(f_wrap1, types.FunctionType):
-#             f_wrap1 = Const(f_wrap1)
-#         else:
-#             f_wrap1 = Foo(f_wrap1)
+class Merge(Node):
+    '''Streaming wrapper to merge 2 inputs into a single output
 
-#     if not isinstance(f_wrap2, FunctionWrapper):
-#         if not isinstance(f_wrap2, types.FunctionType):
-#             f_wrap2 = Const(f_wrap2)
-#         else:
-#             f_wrap2 = Foo(f_wrap2)
+    Arguments:
+        node1 (node): input stream
+        node2 (node): input stream
+    '''
+    def __init__(self, node1, node2):
+        def foo(value1, value2):
+            return value1, value2
 
-#     async def _merge(foo1, foo2):
-#         async for gen1, gen2 in zip(foo1(), foo2()):
-#             if isinstance(gen1, types.AsyncGeneratorType) and \
-#                isinstance(gen2, types.AsyncGeneratorType):
-#                 async for f1, f2 in zip(gen1, gen2):
-#                     ret = []
-#                     ret.extend(f1)
-#                     ret.extend(f1)
-#                     yield ret
-#             elif isinstance(gen1, types.AsyncGeneratorType):
-#                 async for f1 in gen1:
-#                     ret = []
-#                     ret.extend(f1)
-#                     ret.extend(gen2)
-#                     yield ret
-#             elif isinstance(gen2, types.AsyncGeneratorType):
-#                 async for f2 in gen2:
-#                     ret = []
-#                     ret.extend(gen1)
-#                     ret.extend(f2)
-#                     yield ret
-#             else:
-#                 ret = []
-#                 ret.extend(gen1)
-#                 ret.extend(gen2)
-#                 yield ret
+        super().__init__(foo=foo, name='Merge', inputs=2)
+        node1._downstream.append((self, 0))
+        node2._downstream.append((self, 1))
+        self._upstream.append(node1)
+        self._upstream.append(node2)
 
-#     return _wrap(_merge, dict(foo1=f_wrap1, foo2=f_wrap2), name='ListMerge', wraps=(f_wrap1, f_wrap2), share=None)
+class ListMerge(Node):
+    '''Streaming wrapper to merge 2 input lists into a single output list
+
+    Arguments:
+        node1 (node): input stream
+        node2 (node): input stream
+    '''
+    def __init__(self, node1, node2):
+        def foo(value1, value2):
+            return list(value1) + list(value2)
+
+        super().__init__(foo=foo, name='ListMerge', inputs=2)
+        node1._downstream.append((self, 0))
+        node2._downstream.append((self, 1))
+        self._upstream.append(node1)
+        self._upstream.append(node2)
 
 
-# def DictMerge(f_wrap1, f_wrap2):
-#     if not isinstance(f_wrap1, FunctionWrapper):
-#         if not isinstance(f_wrap1, types.FunctionType):
-#             f_wrap1 = Const(f_wrap1)
-#         else:
-#             f_wrap1 = Foo(f_wrap1)
+class DictMerge(Node):
+    '''Streaming wrapper to merge 2 input dicts into a single output dict.
+       Preference is given to the second input (e.g. if keys overlap)
 
-#     if not isinstance(f_wrap2, FunctionWrapper):
-#         if not isinstance(f_wrap2, types.FunctionType):
-#             f_wrap2 = Const(f_wrap2)
-#         else:
-#             f_wrap2 = Foo(f_wrap2)
+    Arguments:
+        node1 (node): input stream
+        node2 (node): input stream
+    '''
+    def __init__(self, node1, node2):
+        def foo(value1, value2):
+            ret = {}
+            ret.update(value1)
+            ret.update(value2)
+            return ret
 
-#     async def _dictmerge(foo1, foo2):
-#         async for gen1, gen2 in zip(foo1(), foo2()):
-#             if isinstance(gen1, types.AsyncGeneratorType) and \
-#                isinstance(gen2, types.AsyncGeneratorType):
-#                 async for f1, f2 in zip(gen1, gen2):
-#                     ret = {}
-#                     ret.update(f1)
-#                     ret.update(f1)
-#                     yield ret
-#             elif isinstance(gen1, types.AsyncGeneratorType):
-#                 async for f1 in gen1:
-#                     ret = {}
-#                     ret.update(f1)
-#                     ret.update(gen2)
-#                     yield ret
-#             elif isinstance(gen2, types.AsyncGeneratorType):
-#                 async for f2 in gen2:
-#                     ret = {}
-#                     ret.update(gen1)
-#                     ret.update(f2)
-#                     yield ret
-#             else:
-#                 ret = {}
-#                 ret.update(gen1)
-#                 ret.update(gen2)
-#                 yield ret
-
-#     return _wrap(_dictmerge, dict(foo1=f_wrap1, foo2=f_wrap2), name='DictMerge', wraps=(f_wrap1, f_wrap2), share=None)
+        super().__init__(foo=foo, name='DictMerge', inputs=2)
+        node1._downstream.append((self, 0))
+        node2._downstream.append((self, 1))
+        self._upstream.append(node1)
+        self._upstream.append(node2)
 
 
-# def Reduce(*f_wraps):
-#     f_wraps = list(f_wraps)
-#     for i, f_wrap in enumerate(f_wraps):
-#         if not isinstance(f_wrap, types.FunctionType):
-#             f_wraps[i] = Const(f_wrap)
-#         else:
-#             f_wraps[i] = Foo(f_wrap)
+class Reduce(Node):
+    '''Streaming wrapper to merge any number of inputs
 
-#     async def _reduce(foos):
-#         async for all_gens in zip(*[foo() for foo in foos]):
-#             gens = []
-#             vals = []
-#             for gen in all_gens:
-#                 if isinstance(gen, types.AsyncGeneratorType):
-#                     gens.append(gen)
-#                 else:
-#                     vals.append(gen)
-#             if gens:
-#                 for gens in zip(*gens):
-#                     ret = list(vals)
-#                     for gen in gens:
-#                         ret.append(next(gen))
-#                     yield ret
-#             else:
-#                 yield vals
+    Arguments:
+        nodes (tuple): input streams
+    '''
+    def __init__(self, *nodes):
+        def foo(*values):
+            return values
 
-#     return _wrap(_reduce, dict(foos=f_wraps), name='Reduce', wraps=tuple(f_wraps), share=None)
+        super().__init__(foo=foo, name='Reduce', inputs=len(nodes))
+        for i, n in enumerate(nodes):
+            n._downstream.append((self, i))
+            self._upstream.append(n)
