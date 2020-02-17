@@ -37,21 +37,10 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - [Streaming](docs/examples/streaming.md)
 - [Lazy](docs/examples/lazy.md)
 
-# Math
-`(Work in progress)`
-
-## Operations
-- unary operators/comparators
-- binary operators/comparators
-
-## Rolling
-- count
-- sum
-
 # Sources and Sinks
-`(Work in progress)`
-
 ## Sources
+- python function/generator/async function/async generator
+- random
 - file
 - kafka
 - websocket
@@ -62,5 +51,53 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - file
 - kafka
 - http
-- TODO websocket
+- websocket
 - TODO socket io
+
+# Transforms
+- Delay - Streaming wrapper to delay a stream
+- Apply - Streaming wrapper to apply a function to an input stream
+- Window - Streaming wrapper to collect a window of values
+- Unroll - Streaming wrapper to unroll an iterable stream
+- UnrollDataFrame - Streaming wrapper to unroll a dataframe into a stream
+- Merge - Streaming wrapper to merge 2 inputs into a single output
+- ListMerge - Streaming wrapper to merge 2 input lists into a single output list
+- DictMerge - Streaming wrapper to merge 2 input dicts into a single output dict. Preference is given to the second input (e.g. if keys overlap)
+- Reduce - Streaming wrapper to merge any number of inputs
+
+# Calculations
+- Noop
+- Negate
+- Invert
+- Add
+- Sub
+- Mult
+- Div
+- RDiv
+- Mod
+- Pow
+- Not
+- And
+- Or
+- Equal
+- NotEqual
+- Less
+- LessOrEqual
+- Greater
+- GreaterOrEqual
+- Log
+- Sin
+- Cos
+- Tan
+- Arcsin
+- Arccos
+- Arctan
+- Sqrt
+- Abs
+- Exp
+- Erf
+- Int
+- Float
+- Bool
+- Str
+- Len
