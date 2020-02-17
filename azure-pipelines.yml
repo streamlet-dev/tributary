@@ -12,34 +12,34 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+      displayName: 'Use Python $(python.version)'
 
-  - script: |
-      python -m pip install --upgrade pip
-      pip install -e .[dev]
-    displayName: 'Install dependencies'
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+      displayName: 'Install dependencies'
 
-  - script: |
-      make lint
-    displayName: 'Lint'
+    - script: |
+        make lint
+      displayName: 'Lint'
 
-  - script:
-      make tests
-    displayName: 'Test'
+    - script:
+        make tests
+      displayName: 'Test'
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFiles: 'python_junit.xml'
-      testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: 'python_junit.xml'
+        testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
 
-  - task: PublishCodeCoverageResults@1
-    inputs: 
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/*coverage.xml'
+    - task: PublishCodeCoverageResults@1
+      inputs: 
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/*coverage.xml'
 
 - job: 'Mac'
   pool:
@@ -51,34 +51,34 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+      displayName: 'Use Python $(python.version)'
 
-  - script: |
-      python -m pip install --upgrade pip
-      pip install -e .[dev]
-    displayName: 'Install dependencies'
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+      displayName: 'Install dependencies'
 
-  - script: |
-      make lint
-    displayName: 'Lint'
+    - script: |
+        make lint
+      displayName: 'Lint'
 
-  - script: |
-      make tests
-    displayName: 'Test'
+    - script: |
+        make tests
+      displayName: 'Test'
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFiles: 'python_junit.xml'
-      testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: 'python_junit.xml'
+        testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
 
-  - task: PublishCodeCoverageResults@1
-    inputs: 
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/*coverage.xml'
+    - task: PublishCodeCoverageResults@1
+      inputs: 
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/*coverage.xml'
 
 - job: 'Windows'
   pool:
@@ -90,39 +90,39 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+      displayName: 'Use Python $(python.version)'
 
     - script: |
-      which python > python.txt
-      set /p PYTHON=<python.txt
-      ln -s %PYTHON% %PYTHON%$(python.version)
-      python --version
-      which python$(python.version)
-    displayName: "Which python"
+        which python > python.txt
+        set /p PYTHON=<python.txt
+        ln -s %PYTHON% %PYTHON%$(python.version)
+        python --version
+        which python$(python.version)
+      displayName: "Which python"
 
     - script: |
-      python -m pip install --upgrade pip
-      pip install -e .[dev]
-    displayName: 'Install dependencies'
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+      displayName: 'Install dependencies'
 
-  - script: |
-      make lint
-    displayName: 'Lint'
+    - script: |
+        make lint
+      displayName: 'Lint'
 
-  - script: |
-      make tests
-    displayName: 'Test'
+    - script: |
+        make tests
+      displayName: 'Test'
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFiles: 'python_junit.xml'
-      testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: 'python_junit.xml'
+        testRunTitle: 'Publish test results for Python $(python.version) $(manylinux_flag)'
 
-  - task: PublishCodeCoverageResults@1
-    inputs: 
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/*coverage.xml'
+    - task: PublishCodeCoverageResults@1
+      inputs: 
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/*coverage.xml'
