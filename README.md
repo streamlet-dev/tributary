@@ -1,7 +1,7 @@
 # <a href="https://tributary.readthedocs.io"><img src="docs/img/icon.png" width="300"></a>
 Python Data Streams
 
-[![Build Status](https://travis-ci.org/timkpaine/tributary.svg?branch=master)](https://travis-ci.org/timkpaine/tributary)
+[![Build Status](https://dev.azure.com/tpaine154/tributary/_apis/build/status/timkpaine.tributary?branchName=master)](https://dev.azure.com/tpaine154/tributary/_build/latest?definitionId=2&branchName=master)
 [![GitHub issues](https://img.shields.io/github/issues/timkpaine/tributary.svg)]()
 [![codecov](https://codecov.io/gh/timkpaine/tributary/branch/master/graph/badge.svg)](https://codecov.io/gh/timkpaine/tributary)
 [![BCH compliance](https://bettercodehub.com/edge/badge/timkpaine/tributary?branch=master)](https://bettercodehub.com/)
