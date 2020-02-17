@@ -1,9 +1,7 @@
-import asyncio
 import math
 import numpy as np
 
 from ..base import Node
-from ...base import StreamEnd
 
 
 def _gen():

@@ -120,6 +120,7 @@ class Unroll(Node):
         node._downstream.append((self, 0))
         self._upstream.append(node)
 
+
 class UnrollDataFrame(Node):
     '''Streaming wrapper to unroll a dataframe into a stream
 
@@ -174,6 +175,7 @@ class Merge(Node):
         node2._downstream.append((self, 1))
         self._upstream.append(node1)
         self._upstream.append(node2)
+
 
 class ListMerge(Node):
     '''Streaming wrapper to merge 2 input lists into a single output list

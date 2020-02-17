@@ -199,7 +199,7 @@ class Node(object):
         '''get nodes by level in tree, reversed relative to output node.
            e.g. given a tree that looks like:
         A -> B -> D -> F
-         \-> C -> E /
+         \\-> C -> E /
          the result will be: [[A], [B, C], [D, E], [F]]
 
          This will be the order we synchronously execute, so that within a
