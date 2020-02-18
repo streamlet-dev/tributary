@@ -1,4 +1,4 @@
-import tributary.lazy as tl
+import tributary as t
 
 from sympy.utilities.lambdify import lambdify
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations as _st, implicit_multiplication_application as _ima
@@ -56,7 +56,7 @@ def construct_lazy(expr, modules=None):
     names = [s.name for s in syms]
     modules = modules or ["scipy", "numpy"]
 
-    class Lazy(tl.LazyGraph):
+    class Lazy(t.LazyGraph):
         def __init__(self, **kwargs):
             for n in names:
                 setattr(self, n, self.node(name=n, value=kwargs.get(n, None)))
@@ -65,7 +65,7 @@ def construct_lazy(expr, modules=None):
             self._function = lambdify(syms, expr, modules=modules)
             self._expr = expr
 
-        @tl.node
+        @t.node
         def evaluate(self):
             return self._function(*self._nodes)
 

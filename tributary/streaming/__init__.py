@@ -1,6 +1,6 @@
 import asyncio
 from copy import deepcopy
-from .base import Node  # noqa: F401
+from .base import Node as StreamingNode  # noqa: F401
 from .calculations import *  # noqa: F401, F403
 from .input import *  # noqa: F401, F403
 from .output import *  # noqa: F401, F403

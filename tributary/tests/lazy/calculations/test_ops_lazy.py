@@ -1,4 +1,4 @@
-import tributary.lazy as t
+import tributary as t
 
 
 class Foo1(t.LazyGraph):
