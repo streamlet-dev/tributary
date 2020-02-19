@@ -7,7 +7,6 @@ if not _PATCHED:
 
 
 from ._version import __version__  # noqa: F401
-from .functional import pipeline, stop  # noqa: F401
 
 from .lazy import LazyGraph, LazyNode, node  # noqa: F401
 from .functional import pipeline, stop  # noqa: F401

@@ -243,4 +243,3 @@ Node.merge = Merge
 Node.listMerge = ListMerge
 Node.dictMerge = DictMerge
 Node.reduce = Reduce
-
