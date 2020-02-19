@@ -42,6 +42,13 @@ def Pow(self, other):
     return self._gennode(self._name + '^' + other._name, (lambda x, y: x.value() ** y.value()), [self, other], self._trace or other._trace)
 
 
+def Mod(self, other):
+    other = self._tonode(other)
+    if isinstance(self._self_reference, Node):
+        return self._gennode(self._name + '%' + other._name, (lambda x, y: x.value() % y.value()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(self._name + '%' + other._name, (lambda x, y: x.value() % y.value()), [self, other], self._trace or other._trace)
+
+
 def Negate(self):
     return self._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
 
@@ -83,15 +90,15 @@ def Tan(self):
 
 
 def Arcsin(self):
-    return self._gennode('sin(' + self._name + ')', (lambda x: math.arcsin(self.value())), [self], self._trace)
+    return self._gennode('arcsin(' + self._name + ')', (lambda x: math.asin(self.value())), [self], self._trace)
 
 
 def Arccos(self):
-    return self._gennode('arccos(' + self._name + ')', (lambda x: math.arccos(self.value())), [self], self._trace)
+    return self._gennode('arccos(' + self._name + ')', (lambda x: math.acos(self.value())), [self], self._trace)
 
 
 def Arctan(self):
-    return self._gennode('arctan(' + self._name + ')', (lambda x: math.arctan(self.value())), [self], self._trace)
+    return self._gennode('arctan(' + self._name + ')', (lambda x: math.atan(self.value())), [self], self._trace)
 
 
 def Abs(self):
@@ -260,8 +267,8 @@ Node.__rtruediv__ = Div
 
 Node.__pow__ = Pow
 Node.__rpow__ = Pow
-# Node.__mod__ = Mod
-# Node.__rmod__ = Mod
+Node.__mod__ = Mod
+Node.__rmod__ = Mod
 
 #####################
 # Logical Operators #
@@ -306,9 +313,9 @@ Node.log = Log
 Node.sin = Sin
 Node.cos = Cos
 Node.tan = Tan
-Node.arcsin = Arcsin
-Node.arccos = Arccos
-Node.arctan = Arctan
+Node.asin = Arcsin
+Node.acos = Arccos
+Node.atan = Arctan
 Node.abs = Abs
 Node.sqrt = Sqrt
 Node.exp = Exp
