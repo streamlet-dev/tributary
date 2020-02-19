@@ -65,4 +65,6 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'rollingCount')
         assert hasattr(ts.StreamingNode, 'rollingSum')
         assert hasattr(ts.StreamingNode, 'rollingCount')
-        assert hasattr(ts.StreamingNode, 'rollingSum')
+        assert hasattr(ts.StreamingNode, 'rollingMin')
+        assert hasattr(ts.StreamingNode, 'rollingMax')
+        assert hasattr(ts.StreamingNode, 'rollingAverage')
