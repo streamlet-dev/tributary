@@ -61,3 +61,6 @@ class TestAPI:
         assert hasattr(tl.LazyNode, 'graphviz')
         assert hasattr(tl.LazyNode, 'print')
         # assert hasattr(tl.LazyNode, 'perspective')
+
+        # assert hasattr(ts.StreamingNode, 'rollingCount')
+        # assert hasattr(ts.StreamingNode, 'rollingSum')

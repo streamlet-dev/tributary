@@ -41,3 +41,7 @@ class Sum(Node):
 
         node._downstream.append((self, 0))
         self._upstream.append(node)
+
+
+Node.rollingCount = Count
+Node.rollingSum = Sum

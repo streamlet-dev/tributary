@@ -21,6 +21,17 @@ def binary(foo, name):
     return _foo
 
 
+def n_ary(foo, name):
+    def _foo(*others):
+        downstream = Node(foo, {}, name=name, inputs=len(others))
+        for i, other in enumerate(others):
+            other._downstream.append((downstream, i))
+
+        downstream._upstream.extend(list(others))
+        return downstream
+    return _foo
+
+
 ########################
 # Arithmetic Operators #
 ########################
@@ -34,6 +45,7 @@ Div = binary(lambda x, y: x / y, name='Div')
 RDiv = binary(lambda x, y: y / x, name='RDiv')
 Mod = binary(lambda x, y: x % y, name='Mod')
 Pow = binary(lambda x, y: x ** y, name='Pow')
+Sum = n_ary(lambda *args: sum(args), name='Sum')
 
 
 #####################
@@ -104,6 +116,9 @@ Node.__pow__ = Pow
 Node.__rpow__ = Pow
 Node.__mod__ = Mod
 Node.__rmod__ = Mod
+
+Node.sum = Sum
+
 
 #####################
 # Logical Operators #

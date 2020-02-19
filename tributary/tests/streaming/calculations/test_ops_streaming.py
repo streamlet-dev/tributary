@@ -80,6 +80,13 @@ class TestOps:
         out = ts.Pow(t, c)
         assert ts.run(out) == [1, 4]
 
+    def test_Sum(self):
+        t = ts.Timer(foo, count=2)
+        t2 = ts.Timer(foo, count=2)
+        c = ts.Const(2)
+        out = ts.Sum(t, t2, c)
+        assert ts.run(out) == [4, 6]
+
     def test_Not(self):
         t = ts.Timer(foo, count=2)
         out = ts.Not(t)
