@@ -44,3 +44,21 @@ class TestAPI:
         assert hasattr(tl.LazyNode, 'exp')
         assert hasattr(tl.LazyNode, 'erf')
 
+        # assert hasattr(tl.LazyNode, 'delay')
+        # assert hasattr(tl.LazyNode, 'state')
+        # assert hasattr(tl.LazyNode, 'apply')
+        # assert hasattr(tl.LazyNode, 'window')
+        # assert hasattr(tl.LazyNode, 'unroll')
+        # assert hasattr(tl.LazyNode, 'unrollDataFrame')
+        # assert hasattr(tl.LazyNode, 'merge')
+        # assert hasattr(tl.LazyNode, 'listMerge')
+        # assert hasattr(tl.LazyNode, 'dictMerge')
+        # assert hasattr(tl.LazyNode, 'reduce')
+
+
+        assert hasattr(tl.LazyNode, 'graph')
+        # assert hasattr(tl.LazyNode, 'pprint')
+        assert hasattr(tl.LazyNode, 'graphviz')
+        assert hasattr(tl.LazyNode, 'print')
+        # assert hasattr(tl.LazyNode, 'perspective')
+

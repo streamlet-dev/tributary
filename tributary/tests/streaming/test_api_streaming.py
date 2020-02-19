@@ -44,3 +44,21 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'exp')
         assert hasattr(ts.StreamingNode, 'erf')
 
+       
+        assert hasattr(ts.StreamingNode, 'delay')
+        # assert hasattr(ts.StreamingNode, 'state')
+        assert hasattr(ts.StreamingNode, 'apply')
+        assert hasattr(ts.StreamingNode, 'window')
+        assert hasattr(ts.StreamingNode, 'unroll')
+        assert hasattr(ts.StreamingNode, 'unrollDataFrame')
+        assert hasattr(ts.StreamingNode, 'merge')
+        assert hasattr(ts.StreamingNode, 'listMerge')
+        assert hasattr(ts.StreamingNode, 'dictMerge')
+        assert hasattr(ts.StreamingNode, 'reduce')
+
+        assert hasattr(ts.StreamingNode, 'graph')
+        assert hasattr(ts.StreamingNode, 'pprint')
+        assert hasattr(ts.StreamingNode, 'graphviz')
+        assert hasattr(ts.StreamingNode, 'print')
+        assert hasattr(ts.StreamingNode, 'perspective')
+

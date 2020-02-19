@@ -231,3 +231,16 @@ class Reduce(Node):
         for i, n in enumerate(nodes):
             n._downstream.append((self, i))
             self._upstream.append(n)
+
+
+Node.delay = Delay
+# Node.state = State
+Node.apply = Apply
+Node.window = Window
+Node.unroll = Unroll
+Node.unrollDataFrame = UnrollDataFrame
+Node.merge = Merge
+Node.listMerge = ListMerge
+Node.dictMerge = DictMerge
+Node.reduce = Reduce
+
