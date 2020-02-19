@@ -11,7 +11,7 @@ def Print(node, text=''):
 
     node._downstream.append((ret, 0))
     ret._upstream.append(node)
-    return ret 
+    return ret
 
 
 def Graph(node):

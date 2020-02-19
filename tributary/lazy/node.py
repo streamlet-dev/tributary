@@ -5,6 +5,7 @@ from ..utils import _either_type
 
 class Node(object):
     '''Class to represent an operation that is lazy'''
+
     def __init__(self,
                  name="?",
                  derived=False,

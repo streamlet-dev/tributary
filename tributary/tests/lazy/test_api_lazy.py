@@ -1,5 +1,6 @@
 import tributary.lazy as tl
 
+
 class TestAPI:
     def test_api(self):
         assert hasattr(tl.LazyNode, '__add__')
@@ -55,10 +56,8 @@ class TestAPI:
         # assert hasattr(tl.LazyNode, 'dictMerge')
         # assert hasattr(tl.LazyNode, 'reduce')
 
-
         assert hasattr(tl.LazyNode, 'graph')
         # assert hasattr(tl.LazyNode, 'pprint')
         assert hasattr(tl.LazyNode, 'graphviz')
         assert hasattr(tl.LazyNode, 'print')
         # assert hasattr(tl.LazyNode, 'perspective')
-

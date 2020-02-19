@@ -10,6 +10,7 @@ class File(Foo):
         filename (str): filename to read
         json (bool): load file line as json
     '''
+
     def __init__(self, filename, json=True):
         async def _file(filename=filename, json=json):
             async with aiofiles.open(filename) as f:

@@ -16,6 +16,7 @@ class Kafka(Node):
         wrap (bool): wrap result in a list
         interval (int): kafka poll interval
     '''
+
     def __init__(self, node, servers='', topic='', json=False, wrap=False):
         p = Producer({'bootstrap.servers': servers})
 

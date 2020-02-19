@@ -47,6 +47,7 @@ class Apply(Node):
         foo (callable): function to apply
         foo_kwargs (dict): kwargs for function
     '''
+
     def __init__(self, node, foo, foo_kwargs=None):
         self._apply = foo
         self._apply_kwargs = foo_kwargs or {}
@@ -84,7 +85,7 @@ def Window(node, size=-1, full_only=False):
             return StreamNone()
         else:
             return node._accum
-    
+
     ret = Node(foo=foo, name='Window', inputs=1)
     node._downstream.append((ret, 0))
     ret._upstream.append(node)
@@ -97,6 +98,7 @@ class Unroll(Node):
     Arguments:
         node (node): input stream
     '''
+
     def __init__(self, node):
         self._count = 0
 
@@ -127,6 +129,7 @@ class UnrollDataFrame(Node):
     Arguments:
         node (node): input stream
     '''
+
     def __init__(self, node, json=False, wrap=False):
         self._count = 0
 
@@ -166,6 +169,7 @@ class Merge(Node):
         node1 (node): input stream
         node2 (node): input stream
     '''
+
     def __init__(self, node1, node2):
         def foo(value1, value2):
             return value1, value2
@@ -184,6 +188,7 @@ class ListMerge(Node):
         node1 (node): input stream
         node2 (node): input stream
     '''
+
     def __init__(self, node1, node2):
         def foo(value1, value2):
             return list(value1) + list(value2)
@@ -203,6 +208,7 @@ class DictMerge(Node):
         node1 (node): input stream
         node2 (node): input stream
     '''
+
     def __init__(self, node1, node2):
         def foo(value1, value2):
             ret = {}
@@ -223,6 +229,7 @@ class Reduce(Node):
     Arguments:
         nodes (tuple): input streams
     '''
+
     def __init__(self, *nodes):
         def foo(*values):
             return values

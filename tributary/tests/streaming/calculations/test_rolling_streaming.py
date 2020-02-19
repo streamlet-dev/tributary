@@ -1,5 +1,6 @@
 import tributary.streaming as ts
 
+
 def foo():
     yield 1
     yield 1

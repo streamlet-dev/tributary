@@ -17,6 +17,7 @@ class HTTP(Node):
         proxies (list): list of URL proxies to pass to requests.post
         cookies (list): list of cookies to pass to requests.post
     '''
+
     def __init__(self, node, url='', json=False, wrap=False, field=None, proxies=None, cookies=None):
         def _send(data, url=url, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies):
             if wrap:

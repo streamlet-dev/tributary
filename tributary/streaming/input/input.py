@@ -25,6 +25,7 @@ class Timer(Node):
         count (int): number of times to call, 0 means infinite (or until generator is complete)
         interval (int/float): minimum delay between calls (can be more due to async scheduling)
     '''
+
     def __init__(self, foo, foo_kwargs=None, count=1, interval=0):
         super().__init__(foo=foo,
                          foo_kwargs=foo_kwargs,
@@ -41,6 +42,7 @@ class Const(Timer):
         value (any): value to return
         count (int): number of times to call, 0 means infinite
     '''
+
     def __init__(self, value, count=0):
         super().__init__(foo=lambda: value, count=count, interval=0)
         self._name = 'Const[{}]'.format(value)
@@ -52,12 +54,14 @@ class Curve(Timer):
     Arguments:
         value (any): value to unroll and return
     '''
+
     def __init__(self, value):
         def foo(curve=value):
             for v in curve:
                 yield v
         super().__init__(foo=foo, count=0)
         self._name = 'Curve[{}]'.format(len(value))
+
 
 class Foo(Timer):
     '''Streaming wrapper to periodically call a function `count` times
@@ -69,6 +73,7 @@ class Foo(Timer):
         count (int): number of times to call, 0 means infinite (or until generator is complete)
         interval (int/float): minimum delay between calls (can be more due to async scheduling)
     '''
+
     def __init__(self, foo, foo_kwargs=None, count=0, interval=0):
         super().__init__(foo=foo, foo_kwargs=foo_kwargs, count=count, interval=interval)
         self._name = 'Foo[{}]'.format(foo.__name__)
@@ -81,6 +86,7 @@ class Random(Foo):
         count (int): number of elements to yield
         interval (float): interval to wait between yields
     '''
+
     def __init__(self, count=10, interval=0.1):
         def _random(count=count, interval=interval):
             step = 0

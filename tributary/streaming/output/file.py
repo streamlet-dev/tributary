@@ -11,6 +11,7 @@ class File(Node):
         filename (str): filename to write
         json (bool): load file line as json
     '''
+
     def __init__(self, node, filename='', json=True):
         async def _file(data):
             async with aiofiles.open(filename, mode='a') as fp:

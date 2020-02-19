@@ -14,6 +14,7 @@ class WebSocket(Node):
         json (bool): dump data as json
         wrap (bool): wrap result in a list
     '''
+
     def __init__(self, node, url='', json=False, wrap=False, field=None, response=False):
         self._websocket = websockets.connect(url)
 

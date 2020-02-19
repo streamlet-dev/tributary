@@ -1,5 +1,6 @@
 import tributary.streaming as ts
 
+
 class TestAPI:
     def test_api(self):
         assert hasattr(ts.StreamingNode, '__add__')
@@ -44,7 +45,6 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'exp')
         assert hasattr(ts.StreamingNode, 'erf')
 
-       
         assert hasattr(ts.StreamingNode, 'delay')
         # assert hasattr(ts.StreamingNode, 'state')
         assert hasattr(ts.StreamingNode, 'apply')
@@ -61,4 +61,3 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'graphviz')
         assert hasattr(ts.StreamingNode, 'print')
         assert hasattr(ts.StreamingNode, 'perspective')
-

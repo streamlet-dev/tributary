@@ -3,6 +3,7 @@ from .node import Node, node  # noqa: F401
 
 class Graph(object):
     '''Wrapper class around a collection of lazy nodes.'''
+
     def __init__(self, *args, **kwargs):
         pass
 
