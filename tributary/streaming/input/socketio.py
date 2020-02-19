@@ -42,4 +42,4 @@ class SocketIO(Foo):
 
                     yield msg
         super().__init__(foo=_sio)
-        self._name = 'Kafka'
+        self._name = 'SocketIO'
