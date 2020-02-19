@@ -59,7 +59,7 @@ class Apply(Node):
         self._upstream.append(node)
 
 
-class Window(Node):
+def Window(node, size=-1, full_only=False):
     '''Streaming wrapper to collect a window of values
 
     Arguments:
@@ -67,28 +67,28 @@ class Window(Node):
         size (int): size of windows to use
         full_only (bool): only return if list is full
     '''
-    def __init__(self, node, size=-1, full_only=False):
-        self._accum = []
+    node._accum = []
 
-        def foo(val, size=size, full_only=full_only):
-            if size == 0:
-                return val
-            else:
-                self._accum.append(val)
+    def foo(val, size=size, full_only=full_only):
+        if size == 0:
+            return val
+        else:
+            node._accum.append(val)
 
-            if size > 0:
-                self._accum = self._accum[-size:]
+        if size > 0:
+            node._accum = node._accum[-size:]
 
-            if full_only and len(self._accum) == size:
-                return self._accum
-            elif full_only:
-                return StreamNone()
-            else:
-                return self._accum
-
-        super().__init__(foo=foo, name='Window', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+        if full_only and len(node._accum) == size:
+            return node._accum
+        elif full_only:
+            return StreamNone()
+        else:
+            return node._accum
+    
+    ret = Node(foo=foo, name='Window', inputs=1)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret
 
 
 class Unroll(Node):

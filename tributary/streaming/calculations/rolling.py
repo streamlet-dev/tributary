@@ -17,12 +17,22 @@ class Count(Node):
 
 
 class Sum(Node):
-    '''Node to sum inputs'''
+    '''Node to sum inputs
+    
+    If stream type is iterable, will do += sum(input). If input
+    stream type is not iterable, will do += input.
+    '''
     def __init__(self, node, text=''):
         self._sum = 0
 
         def foo(val):
-            self._sum += val
+            try:
+                # iterable, sum with sum function
+                iter(val)
+                self._sum += sum(val)
+            except TypeError:
+                # not iterable, sum by value
+                self._sum += val
             return self._sum
 
         super().__init__(foo=foo, foo_kwargs=None, name='Sum', inputs=1)

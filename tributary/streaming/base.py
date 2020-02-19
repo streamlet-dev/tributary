@@ -191,8 +191,9 @@ class Node(object):
     async def _output(self, ret):
         '''output value to downstream nodes'''
         # if downstreams, output
-        for down, i in self._downstream:
-            await down._push(ret, i)
+        if not isinstance(ret, (StreamNone, StreamRepeat)):
+            for down, i in self._downstream:
+                await down._push(ret, i)
         return ret
 
     def _deep_bfs(self, reverse=True):

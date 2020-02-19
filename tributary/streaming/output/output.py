@@ -2,14 +2,16 @@ from IPython.display import display
 from ..base import Node
 
 
-class Print(Node):
-    def __init__(self, node, text=''):
-        def foo(val):
-            return val
-        super().__init__(foo=foo, foo_kwargs=None, name='Print', inputs=1)
+def Print(node, text=''):
+    def foo(val):
+        print(text + str(val))
+        return val
 
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    ret = Node(foo=foo, foo_kwargs=None, name='Print', inputs=1)
+
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret 
 
 
 def Graph(node):

@@ -46,6 +46,19 @@ class Const(Timer):
         self._name = 'Const[{}]'.format(value)
 
 
+class Curve(Timer):
+    '''Streaming wrapper to output a series of values
+
+    Arguments:
+        value (any): value to unroll and return
+    '''
+    def __init__(self, value):
+        def foo(curve=value):
+            for v in curve:
+                yield v
+        super().__init__(foo=foo, count=0)
+        self._name = 'Curve[{}]'.format(len(value))
+
 class Foo(Timer):
     '''Streaming wrapper to periodically call a function `count` times
        with a delay of `interval` in between
