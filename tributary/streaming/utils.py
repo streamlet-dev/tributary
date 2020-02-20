@@ -39,7 +39,7 @@ class Delay(Node):
 #         self._upstream.append(node)
 
 
-class Apply(Node):
+def Apply(node, foo, foo_kwargs=None):
     '''Streaming wrapper to apply a function to an input stream
 
     Arguments:
@@ -47,17 +47,15 @@ class Apply(Node):
         foo (callable): function to apply
         foo_kwargs (dict): kwargs for function
     '''
+    def _foo(val):
+        return ret._apply(val, **ret._apply_kwargs)
+    ret = Node(foo=_foo, name='Apply', inputs=1)
+    ret._apply = foo
+    ret._apply_kwargs = foo_kwargs or {}
 
-    def __init__(self, node, foo, foo_kwargs=None):
-        self._apply = foo
-        self._apply_kwargs = foo_kwargs or {}
-
-        async def foo(val):
-            return self._apply(val, **self._apply_kwargs)
-
-        super().__init__(foo=foo, name='Apply', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret
 
 
 def Window(node, size=-1, full_only=False):
@@ -68,25 +66,25 @@ def Window(node, size=-1, full_only=False):
         size (int): size of windows to use
         full_only (bool): only return if list is full
     '''
-    node._accum = []
-
     def foo(val, size=size, full_only=full_only):
         if size == 0:
             return val
         else:
-            node._accum.append(val)
+            ret._accum.append(val)
 
         if size > 0:
-            node._accum = node._accum[-size:]
+            ret._accum = ret._accum[-size:]
 
-        if full_only and len(node._accum) == size:
-            return node._accum
+        if full_only and len(ret._accum) == size:
+            return ret._accum
         elif full_only:
             return StreamNone()
         else:
-            return node._accum
+            return ret._accum
 
     ret = Node(foo=foo, name='Window', inputs=1)
+    ret._accum = []
+
     node._downstream.append((ret, 0))
     ret._upstream.append(node)
     return ret
@@ -223,21 +221,21 @@ class DictMerge(Node):
         self._upstream.append(node2)
 
 
-class Reduce(Node):
+def Reduce(*nodes):
     '''Streaming wrapper to merge any number of inputs
 
     Arguments:
         nodes (tuple): input streams
     '''
 
-    def __init__(self, *nodes):
-        def foo(*values):
-            return values
+    def foo(*values):
+        return values
 
-        super().__init__(foo=foo, name='Reduce', inputs=len(nodes))
-        for i, n in enumerate(nodes):
-            n._downstream.append((self, i))
-            self._upstream.append(n)
+    ret = Node(foo=foo, name='Reduce', inputs=len(nodes))
+    for i, n in enumerate(nodes):
+        n._downstream.append((ret, i))
+        ret._upstream.append(n)
+    return ret
 
 
 Node.delay = Delay
