@@ -40,4 +40,3 @@ class TestRolling:
 
     def test_average(self):
         assert ts.run(ts.RollingAverage(ts.Foo(foo3))) == [1, 1.5, 2, 2.5, 3]
-

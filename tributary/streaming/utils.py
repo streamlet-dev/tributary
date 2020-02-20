@@ -3,7 +3,7 @@ from .base import Node
 from ..base import StreamNone, StreamRepeat
 
 
-class Delay(Node):
+def Delay(node, delay=1):
     '''Streaming wrapper to delay a stream
 
     Arguments:
@@ -11,14 +11,14 @@ class Delay(Node):
         delay (float): time to delay input stream
     '''
 
-    def __init__(self, node, delay=1):
-        async def foo(val):
-            await asyncio.sleep(delay)
-            return val
+    async def foo(val):
+        await asyncio.sleep(delay)
+        return val
 
-        super().__init__(foo=foo, name='Delay', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    ret = Node(foo=foo, name='Delay', inputs=1)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret
 
 
 # class State(Node):
@@ -90,96 +90,92 @@ def Window(node, size=-1, full_only=False):
     return ret
 
 
-class Unroll(Node):
+def Unroll(node):
     '''Streaming wrapper to unroll an iterable stream
 
     Arguments:
         node (node): input stream
     '''
+    async def foo(value):
+        # unrolled
+        if ret._count > 0:
+            ret._count -= 1
+            return value
 
-    def __init__(self, node):
-        self._count = 0
+        # unrolling
+        try:
+            for v in value:
+                ret._count += 1
+                await ret._push(v, 0)
+        except TypeError:
+            return value
+        else:
+            return StreamRepeat()
 
-        async def foo(value):
-            # unrolled
-            if self._count > 0:
-                self._count -= 1
-                return value
-
-            # unrolling
-            try:
-                for v in value:
-                    self._count += 1
-                    await self._push(v, 0)
-            except TypeError:
-                return value
-            else:
-                return StreamRepeat()
-
-        super().__init__(foo=foo, name='Unroll', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    ret = Node(foo=foo, name='Unroll', inputs=1)
+    ret._count = 0
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret
 
 
-class UnrollDataFrame(Node):
+def UnrollDataFrame(node, json=False, wrap=False):
     '''Streaming wrapper to unroll a dataframe into a stream
 
     Arguments:
         node (node): input stream
     '''
+    async def foo(value, json=json, wrap=wrap):
+        # unrolled
+        if ret._count > 0:
+            ret._count -= 1
+            return value
 
-    def __init__(self, node, json=False, wrap=False):
-        self._count = 0
+        # unrolling
+        try:
+            for i in range(len(value)):
+                row = value.iloc[i]
 
-        async def foo(value, json=json, wrap=wrap):
-            # unrolled
-            if self._count > 0:
-                self._count -= 1
-                return value
+                if json:
+                    data = row.to_dict()
+                    data['index'] = row.name
+                else:
+                    data = row
+                ret._count += 1
+                await ret._push(data, 0)
 
-            # unrolling
-            try:
-                for i in range(len(value)):
-                    row = value.iloc[i]
+        except TypeError:
+            return value
+        else:
+            return StreamRepeat()
 
-                    if json:
-                        data = row.to_dict()
-                        data['index'] = row.name
-                    else:
-                        data = row
-                    self._count += 1
-                    await self._push(data, 0)
+    ret = Node(foo=foo, name='UnrollDF', inputs=1)
+    ret._count = 0
 
-            except TypeError:
-                return value
-            else:
-                return StreamRepeat()
-
-        super().__init__(foo=foo, name='UnrollDF', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret
 
 
-class Merge(Node):
+def Merge(node1, node2):
     '''Streaming wrapper to merge 2 inputs into a single output
 
     Arguments:
         node1 (node): input stream
         node2 (node): input stream
     '''
+    def foo(value1, value2):
+        return value1, value2
 
-    def __init__(self, node1, node2):
-        def foo(value1, value2):
-            return value1, value2
-
-        super().__init__(foo=foo, name='Merge', inputs=2)
-        node1._downstream.append((self, 0))
-        node2._downstream.append((self, 1))
-        self._upstream.append(node1)
-        self._upstream.append(node2)
+    ret = Node(foo=foo, name='Merge', inputs=2)
+    node1._downstream.append((ret, 0))
+    node2._downstream.append((ret, 1))
+    ret._upstream.append(node1)
+    ret._upstream.append(node2)
+    return ret
 
 
-class ListMerge(Node):
+def ListMerge(node1, node2):
     '''Streaming wrapper to merge 2 input lists into a single output list
 
     Arguments:
@@ -187,18 +183,18 @@ class ListMerge(Node):
         node2 (node): input stream
     '''
 
-    def __init__(self, node1, node2):
-        def foo(value1, value2):
-            return list(value1) + list(value2)
+    def foo(value1, value2):
+        return list(value1) + list(value2)
 
-        super().__init__(foo=foo, name='ListMerge', inputs=2)
-        node1._downstream.append((self, 0))
-        node2._downstream.append((self, 1))
-        self._upstream.append(node1)
-        self._upstream.append(node2)
+    ret = Node(foo=foo, name='ListMerge', inputs=2)
+    node1._downstream.append((ret, 0))
+    node2._downstream.append((ret, 1))
+    ret._upstream.append(node1)
+    ret._upstream.append(node2)
+    return ret
 
 
-class DictMerge(Node):
+def DictMerge(node1, node2):
     '''Streaming wrapper to merge 2 input dicts into a single output dict.
        Preference is given to the second input (e.g. if keys overlap)
 
@@ -206,19 +202,18 @@ class DictMerge(Node):
         node1 (node): input stream
         node2 (node): input stream
     '''
+    def foo(value1, value2):
+        ret = {}
+        ret.update(value1)
+        ret.update(value2)
+        return ret
 
-    def __init__(self, node1, node2):
-        def foo(value1, value2):
-            ret = {}
-            ret.update(value1)
-            ret.update(value2)
-            return ret
-
-        super().__init__(foo=foo, name='DictMerge', inputs=2)
-        node1._downstream.append((self, 0))
-        node2._downstream.append((self, 1))
-        self._upstream.append(node1)
-        self._upstream.append(node2)
+    ret = Node(foo=foo, name='DictMerge', inputs=2)
+    node1._downstream.append((ret, 0))
+    node2._downstream.append((ret, 1))
+    ret._upstream.append(node1)
+    ret._upstream.append(node2)
+    return ret
 
 
 def Reduce(*nodes):

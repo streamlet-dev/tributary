@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from ..base import Node
 
 
-class SocketIO(Node):
+def SocketIO(node, url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
     '''Connect to socketIO server and send updates
 
     Args:
@@ -18,26 +18,26 @@ class SocketIO(Node):
         interval (int): socketio wai interval
     '''
 
-    def __init__(self, node, url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
-        o = urlparse(url)
-        socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
-        if sendinit:
-            socketIO.emit(sendinit)
+    o = urlparse(url)
+    socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
+    if sendinit:
+        socketIO.emit(sendinit)
 
-        def _sio(data, field=field, json=json, wrap=wrap, interval=interval):
-            if json:
-                data = JSON.loads(data)
+    def _sio(data, field=field, json=json, wrap=wrap, interval=interval):
+        if json:
+            data = JSON.loads(data)
 
-            if field:
-                data = data[field]
+        if field:
+            data = data[field]
 
-            if wrap:
-                data = [data]
+        if wrap:
+            data = [data]
 
-            socketIO.emit(data)
-            socketIO.wait(seconds=interval)
-            return data
+        socketIO.emit(data)
+        socketIO.wait(seconds=interval)
+        return data
 
-        super().__init__(foo=_sio, name='SocketIO', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    ret = Node(foo=_sio, name='SocketIO', inputs=1)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret

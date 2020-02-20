@@ -3,7 +3,7 @@ import json as JSON
 from ..base import Node
 
 
-class File(Node):
+def File(node, filename='', json=True):
     '''Open up a file and write lines to the file
 
     Args:
@@ -12,15 +12,15 @@ class File(Node):
         json (bool): load file line as json
     '''
 
-    def __init__(self, node, filename='', json=True):
-        async def _file(data):
-            async with aiofiles.open(filename, mode='a') as fp:
-                if json:
-                    fp.write(JSON.dumps(data))
-                else:
-                    fp.write(data)
-            return data
+    async def _file(data):
+        async with aiofiles.open(filename, mode='a') as fp:
+            if json:
+                fp.write(JSON.dumps(data))
+            else:
+                fp.write(data)
+        return data
 
-        super().__init__(foo=_file, name='File', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    ret = Node(foo=_file, name='File', inputs=1)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret

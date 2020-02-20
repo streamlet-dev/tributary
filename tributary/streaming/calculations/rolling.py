@@ -19,6 +19,7 @@ class Count(Node):
 
 class Max(Node):
     '''Node to take rolling max of inputs'''
+
     def __init__(self, node):
         self._max = None
 
@@ -34,6 +35,7 @@ class Max(Node):
 
 class Min(Node):
     '''Node to take rolling min of inputs'''
+
     def __init__(self, node):
         self._min = None
 
@@ -53,6 +55,7 @@ class Sum(Node):
     If stream type is iterable, will do += sum(input). If input
     stream type is not iterable, will do += input.
     '''
+
     def __init__(self, node):
         self._sum = 0
 
@@ -78,6 +81,7 @@ class Average(Node):
     If stream type is iterable, will do (average + sum(input))/(count+len(input)).
     If input stream type is not iterable, will do (average + input)/count
     '''
+
     def __init__(self, node):
         self._sum = 0
         self._count = 0
@@ -92,7 +96,7 @@ class Average(Node):
                 # not iterable, sum by value
                 self._sum += val
                 self._count += 1
-            return self._sum/self._count if self._count > 0 else float('nan')
+            return self._sum / self._count if self._count > 0 else float('nan')
 
         super().__init__(foo=foo, foo_kwargs=None, name='Average', inputs=1)
 

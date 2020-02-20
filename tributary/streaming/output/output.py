@@ -56,21 +56,21 @@ def GraphViz(node):
     return dot
 
 
-class Perspective(Node):
-    def __init__(self, node, text='', psp_kwargs=None):
-        psp_kwargs = psp_kwargs or {}
-        from perspective import PerspectiveWidget
-        p = PerspectiveWidget(psp_kwargs.pop('schema', []), **psp_kwargs)
+def Perspective(node, text='', psp_kwargs=None):
+    psp_kwargs = psp_kwargs or {}
+    from perspective import PerspectiveWidget
+    p = PerspectiveWidget(psp_kwargs.pop('schema', []), **psp_kwargs)
 
-        def foo(val):
-            p.update(val)
-            return val
-        super().__init__(foo=foo, foo_kwargs=None, name='Print', inputs=1)
+    def foo(val):
+        p.update(val)
+        return val
 
-        display(p)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
-        self._name = "Perspective"
+    ret = Node(foo=foo, foo_kwargs=None, name='Perspective', inputs=1)
+
+    display(p)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret
 
 
 Node.graph = Graph

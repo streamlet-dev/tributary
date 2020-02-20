@@ -4,7 +4,7 @@ from ..base import Node
 from ...base import StreamNone, StreamEnd
 
 
-class WebSocket(Node):
+def WebSocket(node, url='', json=False, wrap=False, field=None, response=False):
     '''Connect to websocket and send data
 
     Args:
@@ -14,38 +14,37 @@ class WebSocket(Node):
         json (bool): dump data as json
         wrap (bool): wrap result in a list
     '''
+    async def _send(data, url=url, json=json, wrap=wrap, field=field, response=response):
+        if isinstance(data, (StreamNone, StreamEnd)):
+            return data
 
-    def __init__(self, node, url='', json=False, wrap=False, field=None, response=False):
-        self._websocket = websockets.connect(url)
+        if wrap:
+            data = [data]
+        if json:
+            data = JSON.dumps(data)
 
-        async def _send(data, url=url, json=json, wrap=wrap, field=field, response=response):
-            if isinstance(data, (StreamNone, StreamEnd)):
-                return data
+        await ret._websocket.send(data)
 
-            if wrap:
-                data = [data]
-            if json:
-                data = JSON.dumps(data)
+        if response:
+            msg = await ret._websocket.recv()
 
-            await self._websocket.send(data)
+        else:
+            msg = '{}'
 
-            if response:
-                msg = await self._websocket.recv()
+        if json:
+            msg = JSON.loads(msg)
 
-            else:
-                msg = '{}'
+        if field:
+            msg = msg[field]
 
-            if json:
-                msg = JSON.loads(msg)
+        if wrap:
+            msg = [msg]
 
-            if field:
-                msg = msg[field]
+        return msg
 
-            if wrap:
-                msg = [msg]
+    ret = Node(foo=_send, name='WebSocket', inputs=1)
+    ret._websocket = websockets.connect(url)
 
-            return msg
-
-        super().__init__(foo=_send, name='WebSocket', inputs=1)
-        node._downstream.append((self, 0))
-        self._upstream.append(node)
+    node._downstream.append((ret, 0))
+    ret._upstream.append(node)
+    return ret
