@@ -87,6 +87,13 @@ class TestOps:
         out = ts.Sum(t, t2, c)
         assert ts.run(out) == [4, 6]
 
+    def test_Average(self):
+        t = ts.Timer(foo, count=1)
+        t2 = ts.Timer(foo, count=1)
+        c = ts.Const(1)
+        out = ts.Average(t, t2, c)
+        assert ts.run(out) == [1]
+
     def test_Not(self):
         t = ts.Timer(foo, count=2)
         out = ts.Not(t)

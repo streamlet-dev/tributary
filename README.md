@@ -76,6 +76,8 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - RDiv
 - Mod
 - Pow
+- Sum
+- Average
 - Not
 - And
 - Or
@@ -101,3 +103,10 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - Bool
 - Str
 - Len
+
+# Rolling
+- RollingCount - Node to count inputs
+- RollingMin - Node to take rolling min of inputs
+- RollingMax - Node to take rolling max of inputs
+- RollingSum - Node to take rolling sum inputs
+- RollingAverage - Node to take the running average
