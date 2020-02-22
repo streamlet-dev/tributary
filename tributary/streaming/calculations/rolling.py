@@ -3,7 +3,7 @@ from ..base import Node
 
 def Count(node):
     '''Node to count inputs
-    
+
     Args:
         node (Node): input stream
     '''
@@ -20,7 +20,7 @@ def Count(node):
 
 def Max(node):
     '''Node to take rolling max of inputs
-    
+
     Args:
         node (Node): input stream
     '''
@@ -38,7 +38,7 @@ def Max(node):
 
 def Min(node):
     '''Node to take rolling min of inputs
-    
+
     Args:
         node (Node): input stream
     '''
@@ -58,7 +58,7 @@ def Sum(node):
 
     If stream type is iterable, will do += sum(input). If input
     stream type is not iterable, will do += input.
-    
+
     Args:
         node (Node): input stream
     '''
