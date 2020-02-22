@@ -53,6 +53,36 @@ def Negate(self):
     return self._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
 
 
+def Sum(self, *others):
+    others_nodes = []
+    for other in others:
+        others_nodes.append(self._tonode(other))
+    if isinstance(self._self_reference, Node):
+        return self._gennode('Sum(' + self._name + ',' + ','.join(other._name for other in others_nodes) + ')',
+                             lambda *args: sum(x.value() for x in args),
+                             [self._self_reference] + others_nodes,
+                             self._trace or any(other._trace for other in others_nodes))
+    return self._gennode('Sum(' + self._name + ',' + ','.join(other._name for other in others_nodes) + ')',
+                         lambda *args: sum(x.value() for x in args),
+                         [self] + others_nodes,
+                         self._trace or any(other._trace for other in others_nodes))
+
+
+def Average(self, *others):
+    others_nodes = []
+    for other in others:
+        others_nodes.append(self._tonode(other))
+    if isinstance(self._self_reference, Node):
+        return self._gennode('Average(' + self._name + ',' + ','.join(other._name for other in others_nodes) + ')',
+                             lambda *args: sum(x.value() for x in args) / len(args),
+                             [self._self_reference] + others_nodes,
+                             self._trace or any(other._trace for other in others_nodes))
+    return self._gennode('Average(' + self._name + ',' + ','.join(other._name for other in others_nodes) + ')',
+                         lambda *args: sum(x.value() for x in args) / len(args),
+                         [self] + others_nodes,
+                         self._trace or any(other._trace for other in others_nodes))
+
+
 #####################
 # Logical Operators #
 #####################
@@ -269,6 +299,9 @@ Node.__pow__ = Pow
 Node.__rpow__ = Pow
 Node.__mod__ = Mod
 Node.__rmod__ = Mod
+
+Node.sum = Sum
+Node.average = Average
 
 #####################
 # Logical Operators #

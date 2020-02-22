@@ -46,7 +46,7 @@ RDiv = binary(lambda x, y: y / x, name='RDiv')
 Mod = binary(lambda x, y: x % y, name='Mod')
 Pow = binary(lambda x, y: x ** y, name='Pow')
 Sum = n_ary(lambda *args: sum(args), name='Sum')
-Average = n_ary(lambda *args: sum(args)/len(args), name='Average')
+Average = n_ary(lambda *args: sum(args) / len(args), name='Average')
 
 #####################
 # Logical Operators #

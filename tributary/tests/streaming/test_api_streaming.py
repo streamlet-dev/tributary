@@ -18,6 +18,8 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, '__rpow__')
         assert hasattr(ts.StreamingNode, '__mod__')
         assert hasattr(ts.StreamingNode, '__rmod__')
+        assert hasattr(ts.StreamingNode, 'sum')
+        assert hasattr(ts.StreamingNode, 'average')
         assert hasattr(ts.StreamingNode, '__and__')
         assert hasattr(ts.StreamingNode, '__or__')
         assert hasattr(ts.StreamingNode, '__invert__')
