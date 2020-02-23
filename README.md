@@ -35,7 +35,7 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 
 # Examples
 - [Streaming](docs/examples/streaming.md)
-- [Lazy](docs/examples/lazy.md)
+- [Lazy](docs/examples/lazy/lazy.md)
 
 # Sources and Sinks
 ## Sources
