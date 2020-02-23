@@ -63,11 +63,8 @@ class TestAPI:
         # assert hasattr(tl.LazyNode, 'pprint')
         assert hasattr(tl.LazyNode, 'graphviz')
         assert hasattr(tl.LazyNode, 'print')
-        # assert hasattr(tl.LazyNode, 'perspective')
 
-        # assert hasattr(tl.LazyNode, 'rollingCount')
-        # assert hasattr(tl.LazyNode, 'rollingSum')
-        # assert hasattr(tl.LazyNode, 'rollingCount')
-        # assert hasattr(tl.LazyNode, 'rollingMin')
-        # assert hasattr(tl.LazyNode, 'rollingMax')
-        # assert hasattr(tl.LazyNode, 'rollingAverage')
+    def test_api_lazy_specific(self):
+        '''apis specific to lazy nodes'''
+        assert hasattr(tl.LazyNode, 'expire')
+        assert hasattr(tl.LazyNode, 'interval')

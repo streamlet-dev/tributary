@@ -39,20 +39,20 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 
 # Sources and Sinks
 ## Sources
-- python function/generator/async function/async generator
-- random
-- file
-- kafka
-- websocket
-- http
-- socket io
+- Python Function/Generator/Async Function/Async Generator
+- Random
+- File
+- Kafka
+- Websocket
+- Http
+- SocketIO
 
 ## Sinks
-- file
-- kafka
-- http
-- websocket
-- TODO socket io
+- File
+- Kafka
+- Http
+- Websocket
+- SocketIO
 
 # Transforms
 - Delay - Streaming wrapper to delay a stream

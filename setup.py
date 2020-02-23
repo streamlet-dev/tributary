@@ -38,6 +38,7 @@ requires = [
     'six>=1.11.0',
     'socketIO-client-nexus>=0.7.6',
     'sympy>=1.3',
+    'temporal-cache>=0.0.5',
     'tornado>=5.1.1',
     'websockets>=8.0',
 ]
