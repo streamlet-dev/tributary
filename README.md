@@ -2,8 +2,8 @@
 Python Data Streams
 
 [![Build Status](https://dev.azure.com/tpaine154/tributary/_apis/build/status/timkpaine.tributary?branchName=master)](https://dev.azure.com/tpaine154/tributary/_build/latest?definitionId=2&branchName=master)
-[![GitHub issues](https://img.shields.io/github/issues/timkpaine/tributary.svg)]()
-[![Coverage](https://img.shields.io/azure-devops/coverage/tpaine154/tributary/2)]()
+[![GitHub issues](https://img.shields.io/github/issues/timkpaine/tributary.svg)](https://github.com/timkpaine/tributary/issues)
+[![Coverage](https://img.shields.io/azure-devops/coverage/tpaine154/tributary/2)](https://dev.azure.com/tpaine154/tributary/_build?definitionId=2&_a=summary)
 [![BCH compliance](https://bettercodehub.com/edge/badge/timkpaine/tributary?branch=master)](https://bettercodehub.com/)
 [![PyPI](https://img.shields.io/pypi/l/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
