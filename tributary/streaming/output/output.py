@@ -56,7 +56,7 @@ def GraphViz(node):
     return dot
 
 
-def Perspective(node, text='', psp_kwargs=None):
+def Perspective(node, text='', **psp_kwargs):
     psp_kwargs = psp_kwargs or {}
     from perspective import PerspectiveWidget
     p = PerspectiveWidget(psp_kwargs.pop('schema', []), **psp_kwargs)

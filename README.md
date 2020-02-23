@@ -34,7 +34,7 @@ These are functional streams, built by currying python functions (callbacks).
 These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
 
 # Examples
-- [Streaming](docs/examples/streaming.md)
+- [Streaming](docs/examples/streaming/streaming.md)
 - [Lazy](docs/examples/lazy/lazy.md)
 
 # Sources and Sinks
