@@ -1,70 +1,183 @@
-import tributary as t
+import math
+import tributary.lazy as tl
 
 
-class Foo1(t.LazyGraph):
-    def __init__(self, *args, **kwargs):
-        self.x = self.node('x', readonly=False, value=1, trace=True)
+class TestOps:
+    def test_Negate(self):
+        t = tl.Node(value=5)
+        out = tl.Negate(t)
+        assert out() == -5
+
+    def test_Invert(self):
+        t = tl.Node(value=5)
+        out = tl.Invert(t)
+        assert out() == 1/5
+
+    def test_Add(self):
+        t = tl.Node(value=5)
+        out = tl.Add(t, t)
+        assert out() == 10
+
+    def test_Sub(self):
+        t = tl.Node(value=5)
+        out = tl.Sub(t, t)
+        assert out() == 0
 
 
-class Foo2(t.LazyGraph):
-    def __init__(self, *args, **kwargs):
-        self.y = self.node('y', readonly=False, value=2, trace=True)
+    def test_Mult(self):
+        t = tl.Node(value=5)
+        out = tl.Mult(t, t)
+        assert out() == 25
 
-        # ensure no __nodes clobber
-        self.test = self.node('test', readonly=False, value=2, trace=True)
-        self.x = self.node('x', readonly=False, value=2, trace=True)
+    def test_Div(self):
+        t = tl.Node(value=15)
+        t2 = tl.Node(value=5)
+        out = tl.Div(t, t2)
+        assert out() == 3
 
+    def test_Mod(self):
+        t = tl.Node(value=3)
+        t2 = tl.Node(value=2)
+        out = tl.Mod(t, t2)
+        assert out() == 1
 
-class Foo3(t.LazyGraph):
-    @t.node()
-    def z(self):
-        return self.x | self.y()
+    def test_Pow(self):
+        t = tl.Node(value=3)
+        t2 = tl.Node(value=2)
+        out = tl.Pow(t, t2)
+        assert out() == 9
 
-    @t.node()
-    def y(self):
-        return 10
+    def test_Sum(self):
+        t = tl.Node(value=3)
+        out = tl.Sum(t, t, t, 3)
+        assert out() == 12
 
-    def reset(self):
-        self.x = None
+    def test_Average(self):
+        t = tl.Node(value=3)
+        out = tl.Average(t, 2, 1)
+        assert out() == 2
 
-    def __init__(self):
-        self.x = self.node(name="x", value=None)
+    def test_Not(self):
+        t = tl.Node(value=2)
+        out = tl.Not(t)
+        assert out() == False
 
+    def test_And(self):
+        t = tl.Node(value=2)
+        out = tl.And(t, t)
+        assert out() == 2
 
-class TestLazyOps:
-    def test_add(self):
-        f1 = Foo1()
-        f2 = Foo2()
-        z = f1.x + f2.y
-        assert z() == 3
-        f1.x = 2
-        assert z() == 4
-        f2.y = 4
-        assert z() == 6
+    def test_Or(self):
+        t = tl.Node(value=2)
+        out = tl.Or(t, t)
+        assert out() == 2
 
-    def test_multi(self):
-        f1 = Foo1()
-        f2 = Foo1()
-        f3 = Foo1()
-        z = f1.x + f2.x - f3.x
-        assert z() == 1
-        f1.x = 2
-        assert z() == 2
-        f2.x = 4
-        f3.x = 4
-        assert z() == 2
+    def test_Equal(self):
+        t = tl.Node(value=2)
+        out = tl.Equal(t, 2)
+        assert out() == True
 
-    def test_or(self):
-        f = Foo3()
-        assert f.z()() == 10
-        assert f.x() is None
+    def test_NotEqual(self):
+        t = tl.Node(value=2)
+        out = tl.NotEqual(t, 1)
+        assert out() == True
 
-        f.x = 5
+    def test_Lt(self):
+        t = tl.Node(value=2)
+        out = tl.Lt(t, 1)
+        assert out() == False
 
-        assert f.x() == 5
-        assert f.z()() == 5
+    def test_Le(self):
+        t = tl.Node(value=2)
+        out = tl.Le(t, 2)
+        assert out() == True
 
-        f.reset()
+    def test_Gt(self):
+        t = tl.Node(value=2)
+        out = tl.Gt(t, 2)
+        assert out() == False
 
-        assert f.x() is None
-        assert f.z()() == 10
+    def test_Ge(self):
+        t = tl.Node(value=2)
+        out = tl.Ge(t, 1)
+        assert out() == True
+
+    def test_Log(self):
+        t = tl.Node(value=2)
+        out = tl.Log(t)
+        assert out() == math.log(2)
+
+    def test_Sin(self):
+        t = tl.Node(value=2)
+        out = tl.Sin(t)
+        assert out() == math.sin(2)
+
+    def test_Cos(self):
+        t = tl.Node(value=2)
+        out = tl.Cos(t)
+        assert out() == math.cos(2)
+
+    def test_Tan(self):
+        t = tl.Node(value=2)
+        out = tl.Tan(t)
+        assert out() == math.tan(2)
+
+    def test_Arcsin(self):
+        t = tl.Node(value=2)
+        out = tl.Arcsin(tl.Div(t, 3))
+        assert out() == math.asin(2 / 3)
+
+    def test_Arccos(self):
+        t = tl.Node(value=2)
+        out = tl.Arccos(tl.Div(t, 3))
+        assert out() == math.acos(2 / 3)
+
+    def test_Arctan(self):
+        t = tl.Node(value=2)
+        out = tl.Arctan(t)
+        assert out() == math.atan(2)
+
+    def test_Sqrt(self):
+        t = tl.Node(value=9)
+        out = tl.Sqrt(t)
+        assert out() == 3.0
+
+    def test_Abs(self):
+        t = tl.Node(value=-2)
+        out = tl.Abs(t)
+        assert out() == 2
+
+    def test_Exp(self):
+        t = tl.Node(value=2)
+        out = tl.Exp(t)
+        assert out() == math.exp(2)
+
+    def test_Erf(self):
+        t = tl.Node(value=2)
+        out = tl.Erf(t)
+        assert out() == math.erf(2)
+
+    def test_Int(self):
+        t = tl.Node(value=2.0)
+        out = tl.Int(t)
+        assert out() == 2
+
+    def test_Float(self):
+        t = tl.Node(value=2)
+        out = tl.Float(t)
+        assert out() == 2.0
+
+    def test_Bool(self):
+        t = tl.Node(value=2)
+        out = tl.Bool(t)
+        assert out() == True
+
+    def test_Str(self):
+        t = tl.Node(value=2)
+        out = tl.Str(t)
+        assert out() == '2'
+
+    def test_Len(self):
+        t = tl.Node(value=[1, 2, 3])
+        out = tl.Len(t)
+        assert out() == 3

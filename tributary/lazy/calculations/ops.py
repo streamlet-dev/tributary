@@ -53,6 +53,10 @@ def Negate(self):
     return self._gennode('(-' + self._name + ')', (lambda x: -self.value()), [self], self._trace)
 
 
+def Invert(self):
+    return self._gennode('1/' + self._name, (lambda x: 1/self.value()), [self], self._trace)
+
+
 def Sum(self, *others):
     others_nodes = []
     for other in others:
@@ -136,43 +140,51 @@ def Abs(self):
 
 
 def Sqrt(self):
-    return self._gennode('sqrt(' + self._name + ')', (lambda x: math.sqrt(self.value())), [self], self._trace)
+    return self._gennode('sqrt(' + str(self._name) + ')', (lambda x: math.sqrt(self.value())), [self], self._trace)
 
 
 def Log(self):
-    return self._gennode('log(' + self._name + ')', (lambda x: math.log(self.value())), [self], self._trace)
+    return self._gennode('log(' + str(self._name) + ')', (lambda x: math.log(self.value())), [self], self._trace)
 
 
 def Exp(self):
-    return self._gennode('exp(' + self._name + ')', (lambda x: math.exp(self.value())), [self], self._trace)
+    return self._gennode('exp(' + str(self._name) + ')', (lambda x: math.exp(self.value())), [self], self._trace)
 
 
 def Erf(self):
-    return self._gennode('erf(' + self._name + ')', (lambda x: math.erf(self.value())), [self], self._trace)
+    return self._gennode('erf(' + str(self._name) + ')', (lambda x: math.erf(self.value())), [self], self._trace)
 
 
 ##############
 # Converters #
 ##############
 def Float(self):
-    return self._gennode('float(' + self._name + ')', (lambda x: float(self.value())), [self], self._trace)
+    return self._gennode('float(' + str(self._name) + ')', (lambda x: float(self.value())), [self], self._trace)
 
 
 def Int(self):
-    return self._gennode('int(' + self._name + ')', (lambda x: int(self.value())), [self], self._trace)
+    return self._gennode('int(' + str(self._name) + ')', (lambda x: int(self.value())), [self], self._trace)
 
 
 def Bool(self):
+    return self._gennode('bool(' + str(self._name) + ')', (lambda x: bool(self.value())), [self], self._trace)
+
+
+def __Bool__(self):
     if self.value() is None:
         return False
     return bool(self.value())
+
+
+def Str(self):
+    return self._gennode('str(' + str(self._name) + ')', (lambda x: str(self.value())), [self], self._trace)
 
 
 ###################
 # Python Builtins #
 ###################
 def Len(self):
-    return self._gennode('len(' + self._name + ')', (lambda x: len(self.value())), [self], self._trace)
+    return self._gennode('len(' + str(self._name) + ')', (lambda x: len(self.value())), [self], self._trace)
 
 
 ###################
@@ -228,8 +240,8 @@ def Equal(self, other):
 
     other = self._tonode(other)
     if isinstance(self._self_reference, Node):
-        return self._gennode(self._name + '==' + other._name, (lambda x, y: x() == y()), [self._self_reference, other], self._trace or other._trace)
-    return self._gennode(self._name + '==' + other._name, (lambda x, y: x() == y()), [self, other], self._trace or other._trace)
+        return self._gennode(str(self._name) + '==' + other._name, (lambda x, y: x() == y()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(str(self._name) + '==' + other._name, (lambda x, y: x() == y()), [self, other], self._trace or other._trace)
 
 
 def NotEqual(self, other):
@@ -238,8 +250,8 @@ def NotEqual(self, other):
 
     other = self._tonode(other)
     if isinstance(self._self_reference, Node):
-        return self._gennode(self._name + '!=' + other._name, (lambda x, y: x() != y()), [self._self_reference, other], self._trace or other._trace)
-    return self._gennode(self._name + '!=' + other._name, (lambda x, y: x() != y()), [self, other], self._trace or other._trace)
+        return self._gennode(str(self._name) + '!=' + other._name, (lambda x, y: x() != y()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(str(self._name) + '!=' + other._name, (lambda x, y: x() != y()), [self, other], self._trace or other._trace)
 
 
 def Ge(self, other):
@@ -248,8 +260,8 @@ def Ge(self, other):
 
     other = self._tonode(other)
     if isinstance(self._self_reference, Node):
-        return self._gennode(self._name + '>=' + other._name, (lambda x, y: x() >= y()), [self._self_reference, other], self._trace or other._trace)
-    return self._gennode(self._name + '>=' + other._name, (lambda x, y: x() >= y()), [self, other], self._trace or other._trace)
+        return self._gennode(str(self._name) + '>=' + other._name, (lambda x, y: x() >= y()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(str(self._name) + '>=' + other._name, (lambda x, y: x() >= y()), [self, other], self._trace or other._trace)
 
 
 def Gt(self, other):
@@ -258,8 +270,8 @@ def Gt(self, other):
 
     other = self._tonode(other)
     if isinstance(self._self_reference, Node):
-        return self._gennode(self._name + '>' + other._name, (lambda x, y: x() > y()), [self._self_reference, other], self._trace or other._trace)
-    return self._gennode(self._name + '>' + other._name, (lambda x, y: x() > y()), [self, other], self._trace or other._trace)
+        return self._gennode(str(self._name) + '>' + other._name, (lambda x, y: x() > y()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(str(self._name) + '>' + other._name, (lambda x, y: x() > y()), [self, other], self._trace or other._trace)
 
 
 def Le(self, other):
@@ -268,8 +280,8 @@ def Le(self, other):
 
     other = self._tonode(other)
     if isinstance(self._self_reference, Node):
-        return self._gennode(self._name + '<=' + other._name, (lambda x, y: x() <= y()), [self._self_reference, other], self._trace or other._trace)
-    return self._gennode(self._name + '<=' + other._name, (lambda x, y: x() <= y()), [self, other], self._trace or other._trace)
+        return self._gennode(str(self._name) + '<=' + other._name, (lambda x, y: x() <= y()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(str(self._name) + '<=' + other._name, (lambda x, y: x() <= y()), [self, other], self._trace or other._trace)
 
 
 def Lt(self, other):
@@ -277,8 +289,8 @@ def Lt(self, other):
         return False
     other = self._tonode(other)
     if isinstance(self._self_reference, Node):
-        return self._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self._self_reference, other], self._trace or other._trace)
-    return self._gennode(self._name + '<' + other._name, (lambda x, y: x() < y()), [self, other], self._trace or other._trace)
+        return self._gennode(str(self._name) + '<' + other._name, (lambda x, y: x() < y()), [self._self_reference, other], self._trace or other._trace)
+    return self._gennode(str(self._name) + '<' + other._name, (lambda x, y: x() < y()), [self, other], self._trace or other._trace)
 
 
 ########################
@@ -302,6 +314,7 @@ Node.__rmod__ = Mod
 
 Node.sum = Sum
 Node.average = Average
+Node.invert = Invert
 
 #####################
 # Logical Operators #
@@ -315,7 +328,7 @@ Node.__invert__ = Not
 ##############
 Node.int = Int
 Node.float = Float
-Node.__bool__ = Bool
+Node.__bool__ = __Bool__
 
 ###############
 # Comparators #

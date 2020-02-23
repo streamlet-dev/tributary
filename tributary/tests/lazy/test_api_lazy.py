@@ -20,6 +20,7 @@ class TestAPI:
         assert hasattr(tl.LazyNode, '__rmod__')
         assert hasattr(tl.LazyNode, 'sum')
         assert hasattr(tl.LazyNode, 'average')
+        assert hasattr(tl.LazyNode, 'invert')
         assert hasattr(tl.LazyNode, '__and__')
         assert hasattr(tl.LazyNode, '__or__')
         assert hasattr(tl.LazyNode, '__invert__')

@@ -119,6 +119,7 @@ Node.__rmod__ = Mod
 
 Node.sum = Sum
 Node.average = Average
+Node.invert = Invert
 
 
 #####################
