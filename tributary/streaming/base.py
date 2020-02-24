@@ -19,6 +19,14 @@ async def _agen_to_foo(generator):
         return StreamEnd()
 
 
+def _gen_node(n):
+    if isinstance(n, Node):
+        return n
+    elif callable(n):
+        return Node(n)
+    return Node(lambda: n)
+
+
 class Node(object):
     '''A representation of a node in the forward propogating graph.
 
@@ -225,3 +233,11 @@ class Node(object):
     def value(self):
         '''get value from node'''
         return self._last
+
+
+class StreamingGraph(object):
+    def __init__(self, output_node):
+        self._node = output_node
+
+    def graph(self):
+        return self._node.graph()

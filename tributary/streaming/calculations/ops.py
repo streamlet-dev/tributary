@@ -1,5 +1,5 @@
 import math
-from ..base import Node
+from ..base import Node, _gen_node
 
 
 def unary(foo, name):
@@ -13,6 +13,7 @@ def unary(foo, name):
 
 def binary(foo, name):
     def _foo(self, other):
+        other = _gen_node(other)
         downstream = Node(foo, {}, name=name, inputs=2)
         self._downstream.append((downstream, 0))
         other._downstream.append((downstream, 1))

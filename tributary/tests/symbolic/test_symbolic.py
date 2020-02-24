@@ -49,18 +49,19 @@ class TestConfig:
         from sympy.parsing.sympy_parser import parse_expr
         assert parse_expr('x^2') == ts.parse_expression('x^2')
 
-    # def test_construct_streaming(self):
-    #     import tributary.symbolic as ts
-    #     import tributary.reactive as tr
+    def test_construct_streaming(self):
+        import tributary.symbolic as tsy
+        import tributary.streaming as ts
 
-    #     expr = ts.parse_expression("10sin**2 x**2 + 3xyz + tan theta")
-    #     clz = ts.construct_streaming(expr)
+        expr = tsy.parse_expression("10sin**2 x**2 + 3xyz + tan theta")
+        clz = tsy.construct_streaming(expr)
 
-    #     def foo(*args):
-    #         for i in range(10):
-    #             yield i
+        def foo(*args):
+            for i in range(10):
+                yield i
 
-    #     x = clz(x=tr.Const(1), y=tr.Foo(foo), z=tr.Timer(1, repeat=1), theta=tr.Const(4))
-    #     x.pprint()
-    #     out = x.run()
-    #     assert len(out) == 1
+        # TODO
+        # x = clz(x=ts.Const(1), y=ts.Foo(foo), z=ts.Timer(lambda: 1, count=1), theta=ts.Const(4))
+        # x.pprint()
+        # out = x.run()
+        # assert len(out) == 1

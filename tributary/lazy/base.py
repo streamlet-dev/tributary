@@ -1,7 +1,7 @@
 from .node import Node, node  # noqa: F401
 
 
-class Graph(object):
+class LazyGraph(object):
     '''Wrapper class around a collection of lazy nodes.'''
 
     def __init__(self, *args, **kwargs):
@@ -19,7 +19,7 @@ class Graph(object):
         Returns:
             BaseNode: the newly constructed lazy node
         '''
-        if not hasattr(self, '_Graph__nodes'):
+        if not hasattr(self, '_LazyGraph__nodes'):
             self.__nodes = {}
 
         if name not in self.__nodes:
@@ -33,16 +33,16 @@ class Graph(object):
         return self.__nodes[name]
 
     def __getattribute__(self, name):
-        if name == '_Graph__nodes' or name == '__nodes':
-            return super(Graph, self).__getattribute__(name)
-        elif hasattr(self, '_Graph__nodes') and name in super(Graph, self).__getattribute__('_Graph__nodes'):
-            return super(Graph, self).__getattribute__('_Graph__nodes')[name]
+        if name == '_LazyGraph__nodes' or name == '__nodes':
+            return super(LazyGraph, self).__getattribute__(name)
+        elif hasattr(self, '_LazyGraph__nodes') and name in super(LazyGraph, self).__getattribute__('_LazyGraph__nodes'):
+            return super(LazyGraph, self).__getattribute__('_LazyGraph__nodes')[name]
         else:
-            return super(Graph, self).__getattribute__(name)
+            return super(LazyGraph, self).__getattribute__(name)
 
     def __setattr__(self, name, value):
-        if hasattr(self, '_Graph__nodes') and name in super(Graph, self).__getattribute__('_Graph__nodes'):
-            node = super(Graph, self).__getattribute__('_Graph__nodes')[name]
+        if hasattr(self, '_LazyGraph__nodes') and name in super(LazyGraph, self).__getattribute__('_LazyGraph__nodes'):
+            node = super(LazyGraph, self).__getattribute__('_LazyGraph__nodes')[name]
             if isinstance(value, Node) and node == value:
                 return
             elif isinstance(value, Node):
@@ -51,7 +51,7 @@ class Graph(object):
                 node._dirty = (node._value != value) or (node._value is not None and abs(node._value - value) > 10**-5)
                 node._value = value
         else:
-            super(Graph, self).__setattr__(name, value)
+            super(LazyGraph, self).__setattr__(name, value)
 
 
 def construct(dag):
