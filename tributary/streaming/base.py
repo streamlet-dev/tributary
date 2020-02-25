@@ -1,8 +1,11 @@
 import asyncio
 import types
-from aiostream.aiter_utils import anext
 from asyncio import Queue, QueueEmpty as Empty
 from ..base import StreamEnd, StreamNone, StreamRepeat
+
+
+def anext(obj):
+    return obj.__anext__()
 
 
 def _gen_to_foo(generator):
