@@ -36,10 +36,15 @@ class Node(object):
         '''
         self._name = name
         self._callable = callable
+
+        if isinstance(value, Node):
+            raise Exception('Cannot set value to be itself a node')
+
         self._value = value
         self._readonly = readonly
         self._trace = trace
-        self._callable = callable
+
+        self._callable = callable if not inspect.isgeneratorfunction(callable) else lambda gen=callable(*(callable_args or []), **(callable_kwargs or {})): next(gen)
         self._callable_args = self._transform_args(callable_args or [])
         self._callable_kwargs = self._transform_kwargs(callable_kwargs or {})
         self._callable_is_method = callable_is_method
@@ -51,7 +56,7 @@ class Node(object):
         # cache node operations that have already been done
         self._node_op_cache = {}
 
-        if callable:
+        if self._callable:
             self._callable._node_wrapper = None  # not known until program start
             self._dependencies = {self._callable: (self._callable_args, self._callable_kwargs)}
         else:
@@ -105,6 +110,10 @@ class Node(object):
             if self._trace:
                 if new_value != self._value:
                     print('recomputing: %s#%d' % (self._name, id(self)))
+
+            if isinstance(new_value, Node):
+                raise Exception('Value should not itself be a node!')
+
             self._value = new_value
         return self._value
 

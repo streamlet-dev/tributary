@@ -23,12 +23,14 @@ class LazyGraph(object):
             self.__nodes = {}
 
         if name not in self.__nodes:
-            self.__nodes[name] = Node(name=name,
-                                      derived=False,
-                                      readonly=readonly,
-                                      nullable=nullable,
-                                      value=value,
-                                      trace=trace)
+            if not isinstance(value, Node):
+                value = Node(name=name,
+                             derived=False,
+                             readonly=readonly,
+                             nullable=nullable,
+                             value=value,
+                             trace=trace)
+            self.__nodes[name] = value
             setattr(self, name, self.__nodes[name])
         return self.__nodes[name]
 

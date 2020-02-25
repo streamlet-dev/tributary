@@ -109,7 +109,7 @@ c()
 
 
 
-    6.168300449269846
+    -6.7891874833358825
 
 
 
@@ -137,7 +137,7 @@ import tributary.lazy as tl
 expr = ts.parse_expression("10sin**2 x**2 + 3xyz + tan theta")
 
 # Generate a new class representing the graph
-clz = ts.construct_streaming(expr)
+clz = ts.construct_lazy(expr)
 
 
 # A function to use as an input
@@ -146,16 +146,32 @@ def foo(*args):
         yield _
 
 # Construct with inputs
-x = clz(x=tl.Node(value=1), y=tl.Node(callable=foo), z=tl.Node(value=1), theta=tl.Node(value=4))
+x = clz(x=tl.Node(value=1), y=tl.Node(callable=foo, always_dirty=True), z=tl.Node(value=1), theta=tl.Node(value=4))
+```
 
-# Run the graph
-x
+
+```python
+# print value
+x.evaluate()()
 ```
 
 
 
 
-    <tributary.symbolic.construct_streaming.<locals>.Streaming at 0x11d277490>
+$\displaystyle 8.23855546508529$
+
+
+
+
+```python
+# View the graph
+x.evaluate().graphviz()
+```
+
+
+
+
+![svg](output_19_0.svg)
 
 
 
@@ -220,7 +236,7 @@ price.evaluate().graphviz()
 
 
 
-![svg](output_23_0.svg)
+![svg](output_25_0.svg)
 
 
 
@@ -237,7 +253,7 @@ price.evaluate().graphviz()
 
 
 
-![svg](output_25_0.svg)
+![svg](output_27_0.svg)
 
 
 

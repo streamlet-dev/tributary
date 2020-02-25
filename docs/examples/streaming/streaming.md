@@ -111,11 +111,11 @@ p.graphviz()
 x = ts.run(p)
 ```
 
-    1.0000000000000002
+    0.9999999999999999
+    0.9999999999999999
     0.9999999999999999
     1.0000000000000004
-    0.9999999999999997
-    1.0
+    0.9999999999999998
 
 
 
@@ -126,11 +126,11 @@ x.result()
 
 
 
-    [1.0000000000000002,
+    [0.9999999999999999,
+     0.9999999999999999,
      0.9999999999999999,
      1.0000000000000004,
-     0.9999999999999997,
-     1.0]
+     0.9999999999999998]
 
 
 
@@ -215,6 +215,8 @@ w = ts.Window(vals, size=5)
 n = ts.Apply(w, myfoo)
 psp1 = ts.Perspective(n, schema={'HIGH': float, 'LOW': float, 'MID': float, 'SMA': float}, plugin='y_line')
 x = ts.run(ts.Perspective(psp1, schema={'HIGH': float, 'LOW': float, 'MID': float, 'SMA': float}))
+# This will only display in the notebook, not on Github
+# it uses https://perspective.finos.org/
 ```
 
 
@@ -247,7 +249,23 @@ def foo(*args):
 
 # Construct with inputs
 x = clz(x=tss.Const(1), y=tss.Foo(foo), z=tss.Timer(lambda: 1, count=0), theta=tss.Const(4))
+```
 
+
+```python
+# View the graph
+x.graphviz()
+```
+
+
+
+
+![svg](output_21_0.svg)
+
+
+
+
+```python
 # Run the graph
 y = x.run()
 y
@@ -273,7 +291,7 @@ $\displaystyle \left[ 8.23855546508529, \  11.238555465085287, \  14.23855546508
 
 
 # Symbolic - More Complicated Example
-Here we will construct a lazy pricer for a vanilla european option
+Here we will construct a streaming pricer for a vanilla european option
 
 
 ```python
@@ -334,7 +352,7 @@ price.graphviz()
 
 
 
-![svg](output_25_0.svg)
+![svg](output_27_0.svg)
 
 
 
