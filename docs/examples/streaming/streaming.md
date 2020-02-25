@@ -111,10 +111,10 @@ p.graphviz()
 x = ts.run(p)
 ```
 
-    1.0000000000000004
+    1.0000000000000002
     0.9999999999999999
     1.0000000000000004
-    1.0
+    0.9999999999999997
     1.0
 
 
@@ -126,7 +126,11 @@ x.result()
 
 
 
-    [1.0000000000000004, 0.9999999999999999, 1.0000000000000004, 1.0, 1.0]
+    [1.0000000000000002,
+     0.9999999999999999,
+     1.0000000000000004,
+     0.9999999999999997,
+     1.0]
 
 
 
@@ -219,6 +223,139 @@ x = ts.run(ts.Perspective(psp1, schema={'HIGH': float, 'LOW': float, 'MID': floa
 
 
     PerspectiveWidget(columns=['HIGH', 'LOW', 'MID', 'SMA'])
+
+
+# Symbolic - Simple Example
+Using tributary's sympy functionality, we can construct relatively complicated graphs. Here we will construct as simple lazy graph
+
+
+```python
+import tributary.symbolic as ts
+import tributary.streaming as tss
+
+# Parse sympy expression
+expr = ts.parse_expression("10sin**2 x**2 + 3xyz + tan theta")
+
+# Generate a new class representing the graph
+clz = ts.construct_streaming(expr)
+
+
+# A function to use as an input
+def foo(*args):
+    for _ in range(5):
+        yield _
+
+# Construct with inputs
+x = clz(x=tss.Const(1), y=tss.Foo(foo), z=tss.Timer(lambda: 1, count=0), theta=tss.Const(4))
+
+# Run the graph
+y = x.run()
+y
+```
+
+
+
+
+    <Task pending coro=<_run() running at /Users/theocean154/Programs/projects/tributary/tributary/examples/tributary/streaming/__init__.py:11>>
+
+
+
+
+```python
+y.result()
+```
+
+
+
+
+$\displaystyle \left[ 8.23855546508529, \  11.238555465085287, \  14.238555465085287, \  17.238555465085287, \  20.238555465085287\right]$
+
+
+
+# Symbolic - More Complicated Example
+Here we will construct a lazy pricer for a vanilla european option
+
+
+```python
+import numpy as np
+import sympy as sy
+from IPython.display import display, HTML
+from sympy.stats import Normal as syNormal, cdf
+sy.init_printing()
+
+# adapted from https://gist.github.com/raddy/bd0e977dc8437a4f8276
+#spot, strike, vol, days till expiry, interest rate, call or put (1,-1)
+spot, strike, vol, dte, rate, cp = sy.symbols('spot strike vol dte rate cp')
+
+T = dte / 260.
+N = syNormal('N', 0.0, 1.0)
+
+d1 = (sy.ln(spot / strike) + (0.5 * vol ** 2) * T) / (vol * sy.sqrt(T))
+d2 = d1 - vol * sy.sqrt(T)
+
+TimeValueExpr = sy.exp(-rate * T) * (cp * spot * cdf(N)(cp * d1) - cp * strike  * cdf(N)(cp * d2))
+```
+
+
+```python
+TimeValueExpr
+```
+
+
+
+
+$\displaystyle \left(cp spot \left(\frac{\operatorname{erf}{\left(\frac{8.06225774829855 \sqrt{2} cp \left(0.00192307692307692 dte vol^{2} + \log{\left(\frac{spot}{strike} \right)}\right)}{\sqrt{dte} vol} \right)}}{2} + \frac{1}{2}\right) - cp strike \left(\frac{\operatorname{erf}{\left(0.5 \sqrt{2} cp \left(- 0.0620173672946042 \sqrt{dte} vol + \frac{16.1245154965971 \left(0.00192307692307692 dte vol^{2} + \log{\left(\frac{spot}{strike} \right)}\right)}{\sqrt{dte} vol}\right) \right)}}{2} + \frac{1}{2}\right)\right) e^{- 0.00384615384615385 dte rate}$
+
+
+
+
+```python
+import tributary.symbolic as ts
+PriceClass = ts.construct_streaming(TimeValueExpr)
+
+
+def strikes():
+    strike = 205
+    while strike < 220:
+        yield strike
+        strike += 2.5
+
+price = PriceClass(spot=tss.Const(210.59),
+                   strike=tss.Foo(strikes),
+                   vol=tss.Const(14.04),
+                   dte=tss.Const(4),
+                   rate=tss.Const(.2175),
+                   cp=tss.Const(-1))
+
+price.graphviz()
+
+```
+
+
+
+
+![svg](output_25_0.svg)
+
+
+
+Our function `strikes` will stream in strike prices, and we will see our price output change accordingly
+
+
+```python
+x = price.run()
+
+```
+
+
+```python
+x.result()
+```
+
+
+
+
+$\displaystyle \left[ 124.8198933249367, \  126.82508170405075, \  128.83501237227932, \  130.8496010565144, \  132.86876573965452, \  134.8924265789232\right]$
+
 
 
 

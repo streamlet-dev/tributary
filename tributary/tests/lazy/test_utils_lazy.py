@@ -21,8 +21,6 @@ class TestUtils:
         sleep(3)
         assert out() == 6
 
-
-
     def test_interval(self):
         n = tl.Node(value=5)
         out = tl.Interval(n, seconds=2)
@@ -38,4 +36,3 @@ class TestUtils:
 
         sleep(3)
         assert out() == 6
-

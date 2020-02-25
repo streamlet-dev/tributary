@@ -11,7 +11,7 @@ class TestOps:
     def test_Invert(self):
         t = tl.Node(value=5)
         out = tl.Invert(t)
-        assert out() == 1/5
+        assert out() == 1 / 5
 
     def test_Add(self):
         t = tl.Node(value=5)
@@ -22,7 +22,6 @@ class TestOps:
         t = tl.Node(value=5)
         out = tl.Sub(t, t)
         assert out() == 0
-
 
     def test_Mult(self):
         t = tl.Node(value=5)
@@ -75,12 +74,12 @@ class TestOps:
     def test_Equal(self):
         t = tl.Node(value=2)
         out = tl.Equal(t, 2)
-        assert out() == True
+        assert out()
 
     def test_NotEqual(self):
         t = tl.Node(value=2)
         out = tl.NotEqual(t, 1)
-        assert out() == True
+        assert out()
 
     def test_Lt(self):
         t = tl.Node(value=2)
@@ -90,7 +89,7 @@ class TestOps:
     def test_Le(self):
         t = tl.Node(value=2)
         out = tl.Le(t, 2)
-        assert out() == True
+        assert out()
 
     def test_Gt(self):
         t = tl.Node(value=2)
@@ -100,7 +99,7 @@ class TestOps:
     def test_Ge(self):
         t = tl.Node(value=2)
         out = tl.Ge(t, 1)
-        assert out() == True
+        assert out()
 
     def test_Log(self):
         t = tl.Node(value=2)
@@ -170,7 +169,7 @@ class TestOps:
     def test_Bool(self):
         t = tl.Node(value=2)
         out = tl.Bool(t)
-        assert out() == True
+        assert out()
 
     def test_Str(self):
         t = tl.Node(value=2)

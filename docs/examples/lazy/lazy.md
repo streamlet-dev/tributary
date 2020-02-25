@@ -109,7 +109,7 @@ c()
 
 
 
-    11.705769049823258
+    6.168300449269846
 
 
 
@@ -125,9 +125,42 @@ c.graphviz()
 
 
 
-# Symbolic
-Using tributary's sympy functionality, we can construct relatively complicatd graphs. Here we will construct a lazy pricer for a vanilla european option
+# Symbolic - Simple Example
+Using tributary's sympy functionality, we can construct relatively complicated graphs. Here we will construct as simple lazy graph
 
+
+```python
+import tributary.symbolic as ts
+import tributary.lazy as tl
+
+# Parse sympy expression
+expr = ts.parse_expression("10sin**2 x**2 + 3xyz + tan theta")
+
+# Generate a new class representing the graph
+clz = ts.construct_streaming(expr)
+
+
+# A function to use as an input
+def foo(*args):
+    for _ in range(5):
+        yield _
+
+# Construct with inputs
+x = clz(x=tl.Node(value=1), y=tl.Node(callable=foo), z=tl.Node(value=1), theta=tl.Node(value=4))
+
+# Run the graph
+x
+```
+
+
+
+
+    <tributary.symbolic.construct_streaming.<locals>.Streaming at 0x11d277490>
+
+
+
+# Symbolic - More Complicated Example
+Here we will construct a lazy pricer for a vanilla european option
 
 
 ```python
@@ -187,7 +220,7 @@ price.evaluate().graphviz()
 
 
 
-![svg](output_21_0.svg)
+![svg](output_23_0.svg)
 
 
 
@@ -204,7 +237,7 @@ price.evaluate().graphviz()
 
 
 
-![svg](output_23_0.svg)
+![svg](output_25_0.svg)
 
 
 

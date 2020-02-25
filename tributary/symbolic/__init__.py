@@ -85,6 +85,7 @@ def construct_streaming(expr, modules=None):
     syms = list(symbols(expr))
     names = [s.name for s in syms]
     modules = modules or ["scipy", "numpy"]
+    # modules = modules or  ["math", "mpmath", "sympy"]
 
     class Streaming(ts.StreamingGraph):
         def __init__(self, **kwargs):
@@ -96,9 +97,9 @@ def construct_streaming(expr, modules=None):
                 self._kwargs[n] = kwargs.get(n)
 
             self._nodes = [getattr(self, n) for n in names]
-            self._function = ts.Node(lambdify(syms, expr, modules=modules)(**self._kwargs))
+            self._lambda = lambdify(syms, expr, modules=modules)(**self._kwargs)
             self._expr = expr
 
-            super(Streaming, self).__init__(output_node=self._function)
+            super(Streaming, self).__init__(output_node=self._lambda)
 
     return Streaming

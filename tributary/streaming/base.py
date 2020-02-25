@@ -20,11 +20,12 @@ async def _agen_to_foo(generator):
 
 
 def _gen_node(n):
+    from .input import Const, Foo
     if isinstance(n, Node):
         return n
     elif callable(n):
-        return Node(n)
-    return Node(lambda: n)
+        return Foo(n, name="Callable")
+    return Const(n)
 
 
 class Node(object):
@@ -178,6 +179,7 @@ class Node(object):
                 try:
                     # get from input queue
                     val = inp.get_nowait()
+
                     while isinstance(val, StreamRepeat):
                         # Skip entry
                         val = inp.get_nowait()
@@ -190,6 +192,7 @@ class Node(object):
 
                 except Empty:
                     # wait for value
+                    self._active[i] = StreamNone()
                     ready = False
 
         if ready:
@@ -241,3 +244,10 @@ class StreamingGraph(object):
 
     def graph(self):
         return self._node.graph()
+
+    def graphviz(self):
+        return self._node.graphviz()
+
+    def run(self):
+        from tributary.streaming import run
+        return run(self._node)

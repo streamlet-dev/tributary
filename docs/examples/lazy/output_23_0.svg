@@ -12,44 +12,44 @@
 <!-- evaluate (#0) -->
 <g id="node1" class="node">
 <title>evaluate (#0)</title>
-<ellipse fill="none" stroke="red" cx="1633" cy="-18" rx="56.52" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1633" cy="-18" rx="56.52" ry="18"/>
 <text text-anchor="middle" x="1633" y="-13.8" font-family="Times,serif" font-size="14.00">evaluate (#0)</text>
 </g>
 <!-- cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5)*exp(dte*var(&#45;0.00)*rate) (#1) -->
 <g id="node2" class="node">
 <title>cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5)*exp(dte*var(&#45;0.00)*rate) (#1)</title>
-<ellipse fill="none" stroke="red" cx="1633" cy="-90" rx="995.63" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1633" cy="-90" rx="995.63" ry="18"/>
 <text text-anchor="middle" x="1633" y="-85.8" font-family="Times,serif" font-size="14.00">cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5)*exp(dte*var(&#45;0.00)*rate) (#1)</text>
 </g>
 <!-- cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5)*exp(dte*var(&#45;0.00)*rate) (#1)&#45;&gt;evaluate (#0) -->
 <g id="edge62" class="edge">
 <title>cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5)*exp(dte*var(&#45;0.00)*rate) (#1)&#45;&gt;evaluate (#0)</title>
-<path fill="none" stroke="red" d="M1633,-71.7C1633,-63.98 1633,-54.71 1633,-46.11"/>
-<polygon fill="red" stroke="red" points="1636.5,-46.1 1633,-36.1 1629.5,-46.1 1636.5,-46.1"/>
+<path fill="none" stroke="black" d="M1633,-71.7C1633,-63.98 1633,-54.71 1633,-46.11"/>
+<polygon fill="black" stroke="black" points="1636.5,-46.1 1633,-36.1 1629.5,-46.1 1636.5,-46.1"/>
 </g>
 <!-- cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2) -->
 <g id="node3" class="node">
 <title>cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2)</title>
-<ellipse fill="none" stroke="red" cx="1167" cy="-162" rx="904.47" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1167" cy="-162" rx="904.47" ry="18"/>
 <text text-anchor="middle" x="1167" y="-157.8" font-family="Times,serif" font-size="14.00">cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2)</text>
 </g>
 <!-- cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5)*exp(dte*var(&#45;0.00)*rate) (#1) -->
 <g id="edge55" class="edge">
 <title>cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5)*exp(dte*var(&#45;0.00)*rate) (#1)</title>
-<path fill="none" stroke="red" d="M1279.51,-144.1C1349.22,-133.63 1438.79,-120.17 1510.32,-109.43"/>
-<polygon fill="red" stroke="red" points="1510.92,-112.88 1520.29,-107.93 1509.88,-105.96 1510.92,-112.88"/>
+<path fill="none" stroke="black" d="M1279.51,-144.1C1349.22,-133.63 1438.79,-120.17 1510.32,-109.43"/>
+<polygon fill="black" stroke="black" points="1510.92,-112.88 1520.29,-107.93 1509.88,-105.96 1510.92,-112.88"/>
 </g>
 <!-- cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#3) -->
 <g id="node4" class="node">
 <title>cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#3)</title>
-<ellipse fill="none" stroke="red" cx="412" cy="-378" rx="395.42" ry="18"/>
+<ellipse fill="none" stroke="black" cx="412" cy="-378" rx="395.42" ry="18"/>
 <text text-anchor="middle" x="412" y="-373.8" font-family="Times,serif" font-size="14.00">cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#3)</text>
 </g>
 <!-- cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#3)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2) -->
 <g id="edge30" class="edge">
 <title>cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#3)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2)</title>
-<path fill="none" stroke="red" d="M427.55,-359.79C459.75,-325.46 537.73,-248.93 621,-216 663.14,-199.34 749.39,-187.74 841.14,-179.74"/>
-<polygon fill="red" stroke="red" points="841.52,-183.22 851.19,-178.88 840.92,-176.25 841.52,-183.22"/>
+<path fill="none" stroke="black" d="M427.55,-359.79C459.75,-325.46 537.73,-248.93 621,-216 663.14,-199.34 749.39,-187.74 841.14,-179.74"/>
+<polygon fill="black" stroke="black" points="841.52,-183.22 851.19,-178.88 840.92,-176.25 841.52,-183.22"/>
 </g>
 <!-- cp*spot (#4) -->
 <g id="node5" class="node">
@@ -90,7 +90,7 @@
 <!-- cp*strike (#34) -->
 <g id="node31" class="node">
 <title>cp*strike (#34)</title>
-<ellipse fill="none" stroke="red" cx="1034" cy="-810" rx="63.78" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1034" cy="-810" rx="63.78" ry="18"/>
 <text text-anchor="middle" x="1034" y="-805.8" font-family="Times,serif" font-size="14.00">cp*strike (#34)</text>
 </g>
 <!-- cp (#5)&#45;&gt;cp*strike (#34) -->
@@ -126,7 +126,7 @@
 <!-- spot/strike (#24) -->
 <g id="node24" class="node">
 <title>spot/strike (#24)</title>
-<ellipse fill="none" stroke="red" cx="949" cy="-954" rx="68.14" ry="18"/>
+<ellipse fill="none" stroke="black" cx="949" cy="-954" rx="68.14" ry="18"/>
 <text text-anchor="middle" x="949" y="-949.8" font-family="Times,serif" font-size="14.00">spot/strike (#24)</text>
 </g>
 <!-- spot (#6)&#45;&gt;spot/strike (#24) -->
@@ -138,62 +138,62 @@
 <!-- erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#7) -->
 <g id="node8" class="node">
 <title>erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#7)</title>
-<ellipse fill="none" stroke="red" cx="412" cy="-450" rx="363.55" ry="18"/>
+<ellipse fill="none" stroke="black" cx="412" cy="-450" rx="363.55" ry="18"/>
 <text text-anchor="middle" x="412" y="-445.8" font-family="Times,serif" font-size="14.00">erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#7)</text>
 </g>
 <!-- erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#7)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#3) -->
 <g id="edge29" class="edge">
 <title>erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#7)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#3)</title>
-<path fill="none" stroke="red" d="M412,-431.7C412,-423.98 412,-414.71 412,-406.11"/>
-<polygon fill="red" stroke="red" points="415.5,-406.1 412,-396.1 408.5,-406.1 415.5,-406.1"/>
+<path fill="none" stroke="black" d="M412,-431.7C412,-423.98 412,-414.71 412,-406.11"/>
+<polygon fill="black" stroke="black" points="415.5,-406.1 412,-396.1 408.5,-406.1 415.5,-406.1"/>
 </g>
 <!-- erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5) (#8) -->
 <g id="node9" class="node">
 <title>erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5) (#8)</title>
-<ellipse fill="none" stroke="red" cx="496" cy="-522" rx="330.11" ry="18"/>
+<ellipse fill="none" stroke="black" cx="496" cy="-522" rx="330.11" ry="18"/>
 <text text-anchor="middle" x="496" y="-517.8" font-family="Times,serif" font-size="14.00">erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5) (#8)</text>
 </g>
 <!-- erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5) (#8)&#45;&gt;erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#7) -->
 <g id="edge27" class="edge">
 <title>erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5) (#8)&#45;&gt;erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#7)</title>
-<path fill="none" stroke="red" d="M475.24,-503.7C464.76,-494.97 451.89,-484.24 440.5,-474.75"/>
-<polygon fill="red" stroke="red" points="442.45,-471.82 432.53,-468.1 437.97,-477.19 442.45,-471.82"/>
+<path fill="none" stroke="black" d="M475.24,-503.7C464.76,-494.97 451.89,-484.24 440.5,-474.75"/>
+<polygon fill="black" stroke="black" points="442.45,-471.82 432.53,-468.1 437.97,-477.19 442.45,-471.82"/>
 </g>
 <!-- erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol) (#9) -->
 <g id="node10" class="node">
 <title>erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol) (#9)</title>
-<ellipse fill="none" stroke="red" cx="1180" cy="-594" rx="297.79" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1180" cy="-594" rx="297.79" ry="18"/>
 <text text-anchor="middle" x="1180" y="-589.8" font-family="Times,serif" font-size="14.00">erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol) (#9)</text>
 </g>
 <!-- erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol) (#9)&#45;&gt;erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5) (#8) -->
 <g id="edge25" class="edge">
 <title>erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol) (#9)&#45;&gt;erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5) (#8)</title>
-<path fill="none" stroke="red" d="M1035.78,-578.24C923.9,-566.79 769.01,-550.94 653.83,-539.15"/>
-<polygon fill="red" stroke="red" points="654.17,-535.67 643.86,-538.13 653.45,-542.63 654.17,-535.67"/>
+<path fill="none" stroke="black" d="M1035.78,-578.24C923.9,-566.79 769.01,-550.94 653.83,-539.15"/>
+<polygon fill="black" stroke="black" points="654.17,-535.67 643.86,-538.13 653.45,-542.63 654.17,-535.67"/>
 </g>
 <!-- cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10) -->
 <g id="node11" class="node">
 <title>cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10)</title>
-<ellipse fill="none" stroke="red" cx="1186" cy="-666" rx="286.22" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1186" cy="-666" rx="286.22" ry="18"/>
 <text text-anchor="middle" x="1186" y="-661.8" font-family="Times,serif" font-size="14.00">cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10)</text>
 </g>
 <!-- cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10)&#45;&gt;erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol) (#9) -->
 <g id="edge24" class="edge">
 <title>cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10)&#45;&gt;erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol) (#9)</title>
-<path fill="none" stroke="red" d="M1184.52,-647.7C1183.86,-639.98 1183.06,-630.71 1182.32,-622.11"/>
-<polygon fill="red" stroke="red" points="1185.81,-621.77 1181.47,-612.1 1178.83,-622.37 1185.81,-621.77"/>
+<path fill="none" stroke="black" d="M1184.52,-647.7C1183.86,-639.98 1183.06,-630.71 1182.32,-622.11"/>
+<polygon fill="black" stroke="black" points="1185.81,-621.77 1181.47,-612.1 1178.83,-622.37 1185.81,-621.77"/>
 </g>
 <!-- cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11) -->
 <g id="node12" class="node">
 <title>cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11)</title>
-<ellipse fill="none" stroke="red" cx="1186" cy="-738" rx="237.8" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1186" cy="-738" rx="237.8" ry="18"/>
 <text text-anchor="middle" x="1186" y="-733.8" font-family="Times,serif" font-size="14.00">cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11)</text>
 </g>
 <!-- cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11)&#45;&gt;cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10) -->
 <g id="edge19" class="edge">
 <title>cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11)&#45;&gt;cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10)</title>
-<path fill="none" stroke="red" d="M1186,-719.7C1186,-711.98 1186,-702.71 1186,-694.11"/>
-<polygon fill="red" stroke="red" points="1189.5,-694.1 1186,-684.1 1182.5,-694.1 1189.5,-694.1"/>
+<path fill="none" stroke="black" d="M1186,-719.7C1186,-711.98 1186,-702.71 1186,-694.11"/>
+<polygon fill="black" stroke="black" points="1189.5,-694.1 1186,-684.1 1182.5,-694.1 1189.5,-694.1"/>
 </g>
 <!-- cp*var(11.40) (#12)&#45;&gt;cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11) -->
 <g id="edge6" class="edge">
@@ -216,26 +216,26 @@
 <!-- dte*var(0.001)*vol^var(2)+log(spot/strike) (#15) -->
 <g id="node15" class="node">
 <title>dte*var(0.001)*vol^var(2)+log(spot/strike) (#15)</title>
-<ellipse fill="none" stroke="red" cx="1483" cy="-810" rx="184.05" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1483" cy="-810" rx="184.05" ry="18"/>
 <text text-anchor="middle" x="1483" y="-805.8" font-family="Times,serif" font-size="14.00">dte*var(0.001)*vol^var(2)+log(spot/strike) (#15)</text>
 </g>
 <!-- dte*var(0.001)*vol^var(2)+log(spot/strike) (#15)&#45;&gt;cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11) -->
 <g id="edge18" class="edge">
 <title>dte*var(0.001)*vol^var(2)+log(spot/strike) (#15)&#45;&gt;cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike) (#11)</title>
-<path fill="none" stroke="red" d="M1415.98,-793.2C1371.17,-782.64 1312.04,-768.71 1264.95,-757.61"/>
-<polygon fill="red" stroke="red" points="1265.63,-754.17 1255.1,-755.29 1264.03,-760.99 1265.63,-754.17"/>
+<path fill="none" stroke="black" d="M1415.98,-793.2C1371.17,-782.64 1312.04,-768.71 1264.95,-757.61"/>
+<polygon fill="black" stroke="black" points="1265.63,-754.17 1255.1,-755.29 1264.03,-760.99 1265.63,-754.17"/>
 </g>
 <!-- dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12) (#52) -->
 <g id="node43" class="node">
 <title>dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12) (#52)</title>
-<ellipse fill="none" stroke="red" cx="1755" cy="-738" rx="225.56" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1755" cy="-738" rx="225.56" ry="18"/>
 <text text-anchor="middle" x="1755" y="-733.8" font-family="Times,serif" font-size="14.00">dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12) (#52)</text>
 </g>
 <!-- dte*var(0.001)*vol^var(2)+log(spot/strike) (#15)&#45;&gt;dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12) (#52) -->
 <g id="edge42" class="edge">
 <title>dte*var(0.001)*vol^var(2)+log(spot/strike) (#15)&#45;&gt;dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12) (#52)</title>
-<path fill="none" stroke="red" d="M1545.06,-793.03C1585.65,-782.58 1638.85,-768.89 1681.54,-757.9"/>
-<polygon fill="red" stroke="red" points="1682.51,-761.27 1691.32,-755.39 1680.76,-754.49 1682.51,-761.27"/>
+<path fill="none" stroke="black" d="M1545.06,-793.03C1585.65,-782.58 1638.85,-768.89 1681.54,-757.9"/>
+<polygon fill="black" stroke="black" points="1682.51,-761.27 1691.32,-755.39 1680.76,-754.49 1682.51,-761.27"/>
 </g>
 <!-- dte*var(0.001)*vol^var(2) (#16) -->
 <g id="node16" class="node">
@@ -372,38 +372,38 @@
 <!-- log(spot/strike) (#23) -->
 <g id="node23" class="node">
 <title>log(spot/strike) (#23)</title>
-<ellipse fill="none" stroke="red" cx="1369" cy="-882" rx="85.52" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1369" cy="-882" rx="85.52" ry="18"/>
 <text text-anchor="middle" x="1369" y="-877.8" font-family="Times,serif" font-size="14.00">log(spot/strike) (#23)</text>
 </g>
 <!-- log(spot/strike) (#23)&#45;&gt;dte*var(0.001)*vol^var(2)+log(spot/strike) (#15) -->
 <g id="edge17" class="edge">
 <title>log(spot/strike) (#23)&#45;&gt;dte*var(0.001)*vol^var(2)+log(spot/strike) (#15)</title>
-<path fill="none" stroke="red" d="M1395.44,-864.76C1410.65,-855.43 1429.97,-843.56 1446.6,-833.35"/>
-<polygon fill="red" stroke="red" points="1448.82,-836.09 1455.51,-827.88 1445.16,-830.13 1448.82,-836.09"/>
+<path fill="none" stroke="black" d="M1395.44,-864.76C1410.65,-855.43 1429.97,-843.56 1446.6,-833.35"/>
+<polygon fill="black" stroke="black" points="1448.82,-836.09 1455.51,-827.88 1445.16,-830.13 1448.82,-836.09"/>
 </g>
 <!-- spot/strike (#24)&#45;&gt;log(spot/strike) (#23) -->
 <g id="edge16" class="edge">
 <title>spot/strike (#24)&#45;&gt;log(spot/strike) (#23)</title>
-<path fill="none" stroke="red" d="M1006.17,-944.02C1071.31,-933.72 1180.91,-916.16 1275,-900 1282.08,-898.78 1289.45,-897.49 1296.82,-896.19"/>
-<polygon fill="red" stroke="red" points="1297.6,-899.6 1306.83,-894.4 1296.38,-892.71 1297.6,-899.6"/>
+<path fill="none" stroke="black" d="M1006.17,-944.02C1071.31,-933.72 1180.91,-916.16 1275,-900 1282.08,-898.78 1289.45,-897.49 1296.82,-896.19"/>
+<polygon fill="black" stroke="black" points="1297.6,-899.6 1306.83,-894.4 1296.38,-892.71 1297.6,-899.6"/>
 </g>
 <!-- strike (#26) -->
 <g id="node25" class="node">
 <title>strike (#26)</title>
-<ellipse fill="none" stroke="red" cx="997" cy="-1026" rx="51.24" ry="18"/>
+<ellipse fill="none" stroke="black" cx="997" cy="-1026" rx="51.24" ry="18"/>
 <text text-anchor="middle" x="997" y="-1021.8" font-family="Times,serif" font-size="14.00">strike (#26)</text>
 </g>
 <!-- strike (#26)&#45;&gt;spot/strike (#24) -->
 <g id="edge15" class="edge">
 <title>strike (#26)&#45;&gt;spot/strike (#24)</title>
-<path fill="none" stroke="red" d="M985.62,-1008.41C979.91,-1000.08 972.86,-989.8 966.48,-980.49"/>
-<polygon fill="red" stroke="red" points="969.17,-978.22 960.63,-971.96 963.4,-982.18 969.17,-978.22"/>
+<path fill="none" stroke="black" d="M985.62,-1008.41C979.91,-1000.08 972.86,-989.8 966.48,-980.49"/>
+<polygon fill="black" stroke="black" points="969.17,-978.22 960.63,-971.96 963.4,-982.18 969.17,-978.22"/>
 </g>
 <!-- strike (#26)&#45;&gt;cp*strike (#34) -->
 <g id="edge32" class="edge">
 <title>strike (#26)&#45;&gt;cp*strike (#34)</title>
-<path fill="none" stroke="red" d="M1008.76,-1008.19C1015.1,-998.17 1022.35,-984.92 1026,-972 1038.84,-926.51 1038.22,-870.96 1036.31,-838.43"/>
-<polygon fill="red" stroke="red" points="1039.8,-838.07 1035.63,-828.33 1032.81,-838.54 1039.8,-838.07"/>
+<path fill="none" stroke="black" d="M1008.76,-1008.19C1015.1,-998.17 1022.35,-984.92 1026,-972 1038.84,-926.51 1038.22,-870.96 1036.31,-838.43"/>
+<polygon fill="black" stroke="black" points="1039.8,-838.07 1035.63,-828.33 1032.81,-838.54 1039.8,-838.07"/>
 </g>
 <!-- sqrt(dte)*vol (#27)&#45;&gt;cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol (#10) -->
 <g id="edge23" class="edge">
@@ -414,7 +414,7 @@
 <!-- dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51) -->
 <g id="node42" class="node">
 <title>dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51)</title>
-<ellipse fill="none" stroke="red" cx="1879" cy="-666" rx="273.83" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1879" cy="-666" rx="273.83" ry="18"/>
 <text text-anchor="middle" x="1879" y="-661.8" font-family="Times,serif" font-size="14.00">dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51)</text>
 </g>
 <!-- sqrt(dte)*vol (#27)&#45;&gt;dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51) -->
@@ -468,68 +468,68 @@
 <!-- cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33) -->
 <g id="node30" class="node">
 <title>cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33)</title>
-<ellipse fill="none" stroke="red" cx="1167" cy="-234" rx="537.11" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1167" cy="-234" rx="537.11" ry="18"/>
 <text text-anchor="middle" x="1167" y="-229.8" font-family="Times,serif" font-size="14.00">cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33)</text>
 </g>
 <!-- cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2) -->
 <g id="edge54" class="edge">
 <title>cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33)&#45;&gt;cp*spot*erf(cp*var(11.40)*dte*var(0.001)*vol^var(2)+log(spot/strike)/sqrt(dte)*vol)*var(0.5)+var(0.5)&#45;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#2)</title>
-<path fill="none" stroke="red" d="M1167,-215.7C1167,-207.98 1167,-198.71 1167,-190.11"/>
-<polygon fill="red" stroke="red" points="1170.5,-190.1 1167,-180.1 1163.5,-190.1 1170.5,-190.1"/>
+<path fill="none" stroke="black" d="M1167,-215.7C1167,-207.98 1167,-198.71 1167,-190.11"/>
+<polygon fill="black" stroke="black" points="1170.5,-190.1 1167,-180.1 1163.5,-190.1 1170.5,-190.1"/>
 </g>
 <!-- cp*strike (#34)&#45;&gt;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33) -->
 <g id="edge33" class="edge">
 <title>cp*strike (#34)&#45;&gt;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33)</title>
-<path fill="none" stroke="red" d="M991.8,-796.43C938.6,-777.67 854,-736.86 854,-667 854,-667 854,-667 854,-377 854,-336.55 843.95,-316.14 873,-288 889.65,-271.87 930.52,-260.55 976.67,-252.63"/>
-<polygon fill="red" stroke="red" points="977.29,-256.08 986.59,-251 976.15,-249.17 977.29,-256.08"/>
+<path fill="none" stroke="black" d="M991.8,-796.43C938.6,-777.67 854,-736.86 854,-667 854,-667 854,-667 854,-377 854,-336.55 843.95,-316.14 873,-288 889.65,-271.87 930.52,-260.55 976.67,-252.63"/>
+<polygon fill="black" stroke="black" points="977.29,-256.08 986.59,-251 976.15,-249.17 977.29,-256.08"/>
 </g>
 <!-- erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#37) -->
 <g id="node32" class="node">
 <title>erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#37)</title>
-<ellipse fill="none" stroke="red" cx="1382" cy="-306" rx="500.43" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1382" cy="-306" rx="500.43" ry="18"/>
 <text text-anchor="middle" x="1382" y="-301.8" font-family="Times,serif" font-size="14.00">erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#37)</text>
 </g>
 <!-- erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#37)&#45;&gt;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33) -->
 <g id="edge53" class="edge">
 <title>erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#37)&#45;&gt;cp*strike*erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#33)</title>
-<path fill="none" stroke="red" d="M1329.95,-288.05C1299.55,-278.15 1260.98,-265.6 1229.01,-255.19"/>
-<polygon fill="red" stroke="red" points="1229.9,-251.8 1219.31,-252.03 1227.74,-258.46 1229.9,-251.8"/>
+<path fill="none" stroke="black" d="M1329.95,-288.05C1299.55,-278.15 1260.98,-265.6 1229.01,-255.19"/>
+<polygon fill="black" stroke="black" points="1229.9,-251.8 1219.31,-252.03 1227.74,-258.46 1229.9,-251.8"/>
 </g>
 <!-- erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5) (#38) -->
 <g id="node33" class="node">
 <title>erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5) (#38)</title>
-<ellipse fill="none" stroke="red" cx="1662" cy="-378" rx="467.48" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1662" cy="-378" rx="467.48" ry="18"/>
 <text text-anchor="middle" x="1662" y="-373.8" font-family="Times,serif" font-size="14.00">erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5) (#38)</text>
 </g>
 <!-- erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5) (#38)&#45;&gt;erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#37) -->
 <g id="edge51" class="edge">
 <title>erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5) (#38)&#45;&gt;erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5)+var(0.5) (#37)</title>
-<path fill="none" stroke="red" d="M1594.58,-360.14C1553.89,-349.97 1501.91,-336.98 1459.53,-326.38"/>
-<polygon fill="red" stroke="red" points="1460.36,-322.98 1449.81,-323.95 1458.66,-329.77 1460.36,-322.98"/>
+<path fill="none" stroke="black" d="M1594.58,-360.14C1553.89,-349.97 1501.91,-336.98 1459.53,-326.38"/>
+<polygon fill="black" stroke="black" points="1460.36,-322.98 1449.81,-323.95 1458.66,-329.77 1460.36,-322.98"/>
 </g>
 <!-- erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol) (#39) -->
 <g id="node34" class="node">
 <title>erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol) (#39)</title>
-<ellipse fill="none" stroke="red" cx="1579" cy="-450" rx="434.67" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1579" cy="-450" rx="434.67" ry="18"/>
 <text text-anchor="middle" x="1579" y="-445.8" font-family="Times,serif" font-size="14.00">erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol) (#39)</text>
 </g>
 <!-- erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol) (#39)&#45;&gt;erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5) (#38) -->
 <g id="edge49" class="edge">
 <title>erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol) (#39)&#45;&gt;erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol)*var(0.5) (#38)</title>
-<path fill="none" stroke="red" d="M1599.52,-431.7C1609.87,-422.97 1622.59,-412.24 1633.84,-402.75"/>
-<polygon fill="red" stroke="red" points="1636.33,-405.23 1641.72,-396.1 1631.82,-399.88 1636.33,-405.23"/>
+<path fill="none" stroke="black" d="M1599.52,-431.7C1609.87,-422.97 1622.59,-412.24 1633.84,-402.75"/>
+<polygon fill="black" stroke="black" points="1636.33,-405.23 1641.72,-396.1 1631.82,-399.88 1636.33,-405.23"/>
 </g>
 <!-- cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40) -->
 <g id="node35" class="node">
 <title>cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40)</title>
-<ellipse fill="none" stroke="red" cx="1579" cy="-522" rx="418.76" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1579" cy="-522" rx="418.76" ry="18"/>
 <text text-anchor="middle" x="1579" y="-517.8" font-family="Times,serif" font-size="14.00">cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40)</text>
 </g>
 <!-- cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40)&#45;&gt;erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol) (#39) -->
 <g id="edge48" class="edge">
 <title>cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40)&#45;&gt;erf(cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol) (#39)</title>
-<path fill="none" stroke="red" d="M1579,-503.7C1579,-495.98 1579,-486.71 1579,-478.11"/>
-<polygon fill="red" stroke="red" points="1582.5,-478.1 1579,-468.1 1575.5,-478.1 1582.5,-478.1"/>
+<path fill="none" stroke="black" d="M1579,-503.7C1579,-495.98 1579,-486.71 1579,-478.11"/>
+<polygon fill="black" stroke="black" points="1582.5,-478.1 1579,-468.1 1575.5,-478.1 1582.5,-478.1"/>
 </g>
 <!-- cp*var(0.707) (#41)&#45;&gt;cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40) -->
 <g id="edge36" class="edge">
@@ -552,14 +552,14 @@
 <!-- sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44) -->
 <g id="node38" class="node">
 <title>sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44)</title>
-<ellipse fill="none" stroke="red" cx="1899" cy="-594" rx="364.72" ry="18"/>
+<ellipse fill="none" stroke="black" cx="1899" cy="-594" rx="364.72" ry="18"/>
 <text text-anchor="middle" x="1899" y="-589.8" font-family="Times,serif" font-size="14.00">sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44)</text>
 </g>
 <!-- sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44)&#45;&gt;cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40) -->
 <g id="edge47" class="edge">
 <title>sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44)&#45;&gt;cp*var(0.707)*sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#40)</title>
-<path fill="none" stroke="red" d="M1822.76,-576.32C1775.46,-565.98 1714.56,-552.65 1665.46,-541.91"/>
-<polygon fill="red" stroke="red" points="1666.01,-538.45 1655.49,-539.73 1664.51,-545.29 1666.01,-538.45"/>
+<path fill="none" stroke="black" d="M1822.76,-576.32C1775.46,-565.98 1714.56,-552.65 1665.46,-541.91"/>
+<polygon fill="black" stroke="black" points="1666.01,-538.45 1655.49,-539.73 1664.51,-545.29 1666.01,-538.45"/>
 </g>
 <!-- sqrt(dte)*var(&#45;0.06)*vol (#45)&#45;&gt;sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44) -->
 <g id="edge41" class="edge">
@@ -588,14 +588,14 @@
 <!-- dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51)&#45;&gt;sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44) -->
 <g id="edge46" class="edge">
 <title>dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51)&#45;&gt;sqrt(dte)*var(&#45;0.06)*vol+dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#44)</title>
-<path fill="none" stroke="red" d="M1883.94,-647.7C1886.17,-639.9 1888.85,-630.51 1891.33,-621.83"/>
-<polygon fill="red" stroke="red" points="1894.73,-622.68 1894.11,-612.1 1888,-620.76 1894.73,-622.68"/>
+<path fill="none" stroke="black" d="M1883.94,-647.7C1886.17,-639.9 1888.85,-630.51 1891.33,-621.83"/>
+<polygon fill="black" stroke="black" points="1894.73,-622.68 1894.11,-612.1 1888,-620.76 1894.73,-622.68"/>
 </g>
 <!-- dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12) (#52)&#45;&gt;dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51) -->
 <g id="edge44" class="edge">
 <title>dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12) (#52)&#45;&gt;dte*var(0.001)*vol^var(2)+log(spot/strike)*var(16.12)/sqrt(dte)*vol (#51)</title>
-<path fill="none" stroke="red" d="M1785.02,-720.05C1801.5,-710.75 1822.13,-699.11 1839.86,-689.1"/>
-<polygon fill="red" stroke="red" points="1841.84,-692 1848.83,-684.03 1838.4,-685.9 1841.84,-692"/>
+<path fill="none" stroke="black" d="M1785.02,-720.05C1801.5,-710.75 1822.13,-699.11 1839.86,-689.1"/>
+<polygon fill="black" stroke="black" points="1841.84,-692 1848.83,-684.03 1838.4,-685.9 1841.84,-692"/>
 </g>
 <!-- var(16.12) (#65) -->
 <g id="node44" class="node">

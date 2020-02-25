@@ -1,4 +1,6 @@
 import math
+import numpy as np
+import scipy as sp
 from ..base import Node, _gen_node
 
 
@@ -57,6 +59,57 @@ And = binary(lambda x, y: x and y, name='And')
 Or = binary(lambda x, y: x or y, name='Or')
 
 
+###################
+# Numpy Functions #
+###################
+def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+    if ufunc == np.add:
+        if isinstance(inputs[0], Node):
+            return inputs[0].__add__(inputs[1])
+        else:
+            return inputs[1].__add__(inputs[0])
+    elif ufunc == np.subtract:
+        if isinstance(inputs[0], Node):
+            return inputs[0].__sub__(inputs[1])
+        else:
+            return inputs[1].__sub__(inputs[0])
+    elif ufunc == np.multiply:
+        if isinstance(inputs[0], Node):
+            return inputs[0].__mul__(inputs[1])
+        else:
+            return inputs[1].__mul__(inputs[0])
+    elif ufunc == np.divide:
+        if isinstance(inputs[0], Node):
+            return inputs[0].__truediv__(inputs[1])
+        else:
+            return inputs[1].__truediv__(inputs[0])
+    elif ufunc == np.sin:
+        return inputs[0].sin()
+    elif ufunc == np.cos:
+        return inputs[0].cos()
+    elif ufunc == np.tan:
+        return inputs[0].tan()
+    elif ufunc == np.arcsin:
+        return inputs[0].asin()
+    elif ufunc == np.arccos:
+        return inputs[0].acos()
+    elif ufunc == np.arctan:
+        return inputs[0].atan()
+    elif ufunc == np.exp:
+        return inputs[0].exp()
+    elif ufunc == sp.special.erf:
+        return inputs[0].erf()
+    raise NotImplementedError('Not Implemented!')
+
+
+def __array_function__(self, func, method, *inputs, **kwargs):
+    if func == np.lib.scimath.log:
+        return inputs[0][0].log()
+    elif func == np.lib.scimath.sqrt:
+        return inputs[0][0].sqrt()
+    raise NotImplementedError('Not Implemented!')
+
+
 ###############
 # Comparators #
 ###############
@@ -93,6 +146,12 @@ Bool = unary(lambda x: bool(x), name='Bool')
 Str = unary(lambda x: str(x), name='Str')
 
 
+# __Bool__ = unary(lambda x: bool(x), name='Noop')
+
+def __Bool__(self):
+    return True
+
+
 ###################
 # Python Builtins #
 ###################
@@ -108,10 +167,19 @@ Node.__sub__ = Sub
 Node.__rsub__ = Sub
 Node.__mul__ = Mult
 Node.__rmul__ = Mult
+# Node.__matmul__ = MatMult
+# Node.__rmatmul__ = MatMult
 Node.__div__ = Div
 Node.__rdiv__ = RDiv
+# Node.__divmod__ = DivMod
+# Node.__rdivmod__ = DivMod
 Node.__truediv__ = Div
 Node.__rtruediv__ = RDiv
+Node.__floordiv__ = Div
+# Node.__lshift__ = LShift
+# Node.__rlshift__ = LShift
+# Node.__rshift__ = RShift
+# Node.__rrshift__ = RShift
 
 Node.__pow__ = Pow
 Node.__rpow__ = Pow
@@ -127,17 +195,23 @@ Node.invert = Invert
 # Logical Operators #
 #####################
 Node.__and__ = And
+Node.__rand__ = And
 Node.__or__ = Or
+Node.__ror__ = Or
+# Node.__xor__ = Xor
+# Node.__rxor__ = Xor
 Node.__invert__ = Not
-Node.__bool__ = Bool
-# TODO use __bool__ operator
+Node.__bool__ = __Bool__
 
 ##############
 # Converters #
 ##############
 Node.int = Int
+# Node.__int__ = Int
 Node.float = Float
-Node.__str__ = Str
+# Node.__float__ = Float
+# Node.__str__ = Str
+# Node.__complex__ = Int
 
 ###############
 # Comparators #
@@ -149,17 +223,23 @@ Node.__ge__ = Ge
 Node.__eq__ = Equal
 Node.__ne__ = NotEqual
 Node.__neg__ = Negate
+# Node.__pos__ =
 # Node.__nonzero__ = Bool  # Py2 compat
 
 ###################
 # Python Builtins #
 ###################
 Node.__len__ = Len
+# Node.__round__ = Len
+# Node.__trunc__ = Len
+# Node.__floor__ = Len
+# Node.__ceil__ = Len
 
 ###################
 # Numpy Functions #
 ###################
-# Node.__array_ufunc__ = __array_ufunc__
+Node.__array_ufunc__ = __array_ufunc__
+Node.__array_function__ = __array_function__
 
 
 ##########################
