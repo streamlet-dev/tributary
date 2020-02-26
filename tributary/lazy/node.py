@@ -7,11 +7,11 @@ class Node(object):
     '''Class to represent an operation that is lazy'''
 
     def __init__(self,
+                 value=None,
                  name="?",
                  derived=False,
                  readonly=False,
                  nullable=False,
-                 value=None,
                  callable=None,
                  callable_args=None,
                  callable_kwargs=None,

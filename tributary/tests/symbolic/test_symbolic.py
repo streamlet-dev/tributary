@@ -32,6 +32,8 @@ class TestConfig:
 
         x = price.evaluate()()
 
+        assert price.evaluate()() == x
+
         price.strike = 210
 
         assert x != price.evaluate()()
