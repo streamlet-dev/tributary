@@ -40,12 +40,12 @@ def GraphViz(node):
     def rec(nodes, parent):
         for d in nodes:
             if not isinstance(d, dict):
-                dot.node(d)
+                dot.node(d, shape=d._graphvizshape)
                 dot.edge(d, parent)
 
             else:
                 for k in d:
-                    dot.node(k._name)
+                    dot.node(k._name, shape=k._graphvizshape)
                     rec(d[k], k)
                     dot.edge(k._name, parent._name)
 
@@ -54,6 +54,33 @@ def GraphViz(node):
         rec(d[k], k)
 
     return dot
+
+
+def Dagre(node):
+    import ipydagred3 as dd3
+    G = dd3.Graph()
+    d = Graph(node)
+
+    def rec(nodes, parent):
+        for d in nodes:
+            if not isinstance(d, dict):
+                d._dd3g = G
+                G.setNode(d._name)
+                G.setEdge(d._name, parent)
+            else:
+                for k in d:
+                    k._dd3g = G
+                    G.setNode(k._name)
+                    G.setEdge(k._name, parent._name)
+                    rec(d[k], k)
+
+    for k in d:
+        k._dd3g = G
+        G.setNode(k._name)
+        rec(d[k], k)
+
+    graph = dd3.DagreD3Widget(graph=G)
+    return graph
 
 
 def Perspective(node, text='', **psp_kwargs):
@@ -76,5 +103,6 @@ def Perspective(node, text='', **psp_kwargs):
 Node.graph = Graph
 Node.pprint = PPrint
 Node.graphviz = GraphViz
+Node.dagre = Dagre
 Node.print = Print
 Node.perspective = Perspective

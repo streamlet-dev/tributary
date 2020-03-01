@@ -110,3 +110,13 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - RollingMax - Node to take rolling max of inputs
 - RollingSum - Node to take rolling sum inputs
 - RollingAverage - Node to take the running average
+
+
+# Graph Visualization
+You can visualize the graph with Graphviz. All streaming and lazy nodes support a `graphviz` method.
+
+Streaming nodes also support [ipydagred3](https://github.com/timkpaine/ipydagred3) for live update monitoring.
+
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/streaming/dagred3.gif)
+
+Here green indicates executing, yellow indicates stalled for backpressure, and red indicates that `StreamEnd` has been propogated (e.g. stream has ended).

@@ -49,12 +49,15 @@ class Node(object):
     '''
     _id_ref = 0
 
-    def __init__(self, foo, foo_kwargs=None, name=None, inputs=1, **kwargs):
+    def __init__(self, foo, foo_kwargs=None, name=None, inputs=0, **kwargs):
         # Instances get an id but one id tracker for all nodes so we can
         # uniquely identify them
         # TODO different scheme
         self._id = Node._id_ref
         Node._id_ref += 1
+
+        # Graphviz
+        self._graphvizshape = kwargs.get('graphvizshape', '')
 
         # Every node gets a name so it can be uniquely identified in the graph
         self._name = '{}#{}'.format(name or self.__class__.__name__, self._id)
@@ -100,8 +103,31 @@ class Node(object):
         # stream is in a finished state, will only propogate StreamEnd instances
         self._finished = False
 
+        # dagred3 node if live updating
+        self._dd3g = None
+
     def __repr__(self):
         return '{}'.format(self._name)
+
+    async def _startdd3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #0f0')
+            await asyncio.sleep(0.1)
+
+    async def _waitdd3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #ff0')
+            await asyncio.sleep(0.1)
+
+    async def _finishdd3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #f00')
+            await asyncio.sleep(0.1)
+
+    async def _enddd3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #fff')
+            await asyncio.sleep(0.1)
 
     async def _push(self, inp, index):
         '''push value to downstream nodes'''
@@ -143,11 +169,13 @@ class Node(object):
         await self._output(self._last)
         for i in range(len(self._active)):
             self._active[i] = StreamNone()
+        await self._enddd3g()
 
     async def _finish(self):
         '''mark this node as finished'''
         self._finished = True
         self._last = StreamEnd()
+        await self._finishdd3g()
         await self._output(self._last)
 
     def _backpressure(self):
@@ -159,11 +187,15 @@ class Node(object):
         '''execute the callable if possible, and propogate values downstream'''
         # Downstream nodes can't process
         if self._backpressure():
+            await self._waitdd3g()
             return StreamNone()
 
         # Previously ended stream
         if self._finished:
             return await self._finish()
+
+        # dd3g
+        await self._startdd3g()
 
         # Sleep if needed
         if self._delay_interval:

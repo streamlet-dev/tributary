@@ -59,7 +59,7 @@ class TestConfig:
 
     def test_construct_streaming(self):
         # adapted from https://gist.github.com/raddy/bd0e977dc8437a4f8276
-        #spot, strike, vol, days till expiry, interest rate, call or put (1,-1)
+        # spot, strike, vol, days till expiry, interest rate, call or put (1,-1)
         spot, strike, vol, dte, rate, cp = sy.symbols('spot strike vol dte rate cp')
 
         T = dte / 260.
@@ -68,10 +68,9 @@ class TestConfig:
         d1 = (sy.ln(spot / strike) + (0.5 * vol ** 2) * T) / (vol * sy.sqrt(T))
         d2 = d1 - vol * sy.sqrt(T)
 
-        TimeValueExpr = sy.exp(-rate * T) * (cp * spot * cdf(N)(cp * d1) - cp * strike  * cdf(N)(cp * d2))
+        TimeValueExpr = sy.exp(-rate * T) * (cp * spot * cdf(N)(cp * d1) - cp * strike * cdf(N)(cp * d2))
 
         PriceClass = ts.construct_streaming(TimeValueExpr)
-
 
         def strikes():
             strike = 205
@@ -80,12 +79,12 @@ class TestConfig:
                 strike += 2.5
 
         price = PriceClass(spot=tss.Const(210.59),
-                        #    strike=tss.Print(tss.Const(205), text='strike'),
-                        strike=tss.Foo(strikes, interval=1),
-                        vol=tss.Const(14.04),
-                        dte=tss.Const(4),
-                        rate=tss.Const(.2175),
-                        cp=tss.Const(-1))
+                           #    strike=tss.Print(tss.Const(205), text='strike'),
+                           strike=tss.Foo(strikes, interval=1),
+                           vol=tss.Const(14.04),
+                           dte=tss.Const(4),
+                           rate=tss.Const(.2175),
+                           cp=tss.Const(-1))
 
         ret = tss.run(tss.Print(price._node))
         time.sleep(2)
