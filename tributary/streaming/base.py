@@ -283,6 +283,9 @@ class StreamingGraph(object):
     def graphviz(self):
         return self._node.graphviz()
 
+    def dagre(self):
+        return self._node.dagre()
+
     def run(self):
         from tributary.streaming import run
         return run(self._node)
