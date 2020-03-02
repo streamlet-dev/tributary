@@ -1,42 +1,37 @@
 from ..node import Node
 
 
-def _print(node, counter=0, cache=None):
+def _print(node, cache=None):
     if cache is None:
         cache = {}
 
-    key = cache.get(id(node), str(node) + ' (#' + str(counter) + ')')
-    cache[id(node)] = key
+    cache[id(node)] = node
 
-    if node._dirty or node._subtree_dirty() or node._always_dirty:
-        key += '(dirty)'
-
-    ret = {key: []}
-    counter += 1
+    ret = {node: []}
 
     if node._dependencies:
         for call, deps in node._dependencies.items():
             # callable node
             if hasattr(call, '_node_wrapper') and \
                     call._node_wrapper is not None:
-                val, counter = call._node_wrapper._print(counter, cache)
-                ret[key].append(val)
+                val = call._node_wrapper._print(cache)
+                ret[node].append(val)
 
             # args
             for arg in deps[0]:
-                val, counter = arg._print(counter, cache)
-                ret[key].append(val)
+                val = arg._print(cache)
+                ret[node].append(val)
 
             # kwargs
             for kwarg in deps[1].values():
-                val, counter = kwarg._print(counter, cache)
-                ret[key].append(val)
+                val = kwarg._print(cache)
+                ret[node].append(val)
 
-    return ret, counter
+    return ret
 
 
 def Print(node):
-    return node._print(0, {})[0]
+    return node._print({})
 
 
 def Graph(node):
@@ -53,33 +48,75 @@ def GraphViz(node):
     def rec(nodes, parent):
         for d in nodes:
             if not isinstance(d, dict):
-                if '(dirty)' in d:
-                    dot.node(d.replace('(dirty)', ''), color='red')
-                    dot.edge(d.replace('(dirty)', ''), parent.replace('(dirty)', ''), color='red')
+                if d.isDirty():
+                    dot.node(d._name, color='red')
+                    dot.edge(d._name, parent._name, color='red')
                 else:
-                    dot.node(d)
-                    dot.edge(d, parent.replace('(dirty)', ''))
+                    dot.node(d._name)
+                    dot.edge(d._name, parent._name)
             else:
                 for k in d:
-                    if '(dirty)' in k:
-                        dot.node(k.replace('(dirty)', ''), color='red')
+                    if k.isDirty():
+                        dot.node(k._name, color='red')
                         rec(d[k], k)
-                        dot.edge(k.replace('(dirty)', ''), parent.replace('(dirty)', ''), color='red')
+                        dot.edge(k._name, parent._name, color='red')
                     else:
-                        dot.node(k)
+                        dot.node(k._name)
                         rec(d[k], k)
-                        dot.edge(k, parent.replace('(dirty)', ''))
+                        dot.edge(k._name, parent._name)
 
     for k in d:
-        if '(dirty)' in k:
-            dot.node(k.replace('(dirty)', ''), color='red')
+        if k.isDirty():
+            dot.node(k._name, color='red')
         else:
-            dot.node(k)
+            dot.node(k._name)
         rec(d[k], k)
     return dot
+
+
+def Dagre(node):
+    import ipydagred3 as dd3
+    G = dd3.Graph()
+    d = Graph(node)
+
+    def rec(nodes, parent):
+        for d in nodes:
+            if not isinstance(d, dict):
+                d._dd3g = G
+                if d.isDirty():
+                    G.setNode(d._name, style='fill: #f00')
+                    # G.setEdge(d._name, parent._name, style='stroke: #f00')
+                else:
+                    G.setNode(d._name, style='fill: #fff')
+
+                G.setEdge(d._name, parent._name, style='stroke: #000')
+            else:
+                for k in d:
+                    k._dd3g = G
+                    if k.isDirty():
+                        G.setNode(k._name, style='fill: #f00')
+                        rec(d[k], k)
+                        # G.setEdge(k._name, parent._name, style='stroke: #f00')
+                    else:
+                        G.setNode(k._name, style='fill: #fff')
+                        rec(d[k], k)
+
+                    G.setEdge(k._name, parent._name, style='stroke: #000')
+
+    for k in d:
+        k._dd3g = G
+        if k.isDirty():
+            G.setNode(k._name, style='fill: #f00')
+        else:
+            G.setNode(k._name, style='fill: #fff')
+        rec(d[k], k)
+
+    graph = dd3.DagreD3Widget(graph=G)
+    return graph
 
 
 Node._print = _print
 Node.print = Print
 Node.graph = Graph
 Node.graphviz = GraphViz
+Node.dagre = Dagre
