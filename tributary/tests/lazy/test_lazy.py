@@ -88,9 +88,9 @@ class TestLazy:
         f1 = Foo1()
         f3 = Foo3().foo3()
         z = f1.x + f3
-        assert z._dirty or z._subtree_dirty()
+        assert z.isDirty()
         print(z())  # should call foo3 and recompute (first time)
-        assert not (z._dirty or z._subtree_dirty())
+        assert not z.isDirty()
         print(z())  # should not recompute (foo3 unchanged)
         f3.set(x=0)
         assert z.isDirty()

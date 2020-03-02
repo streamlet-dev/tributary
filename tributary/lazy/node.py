@@ -5,6 +5,7 @@ from ..utils import _either_type
 
 class Node(object):
     '''Class to represent an operation that is lazy'''
+    _id_ref = 0
 
     def __init__(self,
                  value=None,
@@ -34,38 +35,75 @@ class Node(object):
             always_dirty (bool): node should not be lazy - always access underlying value
             trace (bool): trace when the node is called
         '''
-        self._name = name
-        self._callable = callable
+        # Instances get an id but one id tracker for all nodes so we can
+        # uniquely identify them
+        # TODO different scheme
+        self._id = Node._id_ref
+        Node._id_ref += 1
+
+        # Every node gets a name so it can be uniquely identified in the graph
+        self._name = '{}#{}'.format(name or self.__class__.__name__, self._id)
 
         if isinstance(value, Node):
             raise Exception('Cannot set value to be itself a node')
 
+        # starting value
         self._value = value
+
+        # can be set
         self._readonly = readonly
+
+        # trace calls/executions
         self._trace = trace
 
+        # callable and args
         self._callable = callable if not inspect.isgeneratorfunction(callable) else lambda gen=callable(*(callable_args or []), **(callable_kwargs or {})): next(gen)
         self._callable_args = self._transform_args(callable_args or [])
         self._callable_kwargs = self._transform_kwargs(callable_kwargs or {})
         self._callable_is_method = callable_is_method
+
+        # if always dirty, always reevaluate
         self._always_dirty = always_dirty
 
+        # parent nodes in graph
         self._parents = []
+
+        # self reference for method calls
         self._self_reference = self
 
         # cache node operations that have already been done
         self._node_op_cache = {}
 
+        # dependencies can be nodes
         if self._callable:
             self._callable._node_wrapper = None  # not known until program start
             self._dependencies = {self._callable: (self._callable_args, self._callable_kwargs)}
         else:
             self._dependencies = {}
 
+        # if using dagre-d3, this will be set
+        self._dd3g = None
+
+        # if derived node, default to dirty to start
         if derived:
             self._dirty = True
         else:
             self._dirty = False
+
+    def _get_dirty(self):
+        return self._is_dirty
+
+    def _set_dirty(self, val):
+        if val:
+            self._reddd3g()
+        else:
+            self._whited3g()
+        self._is_dirty = val
+
+    _dirty = property(_get_dirty, _set_dirty)
+
+    def _name_no_id(self):
+        return self._name.rsplit('#', 1)[0]
 
     def _transform_args(self, args):
         return args
@@ -77,8 +115,25 @@ class Node(object):
         self._self_reference = other_self
         return self
 
+    def _greendd3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #0f0')
+
+    def _yellowdd3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #ff0')
+
+    def _reddd3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #f00')
+
+    def _whited3g(self):
+        if self._dd3g:
+            self._dd3g.setNode(self._name, style='fill: #fff')
+
     def _compute_from_dependencies(self):
         if self._dependencies:
+            self._greendd3g()
             for deps in six.itervalues(self._dependencies):
                 # recompute args
                 for arg in deps[0]:
@@ -107,9 +162,10 @@ class Node(object):
                 k._node_wrapper = new_value
                 new_value = new_value()  # get value
 
-            if self._trace:
-                if new_value != self._value:
+            if new_value != self._value:
+                if self._trace:
                     print('recomputing: %s#%d' % (self._name, id(self)))
+                self._whited3g()
 
             if isinstance(new_value, Node):
                 raise Exception('Value should not itself be a node!')
@@ -122,7 +178,7 @@ class Node(object):
             # callable node
             if hasattr(call, '_node_wrapper') and \
                call._node_wrapper is not None:
-                if call._node_wrapper._dirty or call._node_wrapper._subtree_dirty() or call._node_wrapper._always_dirty:
+                if call._node_wrapper.isDirty():
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
@@ -130,7 +186,7 @@ class Node(object):
 
             # check args
             for arg in deps[0]:
-                if arg._dirty or arg._subtree_dirty() or arg._always_dirty:
+                if arg.isDirty():
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
@@ -138,15 +194,19 @@ class Node(object):
 
             # check kwargs
             for kwarg in six.itervalues(deps[1]):
-                if kwarg._dirty or kwarg._subtree_dirty() or kwarg._always_dirty:
+                if kwarg.isDirty():
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
                     return True
         return False
 
-    def _recompute(self):
+    def isDirty(self):
         self._dirty = self._dirty or self._subtree_dirty() or self._always_dirty
+        return self._dirty
+
+    def _recompute(self):
+        self.isDirty()
         if self._dirty:
             if self._parents:
                 for parent in self._parents:
@@ -187,8 +247,8 @@ class Node(object):
             for deps in six.itervalues(self._dependencies):
                 # try to set args
                 for arg in deps[0]:
-                    if arg._name == k:
-                        arg._dirty = arg._value != v
+                    if arg._name_no_id() == k:
+                        arg._dirty = (arg._value != v)
                         arg._value = v
                         _set = True
                         break
@@ -198,8 +258,8 @@ class Node(object):
 
                 # try to set kwargs
                 for kwarg in six.itervalues(deps[1]):
-                    if kwarg._name == k:
-                        kwarg._dirty = kwarg._value != v
+                    if kwarg._name_no_id() == k:
+                        kwarg._dirty = (kwarg._value != v)
                         kwarg._value = v
                         _set = True
                         break
