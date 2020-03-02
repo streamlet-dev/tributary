@@ -62,6 +62,7 @@ class TestAPI:
         assert hasattr(tl.LazyNode, 'graph')
         # assert hasattr(tl.LazyNode, 'pprint')
         assert hasattr(tl.LazyNode, 'graphviz')
+        assert hasattr(tl.LazyNode, 'dagre')
         assert hasattr(tl.LazyNode, 'print')
 
     def test_api_lazy_specific(self):

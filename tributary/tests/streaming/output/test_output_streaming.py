@@ -21,3 +21,15 @@ class TestOutput:
             yield 5
 
         assert ts.run(ts.Print(ts.Timer(foo, count=2))) == [1, 2]
+
+    def test_graphviz(self):
+        def foo():
+            yield 1
+
+        assert ts.GraphViz(ts.Print(ts.Timer(foo, count=2)))
+
+    def test_dagre(self):
+        def foo():
+            yield 1
+
+        assert ts.Dagre(ts.Print(ts.Timer(foo, count=2)))

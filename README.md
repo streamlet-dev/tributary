@@ -115,8 +115,14 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 # Graph Visualization
 You can visualize the graph with Graphviz. All streaming and lazy nodes support a `graphviz` method.
 
-Streaming nodes also support [ipydagred3](https://github.com/timkpaine/ipydagred3) for live update monitoring.
+Streaming and lazy nodes also support [ipydagred3](https://github.com/timkpaine/ipydagred3) for live update monitoring.
 
+## Streaming
 ![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/streaming/dagred3.gif)
 
 Here green indicates executing, yellow indicates stalled for backpressure, and red indicates that `StreamEnd` has been propogated (e.g. stream has ended).
+
+## Lazy
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/streaming/dagred3.gif)
+
+Here green indicates executing, and red indicates that the node is dirty. Note the the determination if a node is dirty is also done lazily (we can check with `isDirty` whcih will update the node's graph state.
