@@ -47,6 +47,9 @@ class Node(object):
         if isinstance(value, Node):
             raise Exception('Cannot set value to be itself a node')
 
+        # if using dagre-d3, this will be set
+        self._dd3g = None
+
         # starting value
         self._value = value
 
@@ -81,9 +84,6 @@ class Node(object):
         else:
             self._dependencies = {}
 
-        # if using dagre-d3, this will be set
-        self._dd3g = None
-
         # if derived node, default to dirty to start
         if derived:
             self._dirty = True
@@ -117,19 +117,19 @@ class Node(object):
 
     def _greendd3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #0f0')
+            self._dd3g.setNode(self._name, tooltip=str(self.value()), style='fill: #0f0')
 
     def _yellowdd3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #ff0')
+            self._dd3g.setNode(self._name, tooltip=str(self.value()), style='fill: #ff0')
 
     def _reddd3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #f00')
+            self._dd3g.setNode(self._name, tooltip=str(self.value()), style='fill: #f00')
 
     def _whited3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #fff')
+            self._dd3g.setNode(self._name, tooltip=str(self.value()), style='fill: #fff')
 
     def _compute_from_dependencies(self):
         if self._dependencies:
@@ -162,15 +162,16 @@ class Node(object):
                 k._node_wrapper = new_value
                 new_value = new_value()  # get value
 
-            if new_value != self._value:
-                if self._trace:
-                    print('recomputing: %s#%d' % (self._name, id(self)))
-                self._whited3g()
-
             if isinstance(new_value, Node):
                 raise Exception('Value should not itself be a node!')
 
+            if self._trace:
+                if new_value != self._value:
+                    print('recomputing: %s#%d' % (self._name, id(self)))
+
             self._value = new_value
+
+        self._whited3g()
         return self._value
 
     def _subtree_dirty(self):
@@ -238,6 +239,7 @@ class Node(object):
 
     def setValue(self, value):
         if value != self._value:
+            self._value = value  # leave for dagre
             self._dirty = True
         self._value = value
 

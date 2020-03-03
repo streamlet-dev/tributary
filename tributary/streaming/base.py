@@ -111,22 +111,22 @@ class Node(object):
 
     async def _startdd3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #0f0')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #0f0')
             await asyncio.sleep(0.1)
 
     async def _waitdd3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #ff0')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #ff0')
             await asyncio.sleep(0.1)
 
     async def _finishdd3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #f00')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #f00')
             await asyncio.sleep(0.1)
 
     async def _enddd3g(self):
         if self._dd3g:
-            self._dd3g.setNode(self._name, style='fill: #fff')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #fff')
             await asyncio.sleep(0.1)
 
     async def _push(self, inp, index):
