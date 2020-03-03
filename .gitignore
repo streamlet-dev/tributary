@@ -171,6 +171,9 @@ tmp.py
 tmp2.py
 docs/api/
 tributary/tests/streaming/output/test_file_data.csv
+examples/tributary
+examples/ipydagred3
+ipydagred3
 python_junit.xml
 tmps
 docs/index.md

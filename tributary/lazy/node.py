@@ -19,6 +19,7 @@ class Node(object):
                  callable_is_method=False,
                  always_dirty=False,
                  trace=False,
+                 **kwargs
                  ):
         '''Construct a new lazy node, wrapping a callable or a value
 
@@ -46,6 +47,11 @@ class Node(object):
 
         if isinstance(value, Node):
             raise Exception('Cannot set value to be itself a node')
+
+        # Graphviz shape
+        self._graphvizshape = kwargs.get('graphvizshape', 'box')  # default is box instead of ellipse
+        # because all lazy nodes are i/o nodes
+        # by default
 
         # if using dagre-d3, this will be set
         self._dd3g = None
@@ -216,14 +222,15 @@ class Node(object):
             self._value = self._compute_from_dependencies()
         self._dirty = False
 
-    def _gennode(self, name, foo, foo_args, trace=False):
+    def _gennode(self, name, foo, foo_args, trace=False, **kwargs):
         if name not in self._node_op_cache:
             self._node_op_cache[name] = \
                 Node(name=name,
                      derived=True,
                      callable=foo,
                      callable_args=foo_args,
-                     trace=trace)
+                     trace=trace,
+                     **kwargs)
         return self._node_op_cache[name]
 
     def _tonode(self, other, trace=False):

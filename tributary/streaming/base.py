@@ -56,8 +56,11 @@ class Node(object):
         self._id = Node._id_ref
         Node._id_ref += 1
 
-        # Graphviz
-        self._graphvizshape = kwargs.get('graphvizshape', '')
+        # Graphviz shape
+        self._graphvizshape = kwargs.get('graphvizshape', 'ellipse')
+
+        # dagred3 node if live updating
+        self._dd3g = None
 
         # Every node gets a name so it can be uniquely identified in the graph
         self._name = '{}#{}'.format(name or self.__class__.__name__, self._id)
@@ -102,9 +105,6 @@ class Node(object):
 
         # stream is in a finished state, will only propogate StreamEnd instances
         self._finished = False
-
-        # dagred3 node if live updating
-        self._dd3g = None
 
     def __repr__(self):
         return '{}'.format(self._name)

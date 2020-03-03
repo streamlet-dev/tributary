@@ -1,7 +1,9 @@
 import math
 import numpy as np
-
 from ..base import Node
+
+
+_INPUT_GRAPHVIZSHAPE = "box"
 
 
 def _gen():
@@ -32,7 +34,8 @@ class Timer(Node):
                          name='Timer[{}]'.format(foo.__name__),
                          inputs=0,
                          execution_max=count,
-                         delay_interval=interval)
+                         delay_interval=interval,
+                         graphvizshape=_INPUT_GRAPHVIZSHAPE)
 
 
 class Const(Timer):

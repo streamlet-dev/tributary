@@ -1,5 +1,6 @@
 import requests
 import json as JSON
+from .output import _OUTPUT_GRAPHVIZSHAPE
 from ..base import Node
 from ...base import StreamEnd
 
@@ -43,7 +44,7 @@ def HTTP(node, url='', json=False, wrap=False, field=None, proxies=None, cookies
 
         return msg
 
-    ret = Node(foo=_send, name='Http', inputs=1)
+    ret = Node(foo=_send, name='Http', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node._downstream.append((ret, 0))
     ret._upstream.append(node)
     return ret

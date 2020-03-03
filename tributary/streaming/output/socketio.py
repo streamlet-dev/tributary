@@ -1,6 +1,7 @@
 import json as JSON
 from socketIO_client_nexus import SocketIO as SIO
 from urllib.parse import urlparse
+from .output import _OUTPUT_GRAPHVIZSHAPE
 from ..base import Node
 
 
@@ -37,7 +38,7 @@ def SocketIO(node, url, channel='', field='', sendinit=None, json=False, wrap=Fa
         socketIO.wait(seconds=interval)
         return data
 
-    ret = Node(foo=_sio, name='SocketIO', inputs=1)
+    ret = Node(foo=_sio, name='SocketIO', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node._downstream.append((ret, 0))
     ret._upstream.append(node)
     return ret

@@ -1,13 +1,15 @@
 from IPython.display import display
 from ..base import Node
 
+_OUTPUT_GRAPHVIZSHAPE = "box"
+
 
 def Print(node, text=''):
     def foo(val):
         print(text + str(val))
         return val
 
-    ret = Node(foo=foo, foo_kwargs=None, name='Print', inputs=1)
+    ret = Node(foo=foo, foo_kwargs=None, name='Print', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
 
     node._downstream.append((ret, 0))
     ret._upstream.append(node)
@@ -50,7 +52,7 @@ def GraphViz(node):
                     dot.edge(k._name, parent._name)
 
     for k in d:
-        dot.node(k._name)
+        dot.node(k._name, shape=k._graphvizshape)
         rec(d[k], k)
 
     return dot
@@ -65,18 +67,18 @@ def Dagre(node):
         for d in nodes:
             if not isinstance(d, dict):
                 d._dd3g = G
-                G.setNode(d._name)
+                G.setNode(d._name, shape="rect" if d._graphvizshape == "box" else d._graphvizshape)
                 G.setEdge(d._name, parent)
             else:
                 for k in d:
                     k._dd3g = G
-                    G.setNode(k._name)
+                    G.setNode(k._name, shape="rect" if k._graphvizshape == "box" else k._graphvizshape)
                     G.setEdge(k._name, parent._name)
                     rec(d[k], k)
 
     for k in d:
         k._dd3g = G
-        G.setNode(k._name)
+        G.setNode(k._name, shape="rect" if k._graphvizshape == "box" else k._graphvizshape)
         rec(d[k], k)
 
     graph = dd3.DagreD3Widget(graph=G)
@@ -92,7 +94,7 @@ def Perspective(node, text='', **psp_kwargs):
         p.update(val)
         return val
 
-    ret = Node(foo=foo, foo_kwargs=None, name='Perspective', inputs=1)
+    ret = Node(foo=foo, foo_kwargs=None, name='Perspective', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
 
     display(p)
     node._downstream.append((ret, 0))

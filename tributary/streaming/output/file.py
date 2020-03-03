@@ -1,5 +1,6 @@
 import aiofiles
 import json as JSON
+from .output import _OUTPUT_GRAPHVIZSHAPE
 from ..base import Node
 
 
@@ -20,7 +21,7 @@ def File(node, filename='', json=True):
                 fp.write(data)
         return data
 
-    ret = Node(foo=_file, name='File', inputs=1)
+    ret = Node(foo=_file, name='File', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node._downstream.append((ret, 0))
     ret._upstream.append(node)
     return ret
