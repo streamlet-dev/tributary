@@ -15,6 +15,7 @@ lint: ## run linter
 
 fix:  ## run autopep8/tslint fix
 	autopep8 --in-place -r -a -a tributary/
+	make lint
 
 annotate: ## MyPy type annotation check
 	mypy -s tributary  

@@ -66,13 +66,23 @@ class Node(object):
         self._trace = trace
 
         # callable and args
-        self._callable = callable if not inspect.isgeneratorfunction(callable) else lambda gen=callable(*(callable_args or []), **(callable_kwargs or {})): next(gen)
+        if not inspect.isgeneratorfunction(callable):
+            self._callable = callable
+        else:
+            def _callable(gen=callable(*(callable_args or []), **(callable_kwargs or {}))):
+                try:
+                    return next(gen)
+                except StopIteration:
+                    self._always_dirty = False
+                    self._dirty = False
+                    return self._value
+            self._callable = _callable
         self._callable_args = self._transform_args(callable_args or [])
         self._callable_kwargs = self._transform_kwargs(callable_kwargs or {})
         self._callable_is_method = callable_is_method
 
         # if always dirty, always reevaluate
-        self._always_dirty = always_dirty
+        self._always_dirty = always_dirty or not(self._callable is None)
 
         # parent nodes in graph
         self._parents = []
