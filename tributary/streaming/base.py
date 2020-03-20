@@ -1,6 +1,8 @@
 import asyncio
 import types
 from asyncio import Queue, QueueEmpty as Empty
+from ..lazy.node import Node as LazyNode
+from ..utils import LazyToStreaming
 from ..base import StreamEnd, StreamNone, StreamRepeat
 
 
@@ -26,6 +28,8 @@ def _gen_node(n):
     from .input import Const, Foo
     if isinstance(n, Node):
         return n
+    elif isinstance(n, LazyNode):
+        return LazyToStreaming(n)
     elif callable(n):
         return Foo(n, name="Callable")
     return Const(n)

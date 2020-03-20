@@ -55,6 +55,7 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - SocketIO
 
 # Transforms
+## Modulate
 - Delay - Streaming wrapper to delay a stream
 - Apply - Streaming wrapper to apply a function to an input stream
 - Window - Streaming wrapper to collect a window of values
@@ -65,7 +66,8 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - DictMerge - Streaming wrapper to merge 2 input dicts into a single output dict. Preference is given to the second input (e.g. if keys overlap)
 - Reduce - Streaming wrapper to merge any number of inputs
 
-# Calculations
+## Calculations
+### Arithmetic Operators
 - Noop
 - Negate
 - Invert
@@ -78,15 +80,21 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - Pow
 - Sum
 - Average
+
+### Boolean Operators
 - Not
 - And
 - Or
+
+### Comparators
 - Equal
 - NotEqual
 - Less
 - LessOrEqual
 - Greater
 - GreaterOrEqual
+
+### Math
 - Log
 - Sin
 - Cos
@@ -98,18 +106,25 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 - Abs
 - Exp
 - Erf
+
+## Converters
 - Int
 - Float
 - Bool
 - Str
+
+## Python Builtins
 - Len
 
-# Rolling
+## Rolling
 - RollingCount - Node to count inputs
 - RollingMin - Node to take rolling min of inputs
 - RollingMax - Node to take rolling max of inputs
 - RollingSum - Node to take rolling sum inputs
 - RollingAverage - Node to take the running average
+
+## Node Type Converters
+- Lazy->Streaming
 
 
 # Graph Visualization

@@ -1,5 +1,5 @@
 from IPython.display import display
-from ..base import Node
+from ..base import Node, _gen_node
 
 _OUTPUT_GRAPHVIZSHAPE = "box"
 
@@ -9,6 +9,7 @@ def Print(node, text=''):
         print(text + str(val))
         return val
 
+    node = _gen_node(node)
     ret = Node(foo=foo, foo_kwargs=None, name='Print', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
 
     node._downstream.append((ret, 0))
@@ -94,6 +95,7 @@ def Perspective(node, text='', **psp_kwargs):
         p.update(val)
         return val
 
+    node = _gen_node(node)
     ret = Node(foo=foo, foo_kwargs=None, name='Perspective', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
 
     display(p)
