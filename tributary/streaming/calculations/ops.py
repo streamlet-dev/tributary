@@ -136,6 +136,15 @@ Sqrt = unary(lambda x: math.sqrt(x), name='Sqrt')
 Abs = unary(lambda x: abs(x), name='Abs')
 Exp = unary(lambda x: math.exp(x), name='Exp')
 Erf = unary(lambda x: math.erf(x), name='Erf')
+Floor = unary(lambda x: math.floor(x), name='Floor')
+Ceil = unary(lambda x: math.ceil(x), name='Ceil')
+
+
+def Round(self, ndigits=0):
+    downstream = Node(lambda x: round(x, ndigits=ndigits), {}, name="Round", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    self._downstream.append((downstream, 0))
+    downstream._upstream.append(self)
+    return downstream
 
 
 ##############
@@ -257,3 +266,6 @@ Node.abs = Abs
 Node.sqrt = Sqrt
 Node.exp = Exp
 Node.erf = Erf
+Node.floor = Floor
+Node.ceil = Ceil
+Node.round = Round

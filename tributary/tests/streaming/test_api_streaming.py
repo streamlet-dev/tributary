@@ -47,6 +47,9 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'sqrt')
         assert hasattr(ts.StreamingNode, 'exp')
         assert hasattr(ts.StreamingNode, 'erf')
+        assert hasattr(ts.StreamingNode, 'round')
+        assert hasattr(ts.StreamingNode, 'floor')
+        assert hasattr(ts.StreamingNode, 'ceil')
 
         assert hasattr(ts.StreamingNode, 'delay')
         # assert hasattr(ts.StreamingNode, 'state')
