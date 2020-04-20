@@ -10,6 +10,14 @@ def foo():
     yield 5
 
 
+def foofloat():
+    yield 1.11
+    yield 2.22
+    yield 3.33
+    yield 4.44
+    yield 5.55
+
+
 def foo2():
     yield 1
     yield 4
@@ -201,6 +209,21 @@ class TestOps:
         t = ts.Timer(foo, count=2)
         out = ts.Erf(t)
         assert ts.run(out) == [math.erf(1), math.erf(2)]
+
+    def test_Floor(self):
+        t = ts.Timer(foofloat, count=2)
+        out = ts.Floor(t)
+        assert ts.run(out) == [1., 2.]
+
+    def test_Ceil(self):
+        t = ts.Timer(foofloat, count=2)
+        out = ts.Ceil(t)
+        assert ts.run(out) == [2., 3.]
+
+    def test_Round(self):
+        t = ts.Timer(foofloat, count=2)
+        out = ts.Round(t, 1)
+        assert ts.run(out) == [1.1, 2.2]
 
     def test_Int(self):
         t = ts.Timer(foo, count=2)

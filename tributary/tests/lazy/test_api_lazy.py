@@ -47,6 +47,9 @@ class TestAPI:
         assert hasattr(tl.LazyNode, 'sqrt')
         assert hasattr(tl.LazyNode, 'exp')
         assert hasattr(tl.LazyNode, 'erf')
+        assert hasattr(tl.LazyNode, 'round')
+        assert hasattr(tl.LazyNode, 'floor')
+        assert hasattr(tl.LazyNode, 'ceil')
 
         # assert hasattr(tl.LazyNode, 'delay')
         # assert hasattr(tl.LazyNode, 'state')

@@ -157,6 +157,18 @@ def Erf(self):
     return unary(self, 'erf(' + str(self._name_no_id()) + ')', (lambda x: math.erf(self.value())))
 
 
+def Floor(self):
+    return unary(self, 'floor(' + str(self._name_no_id()) + ')', (lambda x: math.floor(self.value())))
+
+
+def Ceil(self):
+    return unary(self, 'ceil(' + str(self._name_no_id()) + ')', (lambda x: math.ceil(self.value())))
+
+
+def Round(self, ndigits=0):
+    return unary(self, 'round(' + str(self._name_no_id()) + ')', (lambda x: round(self.value(), ndigits=ndigits)))
+
+
 ##############
 # Converters #
 ##############
@@ -377,3 +389,6 @@ Node.abs = Abs
 Node.sqrt = Sqrt
 Node.exp = Exp
 Node.erf = Erf
+Node.floor = Floor
+Node.ceil = Ceil
+Node.round = Round

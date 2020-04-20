@@ -156,6 +156,21 @@ class TestOps:
         out = tl.Erf(t)
         assert out() == math.erf(2)
 
+    def test_Floor(self):
+        t = tl.Node(value=2.2)
+        out = tl.Floor(t)
+        assert out() == 2.
+
+    def test_Ceil(self):
+        t = tl.Node(value=2.2)
+        out = tl.Ceil(t)
+        assert out() == 3.
+
+    def test_Round(self):
+        t = tl.Node(value=2.222222)
+        out = tl.Round(t, ndigits=2)
+        assert out() == 2.22
+
     def test_Int(self):
         t = tl.Node(value=2.0)
         out = tl.Int(t)

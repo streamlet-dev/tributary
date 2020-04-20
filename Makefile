@@ -11,17 +11,17 @@ notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
 
 lint: ## run linter
-	flake8 tributary 
+	python3.7 -m flake8 tributary 
 
 fix:  ## run autopep8/tslint fix
-	autopep8 --in-place -r -a -a tributary/
+	python3.7 -m autopep8 --in-place -r -a -a tributary/
 	make lint
 
 annotate: ## MyPy type annotation check
-	mypy -s tributary  
+	python3.7 -m mypy -s tributary  
 
 annotate_l: ## MyPy type annotation check - count only
-	mypy -s tributary | wc -l 
+	python3.7 -m mypy -s tributary | wc -l 
 
 clean: ## clean the repository
 	find . -name "__pycache__" | xargs  rm -rf 
