@@ -4,7 +4,6 @@ Python Data Streams
 [![Build Status](https://dev.azure.com/tpaine154/tributary/_apis/build/status/timkpaine.tributary?branchName=master)](https://dev.azure.com/tpaine154/tributary/_build/latest?definitionId=2&branchName=master)
 [![GitHub issues](https://img.shields.io/github/issues/timkpaine/tributary.svg)](https://github.com/timkpaine/tributary/issues)
 [![Coverage](https://img.shields.io/azure-devops/coverage/tpaine154/tributary/2/master)](https://dev.azure.com/tpaine154/tributary/_build?definitionId=2&_a=summary)
-[![BCH compliance](https://bettercodehub.com/edge/badge/timkpaine/tributary?branch=master)](https://bettercodehub.com/)
 [![PyPI](https://img.shields.io/pypi/l/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
@@ -31,11 +30,26 @@ These are synchronous, reactive data streams, built using asynchronous python ge
 These are functional streams, built by currying python functions (callbacks). 
 
 ## Lazy
-These are lazily-evaluated python streams, where outputs are propogated only as inputs change.
+These are lazily-evaluated python streams, where outputs are propogated only as inputs change. They are implemented as directed acyclic graphs.
 
 # Examples
-- [Streaming](docs/examples/streaming/streaming.md)
-- [Lazy](docs/examples/lazy/lazy.md)
+- [Streaming](docs/examples/streaming/streaming.md): In this example, we construct a variety of forward propogating reactive graphs.
+- [Lazy](docs/examples/lazy/lazy.md): In this example, we construct a variety of lazily-evaluated directed acyclic computation graphs. 
+
+# Graph Visualization
+You can visualize the graph with Graphviz. All streaming and lazy nodes support a `graphviz` method.
+
+Streaming and lazy nodes also support [ipydagred3](https://github.com/timkpaine/ipydagred3) for live update monitoring.
+
+## Streaming
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/streaming/dagred3.gif)
+
+Here green indicates executing, yellow indicates stalled for backpressure, and red indicates that `StreamEnd` has been propogated (e.g. stream has ended).
+
+## Lazy
+![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/dagred3.gif)
+
+Here green indicates executing, and red indicates that the node is dirty. Note the the determination if a node is dirty is also done lazily (we can check with `isDirty` whcih will update the node's graph state.
 
 # Sources and Sinks
 ## Sources
@@ -125,19 +139,3 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 
 ## Node Type Converters
 - Lazy->Streaming
-
-
-# Graph Visualization
-You can visualize the graph with Graphviz. All streaming and lazy nodes support a `graphviz` method.
-
-Streaming and lazy nodes also support [ipydagred3](https://github.com/timkpaine/ipydagred3) for live update monitoring.
-
-## Streaming
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/streaming/dagred3.gif)
-
-Here green indicates executing, yellow indicates stalled for backpressure, and red indicates that `StreamEnd` has been propogated (e.g. stream has ended).
-
-## Lazy
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/dagred3.gif)
-
-Here green indicates executing, and red indicates that the node is dirty. Note the the determination if a node is dirty is also done lazily (we can check with `isDirty` whcih will update the node's graph state.
