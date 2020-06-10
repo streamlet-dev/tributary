@@ -33,8 +33,8 @@ These are functional streams, built by currying python functions (callbacks).
 These are lazily-evaluated python streams, where outputs are propogated only as inputs change. They are implemented as directed acyclic graphs.
 
 # Examples
-- [Streaming](docs/examples/streaming/streaming.md)
-- [Lazy](docs/examples/lazy/lazy.md)
+- [Streaming](docs/examples/streaming/streaming.md): In this example, we construct a variety of forward propogating reactive graphs.
+- [Lazy](docs/examples/lazy/lazy.md): In this example, we construct a variety of lazily-evaluated directed acyclic computation graphs. 
 
 # Graph Visualization
 You can visualize the graph with Graphviz. All streaming and lazy nodes support a `graphviz` method.
