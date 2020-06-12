@@ -31,4 +31,4 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
     return ret
 
 
-Node.If = If
+Node.if_ = If

@@ -6,13 +6,13 @@ from ..base import Node
 
 
 def unary(node, name, lam):
-    return node._gennode(name, lam, [node], node._trace, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    return node._gennode(name, lam, [node], graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
 
 
 def binary(node1, other, name, lam):
     if isinstance(node1._self_reference, Node):
-        return node1._gennode(name, lam, [node1._self_reference, other], node1._trace or other._trace, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    return node1._gennode(name, lam, [node1, other], node1._trace or other._trace, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+        return node1._gennode(name, lam, [node1._self_reference, other], graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    return node1._gennode(name, lam, [node1, other], graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
 
 
 def n_nary(node, others, name, lam):
@@ -20,12 +20,10 @@ def n_nary(node, others, name, lam):
         return node._gennode(name,
                              lam,
                              [node._self_reference] + others,
-                             node._trace or any(other._trace for other in others),
                              graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
     return node._gennode(name,
                          lam,
                          [node] + others,
-                         node._trace or any(other._trace for other in others),
                          graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
 
 ########################

@@ -18,7 +18,6 @@ class Node(object):
                  callable_kwargs=None,
                  callable_is_method=False,
                  always_dirty=False,
-                 trace=False,
                  **kwargs
                  ):
         '''Construct a new lazy node, wrapping a callable or a value
@@ -34,7 +33,6 @@ class Node(object):
             callable_kwargs (dict): kwargs for the wrapped callable
             callable_is_method (bool): is the callable a method of an object
             always_dirty (bool): node should not be lazy - always access underlying value
-            trace (bool): trace when the node is called
         '''
         # Instances get an id but one id tracker for all nodes so we can
         # uniquely identify them
@@ -62,19 +60,19 @@ class Node(object):
         # can be set
         self._readonly = readonly
 
-        # trace calls/executions
-        self._trace = trace
-
         # callable and args
         if not inspect.isgeneratorfunction(callable):
             self._callable = callable
         else:
             def _callable(gen=callable(*(callable_args or []), **(callable_kwargs or {}))):
                 try:
-                    return next(gen)
+                    ret = next(gen)
+                    print("returning ret", ret)
+                    return ret
                 except StopIteration:
                     self._always_dirty = False
                     self._dirty = False
+                    print("returning ret", self._value)
                     return self._value
             self._callable = _callable
         self._callable_args = self._transform_args(callable_args or [])
@@ -181,10 +179,6 @@ class Node(object):
             if isinstance(new_value, Node):
                 raise Exception('Value should not itself be a node!')
 
-            if self._trace:
-                if new_value != self._value:
-                    print('recomputing: %s#%d' % (self._name, id(self)))
-
             self._value = new_value
 
         self._whited3g()
@@ -232,26 +226,24 @@ class Node(object):
             self._value = self._compute_from_dependencies()
         self._dirty = False
 
-    def _gennode(self, name, foo, foo_args, trace=False, **kwargs):
+    def _gennode(self, name, foo, foo_args, **kwargs):
         if name not in self._node_op_cache:
             self._node_op_cache[name] = \
                 Node(name=name,
                      derived=True,
                      callable=foo,
                      callable_args=foo_args,
-                     trace=trace,
                      **kwargs)
         return self._node_op_cache[name]
 
-    def _tonode(self, other, trace=False):
+    def _tonode(self, other):
         if isinstance(other, Node):
             return other
         if str(other) not in self._node_op_cache:
             self._node_op_cache[str(other)] = \
                 Node(name='var(' + str(other)[:5] + ')',
                      derived=True,
-                     value=other,
-                     trace=trace)
+                     value=other)
         return self._node_op_cache[str(other)]
 
     def setValue(self, value):
@@ -295,7 +287,7 @@ class Node(object):
 
 
 @_either_type
-def node(meth, memoize=True, trace=False):
+def node(meth, memoize=True):
     argspec = inspect.getfullargspec(meth)
     # args = argspec.args
     # varargs = argspec.varargs
@@ -331,16 +323,14 @@ def node(meth, memoize=True, trace=False):
                               derived=True,
                               readonly=False,
                               nullable=nullable,
-                              value=value,
-                              trace=trace))
+                              value=value))
 
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
         node_kwargs[k] = Node(name=k,
                               derived=True,
                               readonly=False,
                               nullable=True,
-                              value=v,
-                              trace=trace)
+                              value=v)
 
     def meth_wrapper(self, *args, **kwargs):
         if len(args) > len(node_args):
@@ -361,8 +351,7 @@ def node(meth, memoize=True, trace=False):
                     callable_args=node_args,
                     callable_kwargs=node_kwargs,
                     callable_is_method=is_method,
-                    always_dirty=not memoize,
-                    trace=trace)
+                    always_dirty=not memoize)
 
     if is_method:
         ret = lambda self, *args, **kwargs: new_node._with_self(self)  # noqa: E731
