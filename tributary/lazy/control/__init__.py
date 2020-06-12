@@ -16,9 +16,10 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
         raise Exception('Else ifs must be in pairs')
 
     def foo():
+        # TODO else ifs
         if if_node():
             return satisfied_node()
-        return unsatisfied_node() if unsatisfied_node else None
+        return unsatisfied_node() if unsatisfied_node is not None else None
 
     if isinstance(if_node._self_reference, Node):
         return if_node._gennode("If",

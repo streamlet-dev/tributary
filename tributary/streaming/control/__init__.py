@@ -16,6 +16,7 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
         raise Exception('Else ifs must be in pairs')
 
     def foo(conditional, if_val, else_val):
+        # TODO else ifs
         if conditional:
             return if_val
         return else_val
