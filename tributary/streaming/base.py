@@ -5,6 +5,9 @@ from ..lazy.node import Node as LazyNode
 from ..utils import LazyToStreaming
 from ..base import StreamEnd, StreamNone, StreamRepeat
 
+_DD3_TRANSITION_DELAY = 0.1  # used so you can visually see the
+# transition e.g. not too fast
+
 
 def anext(obj):
     return obj.__anext__()
@@ -114,24 +117,28 @@ class Node(object):
         return '{}'.format(self._name)
 
     async def _startdd3g(self):
-        if self._dd3g:
+        '''represent start of calculation with a dd3 node'''
+        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
             self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #0f0')
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     async def _waitdd3g(self):
-        if self._dd3g:
+        '''represent a node waiting for its input to tick'''
+        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
             self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #ff0')
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     async def _finishdd3g(self):
-        if self._dd3g:
+        '''represent a node that has finished its calculation'''
+        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
             self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #f00')
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     async def _enddd3g(self):
-        if self._dd3g:
+        '''represent a node that has finished all calculations'''
+        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
             self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #fff')
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     async def _push(self, inp, index):
         '''push value to downstream nodes'''
@@ -139,20 +146,30 @@ class Node(object):
 
     async def _execute(self):
         '''execute callable'''
+        # assume no valid input
         valid = False
+
+        # wait for valid input
         while not valid:
+            # await if its a coroutine
             if asyncio.iscoroutine(self._foo):
                 _last = await self._foo(*self._active, **self._foo_kwargs)
+            # else call it
             elif isinstance(self._foo, types.FunctionType):
                 try:
+                    # could be a generator
                     _last = self._foo(*self._active, **self._foo_kwargs)
                 except ValueError:
-                    # Swap back to function
+                    # Swap back to function to get a new generator next iteration
                     self._foo = self._old_foo
                     continue
             else:
                 raise Exception('Cannot use type:{}'.format(type(self._foo)))
+
+            # calculation was valid
             valid = True
+
+            # increment execution count
             self._execution_count += 1
 
         if isinstance(_last, types.AsyncGeneratorType):

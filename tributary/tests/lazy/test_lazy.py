@@ -4,37 +4,37 @@ import random
 
 class Foo1(t.LazyGraph):
     def __init__(self, *args, **kwargs):
-        self.x = self.node('x', readonly=False, value=1, trace=True)
+        self.x = self.node('x', readonly=False, value=1)
 
 
 class Foo2(t.LazyGraph):
     def __init__(self, *args, **kwargs):
-        self.y = self.node('y', readonly=False, value=2, trace=True)
+        self.y = self.node('y', readonly=False, value=2)
 
         # ensure no __nodes clobber
-        self.test = self.node('test', readonly=False, value=2, trace=True)
-        self.x = self.node('x', readonly=False, value=2, trace=True)
+        self.test = self.node('test', readonly=False, value=2)
+        self.x = self.node('x', readonly=False, value=2)
 
 
 class Foo3(t.LazyGraph):
-    @t.node(trace=True)
+    @t.node()
     def foo1(self):
         return self.random()  # test self access
 
     def random(self):
         return random.random()
 
-    @t.node(trace=True)
+    @t.node()
     def foo3(self, x=4):
         return 3 + x
 
 
 class Foo4(t.LazyGraph):
-    @t.node(trace=True)
+    @t.node()
     def foo1(self):
         return self.foo2() + 1
 
-    @t.node(trace=True)
+    @t.node()
     def foo2(self):
         return random.random()
 

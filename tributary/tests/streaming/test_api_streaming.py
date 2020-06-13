@@ -67,6 +67,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'graphviz')
         assert hasattr(ts.StreamingNode, 'dagre')
         assert hasattr(ts.StreamingNode, 'print')
+        assert hasattr(ts.StreamingNode, 'if_')
 
     def test_api_streaming_specific(self):
         '''apis specific to streaming nodes'''

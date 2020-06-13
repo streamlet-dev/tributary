@@ -7,7 +7,7 @@ class LazyGraph(object):
     def __init__(self, *args, **kwargs):
         pass
 
-    def node(self, name, readonly=False, nullable=True, value=None, trace=False):  # noqa: F811
+    def node(self, name, readonly=False, nullable=True, value=None):  # noqa: F811
         '''method to create a lazy node attached to a graph.
 
         Args:
@@ -15,7 +15,6 @@ class LazyGraph(object):
             readonly (bool): whether the node should be settable
             nullable (bool): whether node can have value None
             value (any): initial value for node
-            trace (bool): trace the calls for a node
         Returns:
             BaseNode: the newly constructed lazy node
         '''
@@ -28,8 +27,7 @@ class LazyGraph(object):
                              derived=False,
                              readonly=readonly,
                              nullable=nullable,
-                             value=value,
-                             trace=trace)
+                             value=value)
             self.__nodes[name] = value
             setattr(self, name, self.__nodes[name])
         return self.__nodes[name]
