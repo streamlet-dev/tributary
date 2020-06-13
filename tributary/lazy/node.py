@@ -61,10 +61,14 @@ class Node(object):
         self._readonly = readonly
 
         # callable and args
+        self._callable_args = callable_args or []
+        self._callable_kwargs = callable_kwargs or {}
+        self._callable_is_method = callable_is_method
+
         if not inspect.isgeneratorfunction(callable):
             self._callable = callable
         else:
-            def _callable(gen=callable(*(callable_args or []), **(callable_kwargs or {}))):
+            def _callable(gen=callable(*self._callable_args, **self._callable_kwargs)):
                 try:
                     ret = next(gen)
                     print("returning ret", ret)
@@ -75,9 +79,6 @@ class Node(object):
                     print("returning ret", self._value)
                     return self._value
             self._callable = _callable
-        self._callable_args = self._transform_args(callable_args or [])
-        self._callable_kwargs = self._transform_kwargs(callable_kwargs or {})
-        self._callable_is_method = callable_is_method
 
         # if always dirty, always reevaluate
         self._always_dirty = always_dirty or not(self._callable is None)
@@ -118,12 +119,6 @@ class Node(object):
 
     def _name_no_id(self):
         return self._name.rsplit('#', 1)[0]
-
-    def _transform_args(self, args):
-        return args
-
-    def _transform_kwargs(self, kwargs):
-        return kwargs
 
     def _with_self(self, other_self):
         self._self_reference = other_self

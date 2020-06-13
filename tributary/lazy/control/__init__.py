@@ -15,20 +15,20 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
     if len(elseifs) % 2 != 0:
         raise Exception('Else ifs must be in pairs')
 
-    def foo():
+    def foo(cond, if_, else_=None):
         # TODO else ifs
-        if if_node():
-            return satisfied_node()
-        return unsatisfied_node() if unsatisfied_node is not None else None
+        if cond.value():
+            return if_.value()
+        return else_.value() if else_ is not None else None
 
     if isinstance(if_node._self_reference, Node):
         return if_node._gennode("If",
                                 foo,
-                                [],
+                                [if_node, satisfied_node, unsatisfied_node],
                                 graphvizshare=_CONTROL_GRAPHVIZSHAPE)
     return if_node._gennode("If",
                             foo,
-                            [],
+                            [if_node, satisfied_node, unsatisfied_node],
                             graphvizshare=_CONTROL_GRAPHVIZSHAPE)
 
 
