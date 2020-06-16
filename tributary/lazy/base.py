@@ -23,6 +23,15 @@ class LazyGraph(object):
                             replace = replace()
                         node._callable_args[i] = replace
 
+                # modify in place in case used elsewhere
+                for k, arg in node._callable_kwargs.items():
+                    if not isinstance(arg, Node):
+                        replace = getattr(self, arg)
+                        if not isinstance(replace, Node) and (isinstance(replace, types.FunctionType) or isinstance(replace, types.MethodType)):
+                            # call function to get node
+                            replace = replace()
+                        node._callable_kwargs[k] = replace
+
     def node(self, name, readonly=False, nullable=True, value=None):  # noqa: F811
         '''method to create a lazy node attached to a graph.
 

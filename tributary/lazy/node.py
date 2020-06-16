@@ -1,5 +1,6 @@
 import six
 import inspect
+from boltons.funcutils import wraps
 from ..utils import _either_type
 
 
@@ -65,9 +66,19 @@ class Node(object):
         self._callable_kwargs = callable_kwargs or {}
         self._callable_is_method = callable_is_method
 
+        # map positional to kw
+        if callable is not None and not inspect.isgeneratorfunction(callable):
+            args = inspect.getfullargspec(callable).args
+            if 'self' in args:
+                args.remove('self')
+            self._callable_args_mapping = {i: arg for i, arg in enumerate(args)}
+        else:
+            self._callable_args_mapping = {}
+
         if not inspect.isgeneratorfunction(callable):
             self._callable = callable
         else:
+            # FIXME this wont work for attribute inputs
             def _callable(gen=callable(*self._callable_args, **self._callable_kwargs)):
                 try:
                     ret = next(gen)
@@ -125,8 +136,15 @@ class Node(object):
         return self._name.rsplit('#', 1)[0]
 
     def _install_args(self, *args):
-        for i, arg in args:
-            self._callable_args[i].setValue(arg)
+        kwargs = []
+        for i, arg in enumerate(args):
+            if i < len(self._callable_args) and self._callable_args[i]._name_no_id() == self._callable_args_mapping[i]:
+                self._callable_args[i].setValue(arg)
+            else:
+                kwargs.append((self._callable_args_mapping[i], arg))
+
+        for k, v in kwargs:
+            self._callable_kwargs[k].setValue(v)
 
     def _install_kwargs(self, **kwargs):
         for k, v in kwargs.items():
@@ -335,6 +353,9 @@ def node(meth, memoize=True, **default_attrs):
     if argspec.varkw:
         raise Exception('varargs not supported yet!')
 
+    if inspect.isgeneratorfunction(meth) and default_attrs:
+        raise Exception('Not a supported pattern yet!')
+
     node_args = []
     node_kwargs = {}
     is_method = False
@@ -378,14 +399,18 @@ def node(meth, memoize=True, **default_attrs):
 
     # add all attribute args to the argspec
     # see the docstring for more details
-    argspec.args.extend(list(default_attrs.keys()))
+
+    # argspec.args.extend(list(default_attrs.keys()))
     node_kwargs.update(default_attrs)
 
     if (len([arg for arg in argspec.args if arg != 'self']) + len(argspec.kwonlydefaults or {})) != (len(node_args) + len(node_kwargs)):
         raise Exception('Missing args (call or preprocessing error has occurred)')
 
+    @wraps(meth)
     def meth_wrapper(self, *args, **kwargs):
         if is_method:
+            # val = meth(self, *(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args if arg not in default_attrs), **
+            #            {k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items() if k not in default_attrs})
             val = meth(self, *(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args), **
                        {k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items()})
         else:
@@ -402,9 +427,9 @@ def node(meth, memoize=True, **default_attrs):
                     always_dirty=not memoize)
 
     if is_method:
-        ret = lambda self, **kwargs: new_node._with_self(self, **kwargs)  # noqa: E731
+        ret = lambda self, *args, **kwargs: new_node._with_self(self, *args, **kwargs)  # noqa: E731
     else:
-        ret = lambda **kwargs: new_node._without_self(**kwargs)  # noqa: E731
+        ret = lambda *args, **kwargs: new_node._without_self(*args, **kwargs)  # noqa: E731
 
     ret._node_wrapper = new_node
     return ret
