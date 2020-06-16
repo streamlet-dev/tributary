@@ -307,7 +307,7 @@ class Node(object):
 def node(meth, memoize=True, **default_attrs):
     '''Convert a method into a lazy node
 
-    Since `self` is not defined at the point of method creation, you can pass in 
+    Since `self` is not defined at the point of method creation, you can pass in
     extra kwargs which represent attributes of the future `self`. These will be
     converted to node args during instantiation
 
@@ -349,20 +349,19 @@ def node(meth, memoize=True, **default_attrs):
         if (is_method and len(argspec.defaults or []) >= i) or \
            (not is_method and len(argspec.defaults or []) > i):
             default = True
-            value = argspec.defaults[i] if not is_method else argspec.defaults[i-1]  # account for self
+            value = argspec.defaults[i] if not is_method else argspec.defaults[i - 1]  # account for self
             nullable = True
         else:
             default = False
             value = None
             nullable = False
 
-
         if arg not in default_attrs and not default:
             node_args.append(Node(name=arg,
-                                derived=True,
-                                readonly=False,
-                                nullable=nullable,
-                                value=value))
+                                  derived=True,
+                                  readonly=False,
+                                  nullable=nullable,
+                                  value=value))
         elif default:
             node_kwargs[arg] = Node(name=arg,
                                     derived=True,
@@ -387,9 +386,11 @@ def node(meth, memoize=True, **default_attrs):
 
     def meth_wrapper(self, *args, **kwargs):
         if is_method:
-            val = meth(self, *(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args), **{k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items()})
+            val = meth(self, *(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args), **
+                       {k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items()})
         else:
-            val = meth(*(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args), **{k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items()})
+            val = meth(*(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args), **
+                       {k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items()})
         return val
 
     new_node = Node(name=meth.__name__,

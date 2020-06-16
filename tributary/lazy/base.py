@@ -23,8 +23,6 @@ class LazyGraph(object):
                             replace = replace()
                         node._callable_args[i] = replace
 
-
-
     def node(self, name, readonly=False, nullable=True, value=None):  # noqa: F811
         '''method to create a lazy node attached to a graph.
 
