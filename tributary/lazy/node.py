@@ -71,12 +71,10 @@ class Node(object):
             def _callable(gen=callable(*self._callable_args, **self._callable_kwargs)):
                 try:
                     ret = next(gen)
-                    print("returning ret", ret)
                     return ret
                 except StopIteration:
                     self._always_dirty = False
                     self._dirty = False
-                    print("returning ret", self._value)
                     return self._value
             self._callable = _callable
 
@@ -98,12 +96,18 @@ class Node(object):
             self._dependencies = {self._callable: (self._callable_args, self._callable_kwargs)}
         else:
             self._dependencies = {}
+            self._inputs = {}
 
         # if derived node, default to dirty to start
         if derived:
             self._dirty = True
         else:
             self._dirty = False
+
+    def inputs(self, name=''):
+        '''get node inputs, optionally by name'''
+        dat = {n._name_no_id(): n for n in self._callable_args}
+        return dat if not name else dat.get(name)
 
     def _get_dirty(self):
         return self._is_dirty
@@ -120,8 +124,23 @@ class Node(object):
     def _name_no_id(self):
         return self._name.rsplit('#', 1)[0]
 
-    def _with_self(self, other_self):
+    def _install_args(self, *args):
+        for i, arg in args:
+            self._callable_args[i].setValue(arg)
+
+    def _install_kwargs(self, **kwargs):
+        for k, v in kwargs.items():
+            self._callable_kwargs[k].setValue(v)
+
+    def _with_self(self, other_self, *args, **kwargs):
         self._self_reference = other_self
+        self._install_args(*args)
+        self._install_kwargs(**kwargs)
+        return self
+
+    def _without_self(self, *args, **kwargs):
+        self._install_args(*args)
+        self._install_kwargs(**kwargs)
         return self
 
     def _greendd3g(self):
@@ -273,7 +292,10 @@ class Node(object):
     def value(self):
         return self._value
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
+        self._install_args(*args)
+        self._install_kwargs(**kwargs)
+
         self._recompute()
         return self.value()
 
@@ -282,7 +304,23 @@ class Node(object):
 
 
 @_either_type
-def node(meth, memoize=True):
+def node(meth, memoize=True, **default_attrs):
+    '''Convert a method into a lazy node
+
+    Since `self` is not defined at the point of method creation, you can pass in 
+    extra kwargs which represent attributes of the future `self`. These will be
+    converted to node args during instantiation
+
+    The format is:
+        @node(my_existing_attr_as_an_arg="_attribute_name"):
+        def my_method(self):
+            pass
+
+    this will be converted into a graph of the form:
+        self._attribute_name -> my_method
+    e.g. as if self._attribute_name was passed as an argument to my_method, and converted to a node in the usual manner
+    '''
+
     argspec = inspect.getfullargspec(meth)
     # args = argspec.args
     # varargs = argspec.varargs
@@ -293,6 +331,7 @@ def node(meth, memoize=True):
 
     if argspec.varargs:
         raise Exception('varargs not supported yet!')
+
     if argspec.varkw:
         raise Exception('varargs not supported yet!')
 
@@ -300,6 +339,7 @@ def node(meth, memoize=True):
     node_kwargs = {}
     is_method = False
 
+    # iterate through method's args and convert them to nodes
     for i, arg in enumerate(argspec.args):
         if arg == 'self':
             # TODO
@@ -308,17 +348,27 @@ def node(meth, memoize=True):
 
         if (is_method and len(argspec.defaults or []) >= i) or \
            (not is_method and len(argspec.defaults or []) > i):
-            value = argspec.defaults[0]
+            default = True
+            value = argspec.defaults[i] if not is_method else argspec.defaults[i-1]  # account for self
             nullable = True
         else:
+            default = False
             value = None
             nullable = False
 
-        node_args.append(Node(name=arg,
-                              derived=True,
-                              readonly=False,
-                              nullable=nullable,
-                              value=value))
+
+        if arg not in default_attrs and not default:
+            node_args.append(Node(name=arg,
+                                derived=True,
+                                readonly=False,
+                                nullable=nullable,
+                                value=value))
+        elif default:
+            node_kwargs[arg] = Node(name=arg,
+                                    derived=True,
+                                    readonly=False,
+                                    nullable=nullable,
+                                    value=value)
 
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
         node_kwargs[k] = Node(name=k,
@@ -327,17 +377,19 @@ def node(meth, memoize=True):
                               nullable=True,
                               value=v)
 
+    # add all attribute args to the argspec
+    # see the docstring for more details
+    argspec.args.extend(list(default_attrs.keys()))
+    node_kwargs.update(default_attrs)
+
+    if (len([arg for arg in argspec.args if arg != 'self']) + len(argspec.kwonlydefaults or {})) != (len(node_args) + len(node_kwargs)):
+        raise Exception('Missing args (call or preprocessing error has occurred)')
+
     def meth_wrapper(self, *args, **kwargs):
-        if len(args) > len(node_args):
-            raise Exception('Missing args (call or preprocessing error has occurred)')
-
-        if len(kwargs) > len(node_kwargs):
-            raise Exception('Missing kwargs (call or preprocessing error has occurred)')
-
         if is_method:
-            val = meth(self, *(arg.value() for arg in args), **kwargs)
+            val = meth(self, *(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args), **{k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items()})
         else:
-            val = meth(*(arg.value() for arg in args), **kwargs)
+            val = meth(*(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args), **{k: v.value() if isinstance(v, Node) else getattr(self, v).value() for k, v in kwargs.items()})
         return val
 
     new_node = Node(name=meth.__name__,
@@ -349,9 +401,9 @@ def node(meth, memoize=True):
                     always_dirty=not memoize)
 
     if is_method:
-        ret = lambda self, *args, **kwargs: new_node._with_self(self)  # noqa: E731
+        ret = lambda self, **kwargs: new_node._with_self(self, **kwargs)  # noqa: E731
     else:
-        ret = lambda *args, **kwargs: new_node  # noqa: E731
+        ret = lambda **kwargs: new_node._without_self(**kwargs)  # noqa: E731
 
     ret._node_wrapper = new_node
     return ret
