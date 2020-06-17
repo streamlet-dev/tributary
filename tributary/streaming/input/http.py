@@ -1,6 +1,6 @@
 import aiohttp
+import asyncio
 import json as JSON
-import time
 from .input import Foo
 
 
@@ -41,7 +41,8 @@ class HTTP(Foo):
                         yield msg
 
                         if interval:
-                            time.sleep(interval)
+                            await asyncio.sleep(interval)
+
                         if repeat >= 0:
                             count += 1
 

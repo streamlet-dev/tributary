@@ -20,8 +20,7 @@ def Kafka(node, servers='', topic='', json=False, wrap=False):
 
     p = Producer({'bootstrap.servers': servers})
 
-    async def _send(data, producer=p, topic=topic, json=json, wrap=wrap):
-        ret = []
+    def _send(data, producer=p, topic=topic, json=json, wrap=wrap):
         # Trigger any available delivery report callbacks from previous produce() calls
         producer.poll(0)
 
@@ -31,11 +30,8 @@ def Kafka(node, servers='', topic='', json=False, wrap=False):
         if json:
             data = JSON.dumps(data)
 
-        producer.produce(topic, data.encode('utf-8'), callback=lambda *args: ret.append(args))
-
-        for data in ret:
-            yield data
-        ret = []
+        producer.produce(topic, data.encode('utf-8'))
+        return data
 
     ret = Node(foo=_send, name='Kafka', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node._downstream.append((ret, 0))
