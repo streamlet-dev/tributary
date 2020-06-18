@@ -1,7 +1,7 @@
 import json as JSON
 from confluent_kafka import Producer
 from .output import _OUTPUT_GRAPHVIZSHAPE
-from ..base import Node
+from ..node import Node
 
 
 def Kafka(node, servers='', topic='', json=False, wrap=False):
@@ -34,6 +34,5 @@ def Kafka(node, servers='', topic='', json=False, wrap=False):
         return data
 
     ret = Node(foo=_send, name='Kafka', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node >> ret
     return ret

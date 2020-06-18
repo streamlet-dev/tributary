@@ -88,4 +88,5 @@ class TestConfig:
 
         ret = tss.run(tss.Print(price._node))
         time.sleep(2)
+        print(ret)
         assert len(ret) == 7

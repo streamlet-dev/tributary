@@ -2,7 +2,7 @@ import math
 import numpy as np
 import scipy as sp
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
-from ..base import Node
+from ..node import Node
 
 
 def unary(node, name, lam):
