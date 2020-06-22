@@ -71,5 +71,6 @@ class TestAPI:
 
     def test_api_lazy_specific(self):
         '''apis specific to lazy nodes'''
+        # expiration/interval functions
         assert hasattr(tl.LazyNode, 'expire')
         assert hasattr(tl.LazyNode, 'interval')
