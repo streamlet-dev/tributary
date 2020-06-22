@@ -1,20 +1,36 @@
 
 class StreamEnd:
     '''Indicates that a stream has nothing left in it'''
-    pass
+    instance = None
+
+    def __new__(cls):
+        if not StreamEnd.instance:
+            StreamEnd.instance = super().__new__(cls)
+            return StreamEnd.instance
+        return StreamEnd.instance
 
 
 class StreamRepeat:
     '''Indicates that a stream has a gap, this object should be ignored
     and the previous action repeated'''
-    pass
+    instance = None
+
+    def __new__(cls):
+        if not StreamRepeat.instance:
+            StreamRepeat.instance = super().__new__(cls)
+            return StreamRepeat.instance
+        return StreamRepeat.instance
 
 
 class StreamNone:
     '''indicates that a stream does not have a value'''
+    instance = None
 
-    def __init__(self, last=None):
-        self.value = last
+    def __new__(cls):
+        if not StreamNone.instance:
+            StreamNone.instance = super().__new__(cls)
+            return StreamNone.instance
+        return StreamNone.instance
 
     def all_bin_ops(self, other):
         return self
