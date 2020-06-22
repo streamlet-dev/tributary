@@ -34,3 +34,39 @@ class TestStreaming:
             yield 2
         t = ts.Foo(foo)
         assert ts.run(t) == [1, 2]
+
+    def test_deep_bfs(self):
+        a = ts.Const(1, count=1)
+        b = ts.Random()
+        c = ts.Curve([1, 2, 3])
+
+        d = a + b
+        e = a + c
+        f = b + c
+
+        g = ts.Print(d)
+        h = ts.Print(e)
+        i = ts.Print(f)
+
+        def _ids(lst):
+            return set([l._id for l in lst])
+
+        def _ids_ids(lst_of_list):
+            ret = []
+            for lst in lst_of_list:
+                ret.append(_ids(lst))
+            return ret
+
+        assert _ids(a._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(b._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(c._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(d._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(e._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(f._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(g._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(h._deep_bfs(tops_only=True)) == _ids([a, b, c])
+        assert _ids(i._deep_bfs(tops_only=True)) == _ids([a, b, c])
+
+        for x in (a, b, c, d, e, f, g, h, i):
+            for y in (a, b, c, d, e, f, g, h, i):
+                assert _ids_ids(x._deep_bfs()) == _ids_ids(y._deep_bfs())

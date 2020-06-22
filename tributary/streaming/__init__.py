@@ -1,26 +1,28 @@
 import asyncio
-from copy import deepcopy
-from .base import StreamingGraph, Node as StreamingNode  # noqa: F401
+from .node import Node as StreamingNode  # noqa: F401
+from .base import StreamingGraph  # noqa: F401
 from .calculations import *  # noqa: F401, F403
 from .control import *  # noqa: F401, F403
 from .input import *  # noqa: F401, F403
 from .output import *  # noqa: F401, F403
 from .utils import *  # noqa: F401, F403
-from ..base import StreamEnd, StreamNone, StreamRepeat
+from ..base import StreamEnd
 
 
 async def _run(node):
-    ret = []
-    nodes = node._deep_bfs()
+    out = Collect(node)  # noqa F405
+    graph = out._construct_graph()
+    nodes = graph.getNodes()
+
+    value, last = None, None
+
     while True:
         for level in nodes:
             await asyncio.gather(*(asyncio.create_task(n()) for n in level))
-        val = deepcopy(node.value())
-        if not isinstance(val, (StreamEnd, StreamNone, StreamRepeat)):
-            ret.append(val)
-        elif isinstance(val, StreamEnd):
+        value, last = out.value(), value
+        if isinstance(value, StreamEnd):
             break
-    return ret
+    return last
 
 
 def run(node):

@@ -1,7 +1,7 @@
 import json as JSON
 import websockets
 from .output import _OUTPUT_GRAPHVIZSHAPE
-from ..base import Node
+from ..node import Node
 from ...base import StreamNone, StreamEnd
 
 
@@ -46,6 +46,6 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False):
     ret = Node(foo=_send, name='WebSocket', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     ret._websocket = websockets.connect(url)
 
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node.downstream().append((ret, 0))
+    ret.upstream().append(node)
     return ret

@@ -1,6 +1,6 @@
 import statistics
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
-from ..base import Node
+from ..node import Node
 
 
 def Count(node):
@@ -15,8 +15,7 @@ def Count(node):
 
     ret = Node(foo=foo, foo_kwargs=None, name='Count', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
     ret._count = 0
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node >> ret
     return ret
 
 
@@ -32,9 +31,7 @@ def Max(node):
 
     ret = Node(foo=foo, foo_kwargs=None, name='Max', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
     ret._max = None
-
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node >> ret
     return ret
 
 
@@ -50,8 +47,7 @@ def Min(node):
 
     ret = Node(foo=foo, foo_kwargs=None, name='Min', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
     ret._min = None
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node >> ret
     return ret
 
 
@@ -76,9 +72,7 @@ def Sum(node):
 
     ret = Node(foo=foo, foo_kwargs=None, name='Sum', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
     ret._sum = 0
-
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node >> ret
     return ret
 
 
@@ -104,8 +98,7 @@ def Average(node):
     ret._sum = 0
     ret._count = 0
 
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node >> ret
     return ret
 
 
