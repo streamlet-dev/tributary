@@ -20,7 +20,7 @@ class HTTP(Foo):
 
     def __init__(self, url, interval=1, repeat=1, json=False, wrap=False, field=None, proxies=None, cookies=None):
         async def _req(url=url, interval=interval, repeat=repeat, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies):
-            count = 0
+            count = 0 if repeat >= 0 else float('-inf')  # make less than anything
             while count < repeat:
                 async with aiohttp.ClientSession() as session:
                     async with session.get(url, cookies=cookies, proxy=proxies) as response:
