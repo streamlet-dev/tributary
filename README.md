@@ -56,19 +56,19 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 # Sources and Sinks
 ## Sources
 - Python Function/Generator/Async Function/Async Generator
-- Random
-- File
-- Kafka
-- Websocket
-- Http
-- SocketIO
+- Random - generates a random dictionary of values
+- File - streams data from a file, optionally loading each line as a json
+- Kafka - streams data from kafka
+- Websocket - strams data from a websocket
+- Http - polls a url with GET requests, streams data out
+- SocketIO - streams data from a socketIO connection
 
 ## Sinks
-- File
-- Kafka
-- Http
-- Websocket
-- SocketIO
+- File - data to a file
+- Kafka - streams data to kafka
+- Http - POSTs data to an url
+- Websocket - streams data to a websocket
+- SocketIO - streams data to a socketIO connection
 
 # Transforms
 ## Modulate
@@ -84,53 +84,53 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 
 ## Calculations
 ### Arithmetic Operators
-- Noop
-- Negate
-- Invert
-- Add
-- Sub
-- Mult
-- Div
-- RDiv
-- Mod
-- Pow
-- Sum
-- Average
+- Noop (unary) - Pass input to output
+- Negate (unary) - -1 * input
+- Invert (unary) - 1/input
+- Add (binary) - add 2 inputs
+- Sub (binary) - subtract second input from first
+- Mult (binary) - multiple inputs
+- Div (binary) - divide first input by second
+- RDiv (binary) - divide second input by first
+- Mod (binary) - first input % second input
+- Pow (binary) - first input^second input
+- Sum (n-ary) - sum all inputs
+- Average (n-ary) - average of all inputs
 
 ### Boolean Operators
-- Not
-- And
-- Or
+- Not (unary) - `Not` input
+- And (binary) - `And` inputs
+- Or (binary) - `Or` inputs
 
 ### Comparators
-- Equal
-- NotEqual
-- Less
-- LessOrEqual
-- Greater
-- GreaterOrEqual
+- Equal (binary) - inputs are equal
+- NotEqual (binary) - inputs are not equal
+- Less (binary) - first input is less than second input
+- LessOrEqual (binary) - first input is less than or equal to second input
+- Greater (binary) - first input is greater than second input
+- GreaterOrEqual (binary) - first input is greater than or equal to second input
 
 ### Math
-- Log
-- Sin
-- Cos
-- Tan
-- Arcsin
-- Arccos
-- Arctan
-- Sqrt
-- Abs
-- Exp
-- Erf
+- Log (unary)
+- Sin (unary)
+- Cos (unary)
+- Tan (unary)
+- Arcsin (unary)
+- Arccos (unary)
+- Arctan (unary)
+- Sqrt (unary)
+- Abs (unary)
+- Exp (unary)
+- Erf (unary)
 
 ## Converters
-- Int
-- Float
-- Bool
-- Str
+- Int (unary)
+- Float (unary)
+- Bool (unary)
+- Str (unary)
 
 ## Python Builtins
-- Len
+- Len (unary)
 
 ## Rolling
 - RollingCount - Node to count inputs
@@ -138,6 +138,8 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - RollingMax - Node to take rolling max of inputs
 - RollingSum - Node to take rolling sum inputs
 - RollingAverage - Node to take the running average
+- SMA - Node to take the simple moving average over a window
+- EMA - Node to take an exponential moving average over a window
 
 ## Node Type Converters
 - Lazy->Streaming

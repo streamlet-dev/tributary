@@ -50,11 +50,9 @@ def Apply(node, foo, foo_kwargs=None):
     def _foo(val):
         return ret._apply(val, **ret._apply_kwargs)
     ret = Node(foo=_foo, name='Apply', inputs=1)
-    ret._apply = foo
-    ret._apply_kwargs = foo_kwargs or {}
-
-    node.downstream().append((ret, 0))
-    ret.upstream().append(node)
+    ret.set('_apply', foo)
+    ret.set('_apply_kwargs', foo_kwargs or {})
+    node >> ret
     return ret
 
 
@@ -83,10 +81,8 @@ def Window(node, size=-1, full_only=False):
             return ret._accum
 
     ret = Node(foo=foo, name='Window', inputs=1)
-    ret._accum = []
-
-    node.downstream().append((ret, 0))
-    ret.upstream().append(node)
+    ret.set('_accum', [])
+    node >> ret
     return ret
 
 
@@ -113,9 +109,8 @@ def Unroll(node):
             return StreamRepeat()
 
     ret = Node(foo=foo, name='Unroll', inputs=1)
-    ret._count = 0
-    node.downstream().append((ret, 0))
-    ret.upstream().append(node)
+    ret.set('_count', 0)
+    node >> ret
     return ret
 
 
@@ -150,10 +145,8 @@ def UnrollDataFrame(node, json=False, wrap=False):
             return StreamRepeat()
 
     ret = Node(foo=foo, name='UnrollDF', inputs=1)
-    ret._count = 0
-
-    node.downstream().append((ret, 0))
-    ret.upstream().append(node)
+    ret.set('_count', 0)
+    node >> ret
     return ret
 
 
@@ -168,10 +161,8 @@ def Merge(node1, node2):
         return value1, value2
 
     ret = Node(foo=foo, name='Merge', inputs=2)
-    node1.downstream().append((ret, 0))
-    node2.downstream().append((ret, 1))
-    ret.upstream().append(node1)
-    ret.upstream().append(node2)
+    node1 >> ret
+    node2 >> ret
     return ret
 
 
@@ -187,10 +178,8 @@ def ListMerge(node1, node2):
         return list(value1) + list(value2)
 
     ret = Node(foo=foo, name='ListMerge', inputs=2)
-    node1.downstream().append((ret, 0))
-    node2.downstream().append((ret, 1))
-    ret.upstream().append(node1)
-    ret.upstream().append(node2)
+    node1 >> ret
+    node2 >> ret
     return ret
 
 
@@ -209,10 +198,8 @@ def DictMerge(node1, node2):
         return ret
 
     ret = Node(foo=foo, name='DictMerge', inputs=2)
-    node1.downstream().append((ret, 0))
-    node2.downstream().append((ret, 1))
-    ret.upstream().append(node1)
-    ret.upstream().append(node2)
+    node1 >> ret
+    node2 >> ret
     return ret
 
 
@@ -228,8 +215,7 @@ def Reduce(*nodes):
 
     ret = Node(foo=foo, name='Reduce', inputs=len(nodes))
     for i, n in enumerate(nodes):
-        n.downstream().append((ret, i))
-        ret.upstream().append(n)
+        n >> ret
     return ret
 
 

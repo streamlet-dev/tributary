@@ -22,7 +22,7 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
         return else_val
 
     ret = Node(foo=foo, foo_kwargs=None, name='If', inputs=3, graphvizshape=_CONTROL_GRAPHVIZSHAPE)
-    ret._count = 0
+    ret.set('_count', 0)
     if_node >> ret
     satisfied_node >> ret
     unsatisfied_node >> ret

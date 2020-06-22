@@ -71,6 +71,7 @@ class TestAPI:
 
     def test_api_streaming_specific(self):
         '''apis specific to streaming nodes'''
+        # window functions
         assert hasattr(ts.StreamingNode, 'perspective')
         assert hasattr(ts.StreamingNode, 'rollingCount')
         assert hasattr(ts.StreamingNode, 'rollingSum')
@@ -78,3 +79,5 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'rollingMin')
         assert hasattr(ts.StreamingNode, 'rollingMax')
         assert hasattr(ts.StreamingNode, 'rollingAverage')
+        assert hasattr(ts.StreamingNode, 'sma')
+        assert hasattr(ts.StreamingNode, 'ema')

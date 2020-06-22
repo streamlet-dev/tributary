@@ -6,7 +6,7 @@ from ..base import StreamEnd, StreamNone, StreamRepeat
 from ..lazy.node import Node as LazyNode
 from ..utils import LazyToStreaming
 
-_DD3_TRANSITION_DELAY = 0.5  # used so you can visually see the
+_DD3_TRANSITION_DELAY = 0.1  # used so you can visually see the
 # transition e.g. not too fast
 
 
@@ -114,11 +114,30 @@ class Node(object):
         # stream is in a finished state, will only propogate StreamEnd instances
         self._finished = False
 
+        # for safety
+        self._initial_attrs = dir(self) + ['_old_foo', '_initial_attrs']
+
     # ***********************
     # Public interface
     # ***********************
     def __repr__(self):
         return '{}'.format(self._name)
+
+    def set(self, key, value):
+        '''Use this method to set attributes
+
+        Since we often use attributes to track node state, let's make sure we don't clobber any important ones'''
+        if hasattr(self, '_initial_attrs') and key in self._initial_attrs:
+            # if we've completed our construction, ensure critical attrs arent overloaded
+            raise Exception('Overloading node-critical attribute: {}'.format(key))
+        self._initial_attrs.append(key)
+        super().__setattr__(key, value)
+
+    def __setattr__(self, key, value):
+        if hasattr(self, '_initial_attrs') and key not in self._initial_attrs:
+            # if we've completed our construction, ensure critical attrs arent overloaded
+            raise Exception('Use set() to set attribute, to avoid overloading node-critical attribute: {}'.format(key))
+        super().__setattr__(key, value)
 
     def upstream(self, node=None):
         '''Access list of upstream nodes'''
@@ -255,6 +274,8 @@ class Node(object):
         for i in range(len(self._active)):
             self._active[i] = StreamNone()
         await self._enddd3g()
+        if isinstance(self._last, StreamEnd):
+            await self._finish()
 
     async def _finish(self):
         '''mark this node as finished'''

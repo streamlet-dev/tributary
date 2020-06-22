@@ -1,3 +1,5 @@
+import statistics
+import pandas as pd
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
 from ..node import Node
 
@@ -13,7 +15,7 @@ def Count(node):
         return ret._count
 
     ret = Node(foo=foo, foo_kwargs=None, name='Count', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    ret._count = 0
+    ret.set('_count', 0)
     node >> ret
     return ret
 
@@ -29,7 +31,7 @@ def Max(node):
         return ret._max
 
     ret = Node(foo=foo, foo_kwargs=None, name='Max', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    ret._max = None
+    ret.set('_max', None)
     node >> ret
     return ret
 
@@ -45,7 +47,7 @@ def Min(node):
         return ret._min
 
     ret = Node(foo=foo, foo_kwargs=None, name='Min', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    ret._min = None
+    ret.set('_min', None)
     node >> ret
     return ret
 
@@ -70,7 +72,7 @@ def Sum(node):
         return ret._sum
 
     ret = Node(foo=foo, foo_kwargs=None, name='Sum', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    ret._sum = 0
+    ret.set('_sum', 0)
     node >> ret
     return ret
 
@@ -94,10 +96,56 @@ def Average(node):
         return ret._sum / ret._count if ret._count > 0 else float('nan')
 
     ret = Node(foo=foo, foo_kwargs=None, name='Average', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    ret._sum = 0
-    ret._count = 0
+    ret.set('_sum', 0)
+    ret.set('_count', 0)
 
     node >> ret
+    return ret
+
+
+def SMA(node, window_width=10, full_only=False):
+    '''Node to take the simple moving average over a window of ticks
+
+    Arguments:
+        node (node): input stream
+        window_width (int): size of window to use
+        full_only (bool): only return if list is full
+    '''
+    def sma(val):
+        return statistics.mean(val) if len(val) > 0 else float('nan')
+    return node.window(window_width, full_only).apply(sma)
+
+
+def EMA(node, window_width=10, full_only=False):
+    '''Node to take the exponential moving average over a window of ticks
+
+    Arguments:
+        node (node): input stream
+        window_width (int): size of window to use
+        full_only (bool): only return if list is full
+    '''
+    ret = None  # avoid undefined symbol
+
+    def ema(val):
+        '''Calculates the EMA of prices within the window'''
+        # Handle case where length is less than duration; EMA is SMA
+        if len(val) < 1:
+            return 0
+        elif len(val) == 1:
+            ret._prev = val[-1]
+        else:
+            if full_only and ret._prev is None:
+                # we'll only receive a window on the first full tick, so we need to backfill
+                # the previous EMA
+                ret._prev = pd.Series(val).ewm(span=window_width, adjust=False)[-1]
+            else:
+                # calculate from last value
+                mult = 2 / (window_width + 1)
+                ret._prev = ret._prev * (1 - mult) + val[-1] * mult
+        return ret._prev
+
+    ret = node.window(window_width, full_only).apply(ema)
+    ret.set('_prev', None)
     return ret
 
 
@@ -106,3 +154,5 @@ Node.rollingMin = Min
 Node.rollingMax = Max
 Node.rollingSum = Sum
 Node.rollingAverage = Average
+Node.sma = SMA
+Node.ema = EMA
