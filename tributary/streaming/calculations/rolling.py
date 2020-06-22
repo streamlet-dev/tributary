@@ -1,3 +1,4 @@
+import statistics
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
 from ..base import Node
 
@@ -108,8 +109,47 @@ def Average(node):
     return ret
 
 
+def SMA(node, window_width=10, full_only=False):
+    '''Node to take the simple moving average over a window of ticks
+
+    Arguments:
+        node (node): input stream
+        window_width (int): size of window to use
+        full_only (bool): only return if list is full
+    '''
+    def sma(val):
+        return statistics.mean(val) if len(val) > 0 else float('nan')
+    return node.window(window_width, full_only).apply(sma)
+
+def EMA(node, smoothing=2, interval=5, window_width=10, full_only=False):
+    '''Node to take the exponential moving average over a window of ticks
+
+    Arguments:
+        node (node): input stream
+        smoothing (int): smoothing factor
+        window_width (int): size of window to use
+        full_only (bool): only return if list is full
+    '''
+    ret = None  # avoid undefined symbol
+    def ema(val):
+        '''Calculates the EMA of prices within the window'''
+        # Handle case where length is less than duration; EMA is SMA
+        if(len(val) < interval-1):
+            ret._prev = statistics.mean(val) if len(val) > 0 else float('nan')
+            return ret._prev
+        # Regular case (EMA based off of previous EMA)
+        else:
+            ema_mult = smoothing / (interval+1)
+            ema = (val - ret._prev) * ema_mult + ret._prev
+            ret._prev = ema
+            return ret
+    ret = node.window(window_width, full_only).apply(ema)
+    return ret
+
+
 Node.rollingCount = Count
 Node.rollingMin = Min
 Node.rollingMax = Max
 Node.rollingSum = Sum
 Node.rollingAverage = Average
+Node.sma = SMA
