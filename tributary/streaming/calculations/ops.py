@@ -2,14 +2,13 @@ import math
 import numpy as np
 import scipy as sp
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
-from ..base import Node, _gen_node
+from ..node import Node, _gen_node
 
 
 def unary(foo, name):
     def _foo(self):
         downstream = Node(foo, {}, name=name, inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-        self._downstream.append((downstream, 0))
-        downstream._upstream.append(self)
+        self >> downstream
         return downstream
     return _foo
 
@@ -18,9 +17,8 @@ def binary(foo, name):
     def _foo(self, other):
         other = _gen_node(other)
         downstream = Node(foo, {}, name=name, inputs=2, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-        self._downstream.append((downstream, 0))
-        other._downstream.append((downstream, 1))
-        downstream._upstream.extend([self, other])
+        self >> downstream
+        other >> downstream
         return downstream
     return _foo
 
@@ -29,9 +27,7 @@ def n_ary(foo, name):
     def _foo(*others):
         downstream = Node(foo, {}, name=name, inputs=len(others), graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
         for i, other in enumerate(others):
-            other._downstream.append((downstream, i))
-
-        downstream._upstream.extend(list(others))
+            other >> downstream
         return downstream
     return _foo
 
@@ -142,8 +138,8 @@ Ceil = unary(lambda x: math.ceil(x), name='Ceil')
 
 def Round(self, ndigits=0):
     downstream = Node(lambda x: round(x, ndigits=ndigits), {}, name="Round", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    self._downstream.append((downstream, 0))
-    downstream._upstream.append(self)
+    self.downstream().append((downstream, 0))
+    downstream.upstream().append(self)
     return downstream
 
 

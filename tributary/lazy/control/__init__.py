@@ -1,6 +1,6 @@
 
 from .utils import _CONTROL_GRAPHVIZSHAPE
-from ..base import Node
+from ..node import Node
 
 
 def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):

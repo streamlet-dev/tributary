@@ -1,6 +1,6 @@
 
 from .utils import _CONTROL_GRAPHVIZSHAPE
-from ..base import Node
+from ..node import Node
 
 
 def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
@@ -23,12 +23,9 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
 
     ret = Node(foo=foo, foo_kwargs=None, name='If', inputs=3, graphvizshape=_CONTROL_GRAPHVIZSHAPE)
     ret._count = 0
-    if_node._downstream.append((ret, 0))
-    satisfied_node._downstream.append((ret, 1))
-    unsatisfied_node._downstream.append((ret, 2))
-    ret._upstream.append(if_node)
-    ret._upstream.append(satisfied_node)
-    ret._upstream.append(unsatisfied_node)
+    if_node >> ret
+    satisfied_node >> ret
+    unsatisfied_node >> ret
     return ret
 
 

@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from ..base import Node
+from ..node import Node
 
 
 _INPUT_GRAPHVIZSHAPE = "box"

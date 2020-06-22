@@ -1,5 +1,8 @@
+import copy
 from IPython.display import display
-from ..base import Node, _gen_node
+from ..node import Node, _gen_node
+from ...base import StreamEnd, StreamNone, StreamRepeat
+
 
 _OUTPUT_GRAPHVIZSHAPE = "box"
 
@@ -11,26 +14,40 @@ def Print(node, text=''):
 
     node = _gen_node(node)
     ret = Node(foo=foo, foo_kwargs=None, name='Print', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    node >> ret
+    return ret
 
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+
+def Collect(node, limit=None):
+    ret = []
+
+    def foo(val, ret=ret):
+        if not isinstance(val, (StreamEnd, StreamNone, StreamRepeat)):
+            ret.append(copy.deepcopy(val))
+            if limit:
+                ret = ret[-limit:]
+        return ret
+
+    node = _gen_node(node)
+    ret = Node(foo=foo, foo_kwargs=None, name='Collect', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    node >> ret
     return ret
 
 
 def Graph(node):
-    if not node._upstream:
+    if not node.upstream():
         # leaf node
         return {node: []}
-    return {node: [_.graph() for _ in node._upstream]}
+    return {node: [_.graph() for _ in node.upstream()]}
 
 
 def PPrint(node, level=0):
     ret = '    ' * (level - 1) if level else ''
 
-    if not node._upstream:
+    if not node.upstream():
         # leaf node
         return ret + '  \\  ' + repr(node)
-    return '    ' * level + repr(node) + '\n' + '\n'.join(_.pprint(level + 1) for _ in node._upstream)
+    return '    ' * level + repr(node) + '\n' + '\n'.join(_.pprint(level + 1) for _ in node.upstream())
 
 
 def GraphViz(node):
@@ -99,8 +116,7 @@ def Perspective(node, text='', **psp_kwargs):
     ret = Node(foo=foo, foo_kwargs=None, name='Perspective', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
 
     display(p)
-    node._downstream.append((ret, 0))
-    ret._upstream.append(node)
+    node >> ret
     return ret
 
 
