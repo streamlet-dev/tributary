@@ -203,15 +203,15 @@ def DictMerge(node1, node2):
     return ret
 
 
-def Reduce(*nodes):
+def Reduce(*nodes, reducer=None):
     '''Streaming wrapper to merge any number of inputs
 
     Arguments:
         nodes (tuple): input streams
     '''
 
-    def foo(*values):
-        return values
+    def foo(*values, reducer=reducer):
+        return values if reducer is None else reducer(*values)
 
     ret = Node(foo=foo, name='Reduce', inputs=len(nodes))
     for i, n in enumerate(nodes):
