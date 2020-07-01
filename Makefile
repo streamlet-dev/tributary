@@ -52,4 +52,10 @@ help:
 print-%:
 	@echo '$*=$($*)'
 
-.PHONY: clean build run test tests help annotate annotate_l docs dist
+dockerup:
+	docker-compose -f ./tributary/tests/docker_setup/docker-compose.yml up -d
+
+dockerdown:
+	docker-compose -f ./tributary/tests/docker_setup/docker-compose.yml down
+
+.PHONY: clean build run test tests help annotate annotate_l docs dist dockerup dockerdown
