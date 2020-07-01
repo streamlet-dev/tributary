@@ -24,13 +24,12 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False):
         if json:
             data = JSON.dumps(data)
 
-        await ret._websocket.send(data)
-
-        if response:
-            msg = await ret._websocket.recv()
-
-        else:
-            msg = '{}'
+        async with ret._websocket as websocket:
+            await websocket.send(data)
+            if response:
+                msg = await websocket.recv()
+            else:
+                msg = '{}'
 
         if json:
             msg = JSON.loads(msg)
@@ -44,7 +43,7 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False):
         return msg
 
     ret = Node(foo=_send, name='WebSocket', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
-    ret._websocket = websockets.connect(url)
+    ret.set('_websocket', websockets.connect(url))
 
     node.downstream().append((ret, 0))
     ret.upstream().append(node)
