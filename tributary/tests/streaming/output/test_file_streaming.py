@@ -18,6 +18,8 @@ class TestFile:
             with open(file, 'r') as fp:
                 data = fp.read()
             return [int(x) for x in data]
-
+	
+	# Test that output is equal to what is read (generalized)
         out = ts.FileSink(ts.Foo(foo), filename=file)
         assert ts.run(out) == read_file(file)
+

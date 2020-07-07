@@ -3,6 +3,7 @@ import tributary.streaming as ts
 
 class TestHttp:
     def test_http(self):
+	'''Test http server'''
         def foo():
             yield 'x'
             yield 'y'
