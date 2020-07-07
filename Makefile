@@ -5,7 +5,9 @@ buildpy2:
 	python2 setup.py build 
 
 tests: ## Clean and Make unit tests
+	make dockerup
 	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
+	make dockerdown
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
