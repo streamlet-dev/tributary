@@ -3,6 +3,7 @@ import tributary.streaming as ts
 
 class TestSocketIO:
     def test_socketio(self):
+        '''Test socketio streaming'''
         def foo():
             yield 'a'
             yield 'b'

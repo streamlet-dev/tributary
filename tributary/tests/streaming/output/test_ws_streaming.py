@@ -3,6 +3,7 @@ import tributary.streaming as ts
 
 class TestWebSocket:
     def test_websocket(self):
+        '''Test websocket streaming'''
         def foo():
             yield 'x'
             yield 'y'

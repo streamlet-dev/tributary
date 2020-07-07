@@ -3,7 +3,7 @@ import tributary.streaming as ts
 
 class TestKafka:
     def test_kafka(self):
-	'''Test streaming with Kafka'''
+        '''Test streaming with Kafka'''
         def foo():
             yield 'a'
             yield 'b'
