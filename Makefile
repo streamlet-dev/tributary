@@ -55,9 +55,9 @@ print-%:
 	@echo '$*=$($*)'
 
 dockerup:
-	docker-compose -f ./tributary/tests/docker_setup/docker-compose.yml up -d
+	docker-compose up -d
 
 dockerdown:
-	docker-compose -f ./tributary/tests/docker_setup/docker-compose.yml down
+	docker-compose down
 
 .PHONY: clean build run test tests help annotate annotate_l docs dist dockerup dockerdown
