@@ -57,6 +57,10 @@ jobs:
       displayName: 'Use Python $(python.version)'
 
     - script: |
+        brew install docker-compose
+      displayName: 'System dependencies'
+
+    - script: |
         python -m pip install --upgrade pip
         pip install -e .[dev]
       displayName: 'Install dependencies'
@@ -113,7 +117,7 @@ jobs:
       displayName: 'Lint'
 
     - script: |
-        make tests
+        make tests_windows
       displayName: 'Test'
 
     - task: PublishTestResults@2

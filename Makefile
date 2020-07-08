@@ -9,6 +9,9 @@ tests: ## Clean and Make unit tests
 	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
 	make dockerdown
 
+tests_windows: ## Clean and Make unit tests omitting output
+	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch --ignore=tributary\tests\streaming\output
+
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
 
@@ -60,4 +63,4 @@ dockerup:
 dockerdown:
 	docker-compose down
 
-.PHONY: clean build run test tests help annotate annotate_l docs dist dockerup dockerdown
+.PHONY: clean build run test tests help annotate annotate_l docs dist dockerup dockerdown tests_windows
