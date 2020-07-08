@@ -27,9 +27,7 @@ jobs:
       displayName: 'Lint'
 
     - script:
-        make dockerup
-        make tests
-        make dockerdown
+        make dockerup && make tests && make dockerdown
       displayName: 'Test'
 
     - task: PublishTestResults@2
