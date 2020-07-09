@@ -16,9 +16,9 @@ def File(node, filename='', json=True):
     async def _file(data):
         async with aiofiles.open(filename, mode='a') as fp:
             if json:
-                fp.write(JSON.dumps(data))
+                await fp.write(JSON.dumps(data))
             else:
-                fp.write(data)
+                await fp.write(data)
         return data
 
     ret = Node(foo=_file, name='File', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)

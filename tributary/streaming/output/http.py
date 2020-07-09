@@ -19,7 +19,7 @@ def HTTP(node, url='', json=False, wrap=False, field=None, proxies=None, cookies
         cookies (list): list of cookies to pass to requests.post
     '''
 
-    def _send(data, url=url, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies):
+    async def _send(data, url=url, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies):
         if wrap:
             data = [data]
         if json:

@@ -5,7 +5,7 @@ buildpy2:
 	python2 setup.py build 
 
 tests: ## Clean and Make unit tests
-	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
+	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch --ignore=$(ignore_flag)
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
@@ -52,4 +52,10 @@ help:
 print-%:
 	@echo '$*=$($*)'
 
-.PHONY: clean build run test tests help annotate annotate_l docs dist
+dockerup:
+	docker-compose -f ci/docker-compose.yml up -d
+
+dockerdown:
+	docker-compose -f ci/docker-compose.yml down
+
+.PHONY: clean build run test tests help annotate annotate_l docs dist dockerup dockerdown
