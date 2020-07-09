@@ -1,11 +1,11 @@
 version: '2'
 services:
   zookeeper:
-    image: wurstmeister/zookeeper:latest
+    image: timkpaine/zookeeper:latest
     ports:
       - "2181:2181"
   kafka:
-    image: wurstmeister/kafka:latest
+    image: timkpaine/kafka:latest
     ports:
       - "9092:9092"
     environment:
@@ -16,12 +16,12 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sockf
   echo-server:
-    image: jmalloc/echo-server:latest
+    image: timkpaine/echo-server:latest
     ports:
       - 8080:8080
   socketio-server:
-    image: voduytuan/docker-socketio:latest
+    image: timkpaine/docker-socketio:latest
     ports:
       - 8069:8069
     volumes:
-      - ./server.js:/srv/app.js
+      - ./scripts/server.js:/srv/app.js
