@@ -15,14 +15,16 @@ class Kafka(Foo):
         interval (int): kafka poll interval
     '''
 
-    def __init__(self, servers, group, topics, json=False, wrap=False, interval=1):
-        c = Consumer({
+    def __init__(self, servers, group, topics, json=False, wrap=False, interval=1, **consumer_kwargs):
+        options = {
             'bootstrap.servers': servers,
             'group.id': group,
             'default.topic.config': {
                 'auto.offset.reset': 'smallest'
             }
-        })
+        }
+        options.update(**consumer_kwargs)
+        c = Consumer(options)
 
         if not isinstance(topics, list):
             topics = [topics]
