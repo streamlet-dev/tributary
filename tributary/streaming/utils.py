@@ -203,11 +203,36 @@ def DictMerge(node1, node2):
     return ret
 
 
+def FixedMap(node, count, mapper=None):
+    '''Streaming wrapper to split stream into a fixed number of outputs
+
+    Arguments:
+        node (Node): input stream
+        count (int): number of output nodes to generate
+        mapper (function): how to map the inputs into `count` streams
+    '''
+    rets = []
+
+    def _default_mapper(value, i):
+        return value[i]
+
+    for _ in range(count):
+        def foo(value, i=_, mapper=mapper or _default_mapper):
+            return mapper(value, i)
+
+        ret = Node(foo=foo, name='FixedMap', inputs=1)
+        node >> ret
+        rets.append(ret)
+
+    return rets
+
+
 def Reduce(*nodes, reducer=None):
     '''Streaming wrapper to merge any number of inputs
 
     Arguments:
         nodes (tuple): input streams
+        reducer (function): how to map the outputs into one stream
     '''
 
     def foo(*values, reducer=reducer):
@@ -228,4 +253,5 @@ Node.unrollDataFrame = UnrollDataFrame
 Node.merge = Merge
 Node.listMerge = ListMerge
 Node.dictMerge = DictMerge
+Node.map = FixedMap
 Node.reduce = Reduce

@@ -51,6 +51,14 @@ class TestUtils:
         out = ts.Merge(ts.Print(ts.Foo(foo1)), ts.Print(ts.Foo(foo2)))
         assert ts.run(out) == [(1, 2), (3, 4)]
 
+    def test_fixed_map(self):
+        def foo():
+            yield [1, 2, 3]
+            yield [4, 5, 6]
+
+        out = ts.Reduce(*[x + 1 for x in ts.Foo(foo).map(3)])
+        assert ts.run(out) == [(2, 3, 4), (5, 6, 7)]
+
     def test_reduce(self):
         def foo1():
             yield 1
