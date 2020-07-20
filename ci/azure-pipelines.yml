@@ -8,7 +8,7 @@ jobs:
 
   variables:
   - name: IGNORE
-    value: 
+    value: ""
 
   strategy:
     matrix:
@@ -31,7 +31,7 @@ jobs:
       displayName: 'Lint'
 
     - script:
-        make dockerup && make IGNORE=${{IGNORE}} tests && make dockerdown
+        make dockerup && make IGNORE=${{ IGNORE }} tests && make dockerdown
       displayName: 'Test'
 
     - task: PublishTestResults@2
