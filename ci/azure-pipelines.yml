@@ -31,7 +31,7 @@ jobs:
       displayName: 'Lint'
 
     - script:
-        make dockerup && make IGNORE=${{ IGNORE }} tests && make dockerdown
+        make dockerup && make IGNORE=${{ variables.IGNORE }} tests && make dockerdown
       displayName: 'Test'
 
     - task: PublishTestResults@2
