@@ -26,15 +26,19 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False):
 
         session = aiohttp.ClientSession()
         async with session.ws_connect(url) as ws:
-            ws.send_str(data)
+            await ws.send_str(data)
 
-            async for msg in ws:
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    x = msg.data
-                elif msg.type == aiohttp.WSMsgType.CLOSED:
-                    x = '{}'
-                elif msg.type == aiohttp.WSMsgType.ERROR:
-                    x = '{}'
+            if response:
+                async for msg in ws:
+                    if msg.type == aiohttp.WSMsgType.TEXT:
+                        x = msg.data
+                    elif msg.type == aiohttp.WSMsgType.CLOSED:
+                        x = '{}'
+                    elif msg.type == aiohttp.WSMsgType.ERROR:
+                        x = '{}'
+            else:
+                x = '{}'
+
         if json:
             x = JSON.loads(x)
 
@@ -47,7 +51,5 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False):
         return x
 
     ret = Node(foo=_send, name='WebSocket', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
-
-    node.downstream().append((ret, 0))
-    ret.upstream().append(node)
+    node >> ret
     return ret

@@ -1,3 +1,5 @@
+IGNORE=tributary/tests/streaming/output
+
 build:  ## Build the repository
 	python3.7 setup.py build 
 
@@ -5,7 +7,7 @@ buildpy2:
 	python2 setup.py build 
 
 tests: ## Clean and Make unit tests
-	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch --ignore=$(ignore_flag)
+	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch --ignore=$(IGNORE)
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
