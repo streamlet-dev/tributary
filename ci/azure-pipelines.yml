@@ -6,6 +6,10 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
 
+  variables:
+  - name: IGNORE
+    value: ""
+
   strategy:
     matrix:
       Python37:
@@ -27,7 +31,7 @@ jobs:
       displayName: 'Lint'
 
     - script:
-        make dockerup && make tests && make dockerdown
+        make dockerup && make IGNORE=${{ variables.IGNORE }} tests && make dockerdown
       displayName: 'Test'
 
     - task: PublishTestResults@2
@@ -44,10 +48,6 @@ jobs:
 - job: 'Mac'
   pool:
     vmImage: 'macos-10.14'
-
-  variables:
-  - name: ignore
-    value: tributary/tests/streaming/output
 
   strategy:
     matrix:
@@ -70,7 +70,7 @@ jobs:
       displayName: 'Lint'
 
     - script: |
-        make ignore_flag=${{ variables.ignore }} tests
+        make tests
       displayName: 'Test'
 
     - task: PublishTestResults@2
@@ -87,10 +87,6 @@ jobs:
 - job: 'Windows'
   pool:
     vmImage: 'vs2017-win2016'
-
-  variables:
-  - name: ignore
-    value: tributary\tests\streaming\output
 
   strategy:
     matrix:
@@ -121,7 +117,7 @@ jobs:
       displayName: 'Lint'
 
     - script: |
-        make ignore_flag=${{ variables.ignore }} tests
+        make tests
       displayName: 'Test'
 
     - task: PublishTestResults@2

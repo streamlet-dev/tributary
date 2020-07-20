@@ -11,4 +11,3 @@ class TestSocketIO:
 
         out = ts.SocketIOSink(ts.Foo(foo), url='http://localhost:8069')
         assert ts.run(out) == ['a', 'b', 'c']
-

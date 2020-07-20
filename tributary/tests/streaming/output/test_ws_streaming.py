@@ -11,4 +11,3 @@ class TestWebSocket:
 
         out = ts.WebSocketSink(ts.Foo(foo), url='ws://localhost:8080', response=True)
         assert len(ts.run(out)) == 3
-

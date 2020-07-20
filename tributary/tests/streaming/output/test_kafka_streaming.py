@@ -11,4 +11,3 @@ class TestKafka:
 
         out = ts.KafkaSink(ts.Foo(foo), servers='localhost:9092', topic='tributary')
         assert ts.run(out) == ['a', 'b', 'c']
-
