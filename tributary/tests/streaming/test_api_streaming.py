@@ -60,6 +60,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'merge')
         assert hasattr(ts.StreamingNode, 'listMerge')
         assert hasattr(ts.StreamingNode, 'dictMerge')
+        assert hasattr(ts.StreamingNode, 'map')
         assert hasattr(ts.StreamingNode, 'reduce')
 
         assert hasattr(ts.StreamingNode, 'graph')

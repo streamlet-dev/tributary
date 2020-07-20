@@ -60,6 +60,7 @@ class TestAPI:
         # assert hasattr(tl.LazyNode, 'merge')
         # assert hasattr(tl.LazyNode, 'listMerge')
         # assert hasattr(tl.LazyNode, 'dictMerge')
+        # assert hasattr(tl.LazyNode, 'map')
         # assert hasattr(tl.LazyNode, 'reduce')
 
         assert hasattr(tl.LazyNode, 'graph')
