@@ -1,5 +1,5 @@
+import aiohttp
 import json as JSON
-import websockets
 from .output import _OUTPUT_GRAPHVIZSHAPE
 from ..node import Node
 from ...base import StreamNone, StreamEnd
@@ -24,26 +24,29 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False):
         if json:
             data = JSON.dumps(data)
 
-        async with ret._websocket as websocket:
-            await websocket.send(data)
-            if response:
-                msg = await websocket.recv()
-            else:
-                msg = '{}'
+        session = aiohttp.ClientSession()
+        async with session.ws_connect(url) as ws:
+            ws.send_str(data)
 
+            async for msg in ws:
+                if msg.type == aiohttp.WSMsgType.TEXT:
+                    x = msg.data
+                elif msg.type == aiohttp.WSMsgType.CLOSED:
+                    x = '{}'
+                elif msg.type == aiohttp.WSMsgType.ERROR:
+                    x = '{}'
         if json:
-            msg = JSON.loads(msg)
+            x = JSON.loads(x)
 
         if field:
-            msg = msg[field]
+            x = x[field]
 
         if wrap:
-            msg = [msg]
+            x = [x]
 
-        return msg
+        return x
 
     ret = Node(foo=_send, name='WebSocket', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
-    ret.set('_websocket', websockets.connect(url))
 
     node.downstream().append((ret, 0))
     ret.upstream().append(node)

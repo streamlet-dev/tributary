@@ -39,8 +39,7 @@ requires = [
     'socketIO-client-nexus>=0.7.6',
     'sympy>=1.5.1',
     'temporal-cache>=0.0.6',
-    'tornado>=5.1.1',
-    'websockets>=8.0',
+    'tornado>=5.1.1'
 ]
 
 requires_dev = [

@@ -11,4 +11,3 @@ class TestHttp:
 
         out = ts.HTTPSink(ts.Foo(foo), url='http://localhost:8080')
         assert len(ts.run(out)) == 3
-
