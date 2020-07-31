@@ -25,3 +25,11 @@ services:
       - 8069:8069
     volumes:
       - ./scripts/server.js:/srv/app.js
+  postgres:
+      image: postgres:latest
+      environment:
+          - POSTGRES_PASSWORD=test
+      volumes:
+          - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      ports:
+          - "5432:5432"

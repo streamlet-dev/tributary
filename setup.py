@@ -24,6 +24,7 @@ with open(pjoin(here, 'README.md'), encoding='utf-8') as f:
 requires = [
     'aiohttp>=3.5.4',
     'aiofiles>=0.4.0',
+    'asyncpg>=0.20.1',
     'boltons>=20.1.0',
     'confluent-kafka>=0.11.6',
     'future>=0.17.1',
