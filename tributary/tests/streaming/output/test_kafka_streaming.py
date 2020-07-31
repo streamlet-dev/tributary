@@ -1,7 +1,9 @@
 import tributary.streaming as ts
+import pytest
 
 
 class TestKafka:
+    @pytest.mark.skipif("sys.platform != 'linux'")
     def test_kafka(self):
         '''Test streaming with Kafka'''
         def foo():

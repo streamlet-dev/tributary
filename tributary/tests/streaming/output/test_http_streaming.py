@@ -1,7 +1,9 @@
 import tributary.streaming as ts
+import pytest
 
 
 class TestHttp:
+    @pytest.mark.skipif("sys.platform != 'linux'")
     def test_http(self):
         '''Test http server'''
         def foo():

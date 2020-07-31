@@ -1,7 +1,9 @@
 import tributary.streaming as ts
+import pytest
 
 
 class TestWebSocket:
+    @pytest.mark.skipif("sys.platform != 'linux'")
     def test_websocket(self):
         '''Test websocket streaming'''
         def foo():

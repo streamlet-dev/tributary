@@ -6,10 +6,6 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
 
-  variables:
-  - name: IGNORE
-    value: ""
-
   strategy:
     matrix:
       Python37:
@@ -31,7 +27,7 @@ jobs:
       displayName: 'Lint'
 
     - script:
-        make dockerup && make IGNORE=${{ variables.IGNORE }} tests && make dockerdown
+        make dockerup && make tests && make dockerdown
       displayName: 'Test'
 
     - task: PublishTestResults@2
