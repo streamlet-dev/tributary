@@ -20,20 +20,23 @@ class Postgres(Foo):
         async def _send(queries=queries, repeat=int(repeat),
                         interval=int(interval), user=user,
                         password=password, database=database, host=host):
-            print(user, password, database, host)
             conn = await asyncpg.connect(user=user, password=password,
                                          database=database, host=host.split(':')[0],
                                          port=host.split(':')[1])
-            count = 0
+            count = 0 if repeat >= 0 else float('-inf')
             while count < repeat:
                 data = []
-                count += 1
                 for query in queries:
                     values = await conn.fetch(query)
                     data.extend([list(x.items()) for x in values])
                 yield data
+
                 if interval:
                     await asyncio.sleep(interval)
+
+                if repeat >= 0:
+                    count += 1
+
             await conn.close()
 
         super().__init__(foo=_send)
