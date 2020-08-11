@@ -3,7 +3,7 @@ import pytest
 
 
 class TestPostgres:
-    @pytest.mark.skipif("sys.platform != 'linux'")
+    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS'))")
     def test_http(self):
 
         def foo():

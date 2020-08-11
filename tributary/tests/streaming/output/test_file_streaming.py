@@ -4,7 +4,6 @@ import pytest
 
 
 class TestFile:
-    @pytest.mark.skipif("sys.platform != 'linux'")
     def test_file(self):
         file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_file_data.csv'))
         if os.path.exists(file):

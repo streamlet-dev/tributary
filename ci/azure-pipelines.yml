@@ -26,6 +26,10 @@ jobs:
         make lint
       displayName: 'Lint'
 
+    - script: |
+        export TRIBUTARY_SKIP_DOCKER_TESTS=0
+      displayName: 'Pre-Test'
+
     - script:
         make dockerup && make tests && make dockerdown
       displayName: 'Test'
@@ -64,6 +68,10 @@ jobs:
     - script: |
         make lint
       displayName: 'Lint'
+
+    - script: |
+        export TRIBUTARY_SKIP_DOCKER_TESTS=1
+      displayName: 'Pre-Test'
 
     - script: |
         make tests
@@ -111,6 +119,10 @@ jobs:
     - script: |
         make lint
       displayName: 'Lint'
+
+    - script: |
+        SET TRIBUTARY_SKIP_DOCKER_TESTS=1
+      displayName: 'Pre-Test'
 
     - script: |
         make tests
