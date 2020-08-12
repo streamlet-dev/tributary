@@ -1,7 +1,9 @@
 import tributary.streaming as ts
+import pytest
 
 
 class TestSocketIO:
+    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS'))")
     def test_socketio(self):
         '''Test socketio streaming'''
         def foo():

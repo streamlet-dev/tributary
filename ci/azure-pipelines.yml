@@ -6,14 +6,13 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
 
-  variables:
-  - name: IGNORE
-    value: ""
-
   strategy:
     matrix:
       Python37:
         python.version: '3.7'
+
+  variables:
+    TRIBUTARY_SKIP_DOCKER_TESTS: 0
 
   steps:
     - task: UsePythonVersion@0
@@ -31,7 +30,7 @@ jobs:
       displayName: 'Lint'
 
     - script:
-        make dockerup && make IGNORE=${{ variables.IGNORE }} tests && make dockerdown
+        make dockerup && make tests && make dockerdown
       displayName: 'Test'
 
     - task: PublishTestResults@2
@@ -53,6 +52,9 @@ jobs:
     matrix:
       Python37:
         python.version: '3.7'
+
+  variables:
+    TRIBUTARY_SKIP_DOCKER_TESTS: 1
 
   steps:
     - task: UsePythonVersion@0
@@ -92,6 +94,9 @@ jobs:
     matrix:
       Python37:
         python.version: '3.7'
+
+  variables:
+    TRIBUTARY_SKIP_DOCKER_TESTS: 1
 
   steps:
     - task: UsePythonVersion@0

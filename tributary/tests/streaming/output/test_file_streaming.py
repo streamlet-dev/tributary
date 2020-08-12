@@ -1,6 +1,6 @@
 import os
-import os.path
 import tributary.streaming as ts
+import pytest
 
 
 class TestFile:
