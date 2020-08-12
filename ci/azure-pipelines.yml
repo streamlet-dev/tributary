@@ -11,6 +11,9 @@ jobs:
       Python37:
         python.version: '3.7'
 
+  variables:
+    TRIBUTARY_SKIP_DOCKER_TESTS: 0
+
   steps:
     - task: UsePythonVersion@0
       inputs:
@@ -25,10 +28,6 @@ jobs:
     - script: |
         make lint
       displayName: 'Lint'
-
-    - script: |
-        export TRIBUTARY_SKIP_DOCKER_TESTS=0
-      displayName: 'Pre-Test'
 
     - script:
         make dockerup && make tests && make dockerdown
@@ -54,6 +53,9 @@ jobs:
       Python37:
         python.version: '3.7'
 
+  variables:
+    TRIBUTARY_SKIP_DOCKER_TESTS: 1
+
   steps:
     - task: UsePythonVersion@0
       inputs:
@@ -68,10 +70,6 @@ jobs:
     - script: |
         make lint
       displayName: 'Lint'
-
-    - script: |
-        export TRIBUTARY_SKIP_DOCKER_TESTS=1
-      displayName: 'Pre-Test'
 
     - script: |
         make tests
@@ -97,6 +95,9 @@ jobs:
       Python37:
         python.version: '3.7'
 
+  variables:
+    TRIBUTARY_SKIP_DOCKER_TESTS: 1
+
   steps:
     - task: UsePythonVersion@0
       inputs:
@@ -119,10 +120,6 @@ jobs:
     - script: |
         make lint
       displayName: 'Lint'
-
-    - script: |
-        SET TRIBUTARY_SKIP_DOCKER_TESTS=1
-      displayName: 'Pre-Test'
 
     - script: |
         make tests
