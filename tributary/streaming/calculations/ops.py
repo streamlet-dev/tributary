@@ -16,7 +16,6 @@ def unary(foos, name):
 
 def binary(foos, name):
     def _foo(self, other):
-        # TODO clean up
         if not isinstance(other, Node):
             other = _gen_node(other)
             setattr(other, 'use_dual', self.use_dual)
