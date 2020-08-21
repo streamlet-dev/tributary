@@ -117,6 +117,9 @@ class Node(object):
         # for safety
         self._initial_attrs = dir(self) + ['_old_foo', '_initial_attrs']
 
+        # use dual number operators
+        self.set('use_dual', kwargs.get('use_dual', False))
+
     # ***********************
     # Public interface
     # ***********************
