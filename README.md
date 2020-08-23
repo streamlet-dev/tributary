@@ -37,6 +37,7 @@ These are lazily-evaluated python streams, where outputs are propogated only as 
 # Examples
 - [Streaming](docs/examples/streaming/streaming.md): In this example, we construct a variety of forward propogating reactive graphs.
 - [Lazy](docs/examples/lazy/lazy.md): In this example, we construct a variety of lazily-evaluated directed acyclic computation graphs. 
+- [Automatic Differentiation](docs/examples/autodiff/autodiff.md): In this example, we use `tributary` to perform automatic differentiation on both lazy and streaming graphs.
 
 # Graph Visualization
 You can visualize the graph with Graphviz. All streaming and lazy nodes support a `graphviz` method.

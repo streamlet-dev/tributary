@@ -59,7 +59,7 @@ class Node(object):
         self._value = value
 
         # use dual number operators
-        self.use_dual = kwargs.get('use_dual', False)
+        self._use_dual = kwargs.get('use_dual', False)
 
         # can be set
         self._readonly = readonly

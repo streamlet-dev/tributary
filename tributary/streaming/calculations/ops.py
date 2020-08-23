@@ -7,8 +7,8 @@ from ..node import Node, _gen_node
 
 def unary(foos, name):
     def _foo(self):
-        foo = foos[0] if len(foos) == 1 or not self.use_dual else foos[1]
-        downstream = Node(foo, {}, name=name, inputs=1, use_dual=self.use_dual, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+        foo = foos[0] if len(foos) == 1 or not self._use_dual else foos[1]
+        downstream = Node(foo, {}, name=name, inputs=1, use_dual=self._use_dual, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
         self >> downstream
         return downstream
     return _foo
@@ -18,11 +18,11 @@ def binary(foos, name):
     def _foo(self, other):
         if not isinstance(other, Node):
             other = _gen_node(other)
-            setattr(other, 'use_dual', self.use_dual)
-        if self.use_dual != other.use_dual:
+            setattr(other, '_use_dual', self._use_dual)
+        if self._use_dual != other._use_dual:
             raise NotImplementedError('Dual/Non-dual mismatch')
-        foo = foos[0] if len(foos) == 1 or not self.use_dual else foos[1]
-        downstream = Node(foo, {}, name=name, inputs=2, use_dual=self.use_dual, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+        foo = foos[0] if len(foos) == 1 or not self._use_dual else foos[1]
+        downstream = Node(foo, {}, name=name, inputs=2, use_dual=self._use_dual, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
         self >> downstream
         other >> downstream
         return downstream
@@ -31,7 +31,7 @@ def binary(foos, name):
 
 def n_ary(foos, name):
     def _foo(*others):
-        use_dual = [x.use_dual for x in others]
+        use_dual = [x._use_dual for x in others]
         if np.any(use_dual) != np.all(use_dual):
             raise NotImplementedError('Dual/Non-dual mismatch')
         foo = foos[0] if len(foos) == 1 or not np.all(use_dual) else foos[1]
@@ -147,7 +147,7 @@ Ceil = unary((lambda x: math.ceil(x), lambda x: (math.ceil(x[0]), math.ceil(x[1]
 
 
 def Round(self, ndigits=0):
-    downstream = Node(lambda x: round(x, ndigits=ndigits) if not self.use_dual else
+    downstream = Node(lambda x: round(x, ndigits=ndigits) if not self._use_dual else
                       (round(x[0], ndigits=ndigits), round(x[1], ndigits=ndigits)),
                       {},
                       name="Round",
