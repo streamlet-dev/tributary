@@ -58,7 +58,7 @@ def Div(self, other):
     other = self._tonode(other)
     other._use_dual = self._use_dual
     return binary(self, other, self._name_no_id() + '/' + other._name_no_id(),
-                  (lambda x, y: x.value() / y.value() if not self._use_dual else (x.value()[0] / y.value()[0], (x.value()[1] * y.value()[0] - x.value()[0] * y.value()[1])/y.value()[0]**2)))
+                  (lambda x, y: x.value() / y.value() if not self._use_dual else (x.value()[0] / y.value()[0], (x.value()[1] * y.value()[0] - x.value()[0] * y.value()[1]) / y.value()[0]**2)))
 
 
 def Pow(self, other):
@@ -77,12 +77,12 @@ def Mod(self, other):
 
 def Negate(self):
     return unary(self, '(-' + self._name_no_id() + ')',
-                 (lambda x: -self.value() if not self._use_dual else (-1*self.value()[0], -1*self.value()[1])))
+                 (lambda x: -self.value() if not self._use_dual else (-1 * self.value()[0], -1 * self.value()[1])))
 
 
 def Invert(self):
     return unary(self, '1/' + self._name_no_id(),
-                 (lambda x: 1 / self.value() if not self._use_dual else (1/self.value()[0], -self.value()[1]/(self.value()[0]**2))))
+                 (lambda x: 1 / self.value() if not self._use_dual else (1 / self.value()[0], -self.value()[1] / (self.value()[0]**2))))
 
 
 def Sum(self, *others):
@@ -114,8 +114,8 @@ def Average(self, *others):
     return n_nary(self,
                   others_nodes,
                   'Average(' + self._name_no_id() + ',' + ','.join(other._name_no_id() for other in others_nodes) + ')',
-                  (lambda *args: sum(x.value() for x in args) / len(args) if not self._use_dual else ((sum([x.value()[0] for x in args])/len(args),
-                                                                                                     sum(x.value()[1] for x in args)/len(args)))))
+                  (lambda *args: sum(x.value() for x in args) / len(args) if not self._use_dual else ((sum([x.value()[0] for x in args]) / len(args),
+                                                                                                       sum(x.value()[1] for x in args) / len(args)))))
 
 
 #####################
@@ -152,42 +152,42 @@ def Cos(self):
 
 def Tan(self):
     return unary(self, 'tan(' + self._name_no_id() + ')',
-                 (lambda x: math.tan(self.value()) if not self._use_dual else (math.tan(self.value()[0]), self.value()[1]*(1/math.cos(self.value()[0]))**2)))
+                 (lambda x: math.tan(self.value()) if not self._use_dual else (math.tan(self.value()[0]), self.value()[1] * (1 / math.cos(self.value()[0]))**2)))
 
 
 def Arcsin(self):
     return unary(self, 'arcsin(' + self._name_no_id() + ')',
-                 (lambda x: math.asin(self.value()) if not self._use_dual else (math.asin(self.value()[0]), self.value()[1]/math.sqrt(1-self.value()[0]**2))))
+                 (lambda x: math.asin(self.value()) if not self._use_dual else (math.asin(self.value()[0]), self.value()[1] / math.sqrt(1 - self.value()[0]**2))))
 
 
 def Arccos(self):
     return unary(self, 'arccos(' + self._name_no_id() + ')',
-                 (lambda x: math.acos(self.value()) if not self._use_dual else (math.acos(self.value()[0]), -1*self.value()[1]/math.sqrt(1-self.value()[0]**2))))
+                 (lambda x: math.acos(self.value()) if not self._use_dual else (math.acos(self.value()[0]), -1 * self.value()[1] / math.sqrt(1 - self.value()[0]**2))))
 
 
 def Arctan(self):
     return unary(self, 'arctan(' + self._name_no_id() + ')',
-                 (lambda x: math.atan(self.value()) if not self._use_dual else (math.atan(self.value()[0]), self.value()[1]/(1 + self.value()[0]**2))))
+                 (lambda x: math.atan(self.value()) if not self._use_dual else (math.atan(self.value()[0]), self.value()[1] / (1 + self.value()[0]**2))))
 
 
 def Abs(self):
     return unary(self, '||' + self._name_no_id() + '||',
-                 (lambda x: abs(self.value()) if not self._use_dual else (abs(self.value()[0]), self.value()[1]*self.value()[0]/abs(self.value()[0]))))
+                 (lambda x: abs(self.value()) if not self._use_dual else (abs(self.value()[0]), self.value()[1] * self.value()[0] / abs(self.value()[0]))))
 
 
 def Sqrt(self):
     return unary(self, 'sqrt(' + str(self._name_no_id()) + ')',
-                 (lambda x: math.sqrt(self.value()) if not self._use_dual else (math.sqrt(self.value()[0]), self.value()[1]*0.5/math.sqrt(self.value()[0]))))
+                 (lambda x: math.sqrt(self.value()) if not self._use_dual else (math.sqrt(self.value()[0]), self.value()[1] * 0.5 / math.sqrt(self.value()[0]))))
 
 
 def Log(self):
     return unary(self, 'log(' + str(self._name_no_id()) + ')',
-                 (lambda x: math.log(self.value()) if not self._use_dual else (math.log(self.value()[0]), self.value()[1]/self.value()[0])))
+                 (lambda x: math.log(self.value()) if not self._use_dual else (math.log(self.value()[0]), self.value()[1] / self.value()[0])))
 
 
 def Exp(self):
     return unary(self, 'exp(' + str(self._name_no_id()) + ')',
-                 (lambda x: math.exp(self.value()) if not self._use_dual else (math.exp(self.value()[0]), self.value()[1]*math.exp(self.value()[0]))))
+                 (lambda x: math.exp(self.value()) if not self._use_dual else (math.exp(self.value()[0]), self.value()[1] * math.exp(self.value()[0]))))
 
 
 def Erf(self):

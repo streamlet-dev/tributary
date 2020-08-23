@@ -46,17 +46,17 @@ def n_ary(foos, name):
 # Arithmetic Operators #
 ########################
 Noop = unary((lambda x: x,), name='Noop')
-Negate = unary((lambda x: -1 * x, lambda x: (-1*x[0], -1*x[1])), name='Negate')
-Invert = unary((lambda x: 1 / x, lambda x: (1/x[0], -x[1]/(x[0]**2))), name='Invert')
+Negate = unary((lambda x: -1 * x, lambda x: (-1 * x[0], -1 * x[1])), name='Negate')
+Invert = unary((lambda x: 1 / x, lambda x: (1 / x[0], -x[1] / (x[0]**2))), name='Invert')
 Add = binary((lambda x, y: x + y, lambda x, y: (x[0] + y[0], x[1] + y[1])), name='Add')
 Sub = binary((lambda x, y: x - y, lambda x, y: (x[0] - y[0], x[1] - y[1])), name='Sub')
 Mult = binary((lambda x, y: x * y, lambda x, y: (x[0] * y[0], x[0] * y[1] + x[1] * y[0])), name='Mult')
-Div = binary((lambda x, y: x / y, lambda x, y: (x[0] / y[0], (x[1] * y[0] - x[0] * y[1])/y[0]**2)), name='Div')
-RDiv = binary((lambda x, y: y / x, lambda x, y: (y[0] / x[0], (y[1] * x[0] - y[0] * x[1])/x[0]**2)), name='RDiv')
+Div = binary((lambda x, y: x / y, lambda x, y: (x[0] / y[0], (x[1] * y[0] - x[0] * y[1]) / y[0]**2)), name='Div')
+RDiv = binary((lambda x, y: y / x, lambda x, y: (y[0] / x[0], (y[1] * x[0] - y[0] * x[1]) / x[0]**2)), name='RDiv')
 Mod = binary((lambda x, y: x % y, lambda: _raise(NotImplementedError('Not Implemented!'))), name='Mod')
 Pow = binary((lambda x, y: x ** y, lambda x, y: (x[0] ** y, y * x[1] * x[0] ** (y - 1))), name='Pow')
 Sum = n_ary((lambda *args: sum(args), lambda *args: (sum([x[0] for x in args]), sum(x[1] for x in args))), name='Sum')
-Average = n_ary((lambda *args: sum(args) / len(args), lambda *args: ((sum([x[0] for x in args])/len(args), sum(x[1] for x in args)/len(args)))), name='Average')
+Average = n_ary((lambda *args: sum(args) / len(args), lambda *args: ((sum([x[0] for x in args]) / len(args), sum(x[1] for x in args) / len(args)))), name='Average')
 
 #####################
 # Logical Operators #
@@ -131,16 +131,16 @@ Ge = binary((lambda x, y: x >= y, lambda x, y: x[0] > y[0] or x[0] == y[0]), nam
 ##########################
 # Mathematical Functions #
 ##########################
-Log = unary((lambda x: math.log(x), lambda x: (math.log(x[0]), x[1]/x[0])), name='Log')
+Log = unary((lambda x: math.log(x), lambda x: (math.log(x[0]), x[1] / x[0])), name='Log')
 Sin = unary((lambda x: math.sin(x), lambda x: (math.sin(x[0]), math.cos(x[0]) * x[1])), name='Sin')
 Cos = unary((lambda x: math.cos(x), lambda x: (math.cos(x[0]), -1 * math.sin(x[0]) * x[1])), name='Cos')
-Tan = unary((lambda x: math.tan(x), lambda x: (math.tan(x[0]), x[1]*(1/math.cos(x[0]))**2)), name='Tan')
-Arcsin = unary((lambda x: math.asin(x), lambda x: (math.asin(x[0]), x[1]/math.sqrt(1-x[0]**2))), name='Arcsin')
-Arccos = unary((lambda x: math.acos(x), lambda x: (math.acos(x[0]), -1*x[1]/math.sqrt(1-x[0]**2))), name='Arccos')
-Arctan = unary((lambda x: math.atan(x), lambda x: (math.atan(x[0]), x[1]/(1 + x[0]**2))), name='Arctan')
-Sqrt = unary((lambda x: math.sqrt(x), lambda x: (math.sqrt(x[0]), x[1]*0.5/math.sqrt(x[0]))), name='Sqrt')
-Abs = unary((lambda x: abs(x), lambda x: (abs(x[0]), x[1]*x[0]/abs(x[0]))), name='Abs')
-Exp = unary((lambda x: math.exp(x), lambda x: (math.exp(x[0]), x[1]*math.exp(x[0]))), name='Exp')
+Tan = unary((lambda x: math.tan(x), lambda x: (math.tan(x[0]), x[1] * (1 / math.cos(x[0]))**2)), name='Tan')
+Arcsin = unary((lambda x: math.asin(x), lambda x: (math.asin(x[0]), x[1] / math.sqrt(1 - x[0]**2))), name='Arcsin')
+Arccos = unary((lambda x: math.acos(x), lambda x: (math.acos(x[0]), -1 * x[1] / math.sqrt(1 - x[0]**2))), name='Arccos')
+Arctan = unary((lambda x: math.atan(x), lambda x: (math.atan(x[0]), x[1] / (1 + x[0]**2))), name='Arctan')
+Sqrt = unary((lambda x: math.sqrt(x), lambda x: (math.sqrt(x[0]), x[1] * 0.5 / math.sqrt(x[0]))), name='Sqrt')
+Abs = unary((lambda x: abs(x), lambda x: (abs(x[0]), x[1] * x[0] / abs(x[0]))), name='Abs')
+Exp = unary((lambda x: math.exp(x), lambda x: (math.exp(x[0]), x[1] * math.exp(x[0]))), name='Exp')
 Erf = unary((lambda x: math.erf(x), lambda x: _raise(NotImplementedError('Not Implemented!'))), name='Erf')
 Floor = unary((lambda x: math.floor(x), lambda x: (math.floor(x[0]), math.floor(x[1]))), name='Floor')
 Ceil = unary((lambda x: math.ceil(x), lambda x: (math.ceil(x[0]), math.ceil(x[1]))), name='Ceil')
