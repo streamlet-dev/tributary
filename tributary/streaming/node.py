@@ -114,6 +114,9 @@ class Node(object):
         # stream is in a finished state, will only propogate StreamEnd instances
         self._finished = False
 
+        # check if dual number
+        self._use_dual = kwargs.get('use_dual', False)
+
         # for safety
         self._initial_attrs = dir(self) + ['_old_foo', '_initial_attrs']
 

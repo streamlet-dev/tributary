@@ -28,14 +28,15 @@ class Timer(Node):
         interval (int/float): minimum delay between calls (can be more due to async scheduling)
     '''
 
-    def __init__(self, foo, foo_kwargs=None, count=1, interval=0):
+    def __init__(self, foo, foo_kwargs=None, count=1, interval=0, **kwargs):
         super().__init__(foo=foo,
                          foo_kwargs=foo_kwargs,
                          name='Timer[{}]'.format(foo.__name__),
                          inputs=0,
                          execution_max=count,
                          delay_interval=interval,
-                         graphvizshape=_INPUT_GRAPHVIZSHAPE)
+                         graphvizshape=_INPUT_GRAPHVIZSHAPE,
+                         **kwargs)
 
 
 class Const(Timer):
@@ -46,8 +47,8 @@ class Const(Timer):
         count (int): number of times to call, 0 means infinite
     '''
 
-    def __init__(self, value, count=0):
-        super().__init__(foo=lambda: value, count=count, interval=0)
+    def __init__(self, value, count=0, **kwargs):
+        super().__init__(foo=lambda: value, count=count, interval=0, **kwargs)
         self._name = 'Const[{}]'.format(value)
 
 

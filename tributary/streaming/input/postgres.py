@@ -15,6 +15,7 @@ class Postgres(Foo):
             interval (int): seconds to wait before executing queries
             repeat (int): times to repeat
     '''
+
     def __init__(self, user, password, database, host,
                  queries, repeat=1, interval=1):
         async def _send(queries=queries, repeat=int(repeat),
