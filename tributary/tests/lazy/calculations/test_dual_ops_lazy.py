@@ -145,6 +145,11 @@ class TestOps:
         out = tl.Exp(t)
         assert out() == (math.exp(5), math.exp(5))
 
+    def test_Erf(self):
+        t = tl.Node(value=(5, 1), use_dual=True)
+        out = tl.Erf(t)
+        assert out() == (math.erf(5), (2/math.sqrt(math.pi))*math.exp(-5**2))
+
     def test_Floor(self):
         t = tl.Node(value=(5.333, 1.333), use_dual=True)
         out = tl.Floor(t)
