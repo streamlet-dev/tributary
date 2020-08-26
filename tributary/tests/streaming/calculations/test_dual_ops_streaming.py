@@ -307,6 +307,16 @@ class TestDualOps:
         out = ts.Exp(t)
         assert ts.run(out) == expected
 
+    def test_Erf(self):
+        '''
+        f = erf(x)
+        f' = (2/sqrt(pi))*e^(-x^2)
+        '''
+        expected = [(math.erf(x), (2/math.sqrt(math.pi))*math.exp(-x**2)) for x in rng]
+        t = ts.Timer(foo_range, count=len(rng), use_dual=True)
+        out = ts.Erf(t)
+        assert ts.run(out) == expected
+
     def test_Floor(self):
         expected = [(math.floor(x), math.floor(0.05)) for x in zero_one_rng]
         t = ts.Timer(foo_zero_one, count=len(zero_one_rng), use_dual=True)
