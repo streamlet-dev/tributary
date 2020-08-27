@@ -58,3 +58,9 @@ class TestRolling:
         comp = pd.Series([_ for _ in range(10)]).ewm(span=10, adjust=False).mean()
         for i, x in enumerate(ret):
             assert (x - comp[i]) < .001
+    
+    def test_last(self):
+        assert ts.run(ts.RollingLast(ts.Foo(foo2))) == [1, 2, 0, 5, 4]
+    
+    def test_first(self):
+        assert ts.run(ts.RollingFirst(ts.Foo(foo2))) == [1, 1, 1, 1, 1]
