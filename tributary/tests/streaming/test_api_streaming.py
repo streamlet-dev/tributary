@@ -85,6 +85,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'rollingLast')
         assert hasattr(ts.StreamingNode, 'rollingFirst')
 
+        # inputs
         assert hasattr(ts, "File")
         assert hasattr(ts, "FileSource")
         assert hasattr(ts, "FileSink")
@@ -104,6 +105,7 @@ class TestAPI:
         assert hasattr(ts, "WebSocketSource")
         assert hasattr(ts, "WebSocketSink")
 
+        # Other inputs
         assert hasattr(ts, "Timer")
         assert hasattr(ts, "Const")
         assert hasattr(ts, "Curve")
