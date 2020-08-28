@@ -2,6 +2,7 @@ import statistics
 import pandas as pd
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
 from ..node import Node
+from ...base import StreamNone
 
 
 def Count(node):
@@ -149,6 +150,45 @@ def EMA(node, window_width=10, full_only=False):
     return ret
 
 
+def Last(node):
+    '''
+    Node to return the last value encountered
+    '''
+    def foo(val):
+        try:
+            iter(val)
+            ret._last_val = val[-1]
+        except TypeError:
+            ret._last_val = val
+        return ret._last_val
+
+    ret = Node(foo=foo, name='Last', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    ret.set('_last_val', StreamNone())
+    node >> ret
+    return ret
+
+
+def First(node):
+    '''
+    Node to return the first value encountered
+    '''
+    def foo(val):
+        if not ret._populated:
+            try:
+                iter(val)
+                ret._first = val[0]
+            except TypeError:
+                ret._first = val
+        ret._populated = True
+        return ret._first
+
+    ret = Node(foo=foo, name='First', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    ret.set('_first', StreamNone())
+    ret.set('_populated', False)
+    node >> ret
+    return ret
+
+
 Node.rollingCount = Count
 Node.rollingMin = Min
 Node.rollingMax = Max
@@ -156,3 +196,5 @@ Node.rollingSum = Sum
 Node.rollingAverage = Average
 Node.sma = SMA
 Node.ema = EMA
+Node.rollingLast = Last
+Node.rollingFirst = First

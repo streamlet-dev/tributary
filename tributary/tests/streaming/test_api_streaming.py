@@ -82,6 +82,8 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'rollingAverage')
         assert hasattr(ts.StreamingNode, 'sma')
         assert hasattr(ts.StreamingNode, 'ema')
+        assert hasattr(ts.StreamingNode, 'rollingLast')
+        assert hasattr(ts.StreamingNode, 'rollingFirst')
 
         assert hasattr(ts, "File")
         assert hasattr(ts, "FileSource")
