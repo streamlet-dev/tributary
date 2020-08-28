@@ -83,6 +83,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'sma')
         assert hasattr(ts.StreamingNode, 'ema')
 
+        # inputs
         assert hasattr(ts, "File")
         assert hasattr(ts, "FileSource")
         assert hasattr(ts, "FileSink")
@@ -102,6 +103,7 @@ class TestAPI:
         assert hasattr(ts, "WebSocketSource")
         assert hasattr(ts, "WebSocketSink")
 
+        # Other inputs
         assert hasattr(ts, "Timer")
         assert hasattr(ts, "Const")
         assert hasattr(ts, "Curve")

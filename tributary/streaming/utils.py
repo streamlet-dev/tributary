@@ -16,8 +16,7 @@ def Delay(node, delay=1):
         return val
 
     ret = Node(foo=foo, name='Delay', inputs=1)
-    node.downstream().append((ret, 0))
-    ret.upstream().append(node)
+    node >> ret
     return ret
 
 

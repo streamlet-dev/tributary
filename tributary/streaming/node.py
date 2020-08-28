@@ -57,7 +57,7 @@ class Node(object):
     '''
     _id_ref = 0
 
-    def __init__(self, foo, foo_kwargs=None, name=None, inputs=0, **kwargs):
+    def __init__(self, foo, foo_kwargs=None, name=None, inputs=0, drop=False, replace=False, repeat=False, **kwargs):
         # Instances get an id but one id tracker for all nodes so we can
         # uniquely identify them
         # TODO different scheme
@@ -117,6 +117,18 @@ class Node(object):
         # check if dual number
         self._use_dual = kwargs.get('use_dual', False)
 
+        # Replacement policy #
+        # drop ticks
+        self._drop = drop
+
+        # replace ticks
+        self._replace = replace
+
+        assert not (self._drop and self._replace)
+
+        # repeat last if input is StreamNone
+        self._repeat = repeat
+
         # for safety
         self._initial_attrs = dir(self) + ['_old_foo', '_initial_attrs']
 
@@ -131,8 +143,10 @@ class Node(object):
 
         Since we often use attributes to track node state, let's make sure we don't clobber any important ones'''
         if hasattr(self, '_initial_attrs') and key in self._initial_attrs:
+
             # if we've completed our construction, ensure critical attrs arent overloaded
             raise Exception('Overloading node-critical attribute: {}'.format(key))
+
         self._initial_attrs.append(key)
         super().__setattr__(key, value)
 
@@ -140,6 +154,7 @@ class Node(object):
         if hasattr(self, '_initial_attrs') and key not in self._initial_attrs:
             # if we've completed our construction, ensure critical attrs arent overloaded
             raise Exception('Use set() to set attribute, to avoid overloading node-critical attribute: {}'.format(key))
+
         super().__setattr__(key, value)
 
     def upstream(self, node=None):
@@ -149,10 +164,6 @@ class Node(object):
     def downstream(self, node=None):
         '''Access list of downstream nodes'''
         return self._downstream
-
-    def prune(self):
-        '''Remove downstream nodes'''
-        self._downstream = []
 
     def value(self):
         '''get value from node'''
@@ -230,6 +241,17 @@ class Node(object):
         '''push value to downstream nodes'''
         await self._input[index].put(inp)
 
+    async def _empty(self, index):
+        '''check if value'''
+        return self._input[index].empty() or self._active[index] != StreamNone()
+
+    async def _pop(self, index):
+        '''pop value from downstream nodes'''
+        try:
+            return await self._input[index].get()
+        except Empty:
+            return
+
     async def _execute(self):
         '''execute callable'''
         # assume no valid input
@@ -240,15 +262,18 @@ class Node(object):
             # await if its a coroutine
             if asyncio.iscoroutine(self._foo):
                 _last = await self._foo(*self._active, **self._foo_kwargs)
+
             # else call it
             elif isinstance(self._foo, types.FunctionType):
                 try:
                     # could be a generator
                     _last = self._foo(*self._active, **self._foo_kwargs)
+
                 except ValueError:
                     # Swap back to function to get a new generator next iteration
                     self._foo = self._old_foo
                     continue
+
             else:
                 raise Exception('Cannot use type:{}'.format(type(self._foo)))
 
@@ -263,6 +288,7 @@ class Node(object):
                 return await _agen_to_foo(g)
             self._foo = _foo
             _last = await self._foo()
+
         elif isinstance(_last, types.GeneratorType):
             # Swap to generator unroller
             self._old_foo = self._foo
@@ -272,10 +298,20 @@ class Node(object):
         elif asyncio.iscoroutine(_last):
             _last = await _last
 
-        self._last = _last
+        if self._repeat:
+            if isinstance(_last, (StreamNone, StreamRepeat)):
+                # NOOP
+                self._last = self._last
+            else:
+                self._last = _last
+        else:
+            self._last = _last
+
         await self._output(self._last)
+
         for i in range(len(self._active)):
             self._active[i] = StreamNone()
+
         await self._enddd3g()
         if isinstance(self._last, StreamEnd):
             await self._finish()
@@ -289,6 +325,9 @@ class Node(object):
 
     def _backpressure(self):
         '''check if downstream() are all empty, if not then don't propogate'''
+        if self._drop or self._replace:
+            return False
+
         ret = not all(n._input[i].empty() for n, i in self.downstream())
         return ret
 
@@ -297,7 +336,31 @@ class Node(object):
         # if downstreams, output
         if not isinstance(ret, (StreamNone, StreamRepeat)):
             for down, i in self.downstream():
-                await down._push(ret, i)
+
+                if self._drop:
+                    if not down._input[i].empty():
+                        # do nothing
+                        pass
+
+                    elif not isinstance(down._active[i], StreamNone):
+                        # do nothing
+                        pass
+
+                    else:
+                        await down._push(ret, i)
+
+                elif self._replace:
+                    if not down._input[i].empty():
+                        _ = await down._pop(i)
+
+                    elif not isinstance(down._active[i], StreamNone):
+                        down._active[i] = ret
+
+                    else:
+                        await down._push(ret, i)
+
+                else:
+                    await down._push(ret, i)
         return ret
     # ***********************
 

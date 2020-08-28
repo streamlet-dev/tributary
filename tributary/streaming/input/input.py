@@ -59,11 +59,11 @@ class Curve(Timer):
         value (any): value to unroll and return
     '''
 
-    def __init__(self, value):
+    def __init__(self, value, **kwargs):
         def foo(curve=value):
             for v in curve:
                 yield v
-        super().__init__(foo=foo, count=0)
+        super().__init__(foo=foo, count=0, **kwargs)
         self._name = 'Curve[{}]'.format(len(value))
 
 
@@ -78,8 +78,8 @@ class Foo(Timer):
         interval (int/float): minimum delay between calls (can be more due to async scheduling)
     '''
 
-    def __init__(self, foo, foo_kwargs=None, count=0, interval=0):
-        super().__init__(foo=foo, foo_kwargs=foo_kwargs, count=count, interval=interval)
+    def __init__(self, foo, foo_kwargs=None, count=0, interval=0, **kwargs):
+        super().__init__(foo=foo, foo_kwargs=foo_kwargs, count=count, interval=interval, **kwargs)
         self._name = 'Foo[{}]'.format(foo.__name__)
 
 
@@ -91,7 +91,7 @@ class Random(Foo):
         interval (float): interval to wait between yields
     '''
 
-    def __init__(self, count=10, interval=0.1):
+    def __init__(self, count=10, interval=0.1, **kwargs):
         def _random(count=count, interval=interval):
             step = 0
             while step < count:
@@ -104,5 +104,5 @@ class Random(Foo):
                            'C': x['C'][i],
                            'D': x['D'][i]}
                     step += 1
-        super().__init__(foo=_random, count=count, interval=interval)
+        super().__init__(foo=_random, count=count, interval=interval, **kwargs)
         self._name = 'Random'
