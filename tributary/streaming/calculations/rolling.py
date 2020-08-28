@@ -2,6 +2,7 @@ import statistics
 import pandas as pd
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
 from ..node import Node
+from ...base import StreamNone
 
 
 def Count(node):
@@ -162,7 +163,7 @@ def Last(node):
         return ret._last_val
 
     ret = Node(foo=foo, name='Last', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    ret.set('_last_val', 0)
+    ret.set('_last_val', StreamNone())
     node >> ret
     return ret
 
@@ -182,7 +183,7 @@ def First(node):
         return ret._first
 
     ret = Node(foo=foo, name='First', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    ret.set('_first', 0)
+    ret.set('_first', StreamNone())
     ret.set('_populated', False)
     node >> ret
     return ret
