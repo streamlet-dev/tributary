@@ -14,13 +14,19 @@ Tributary is a library for constructing dataflow graphs in python. Unlike many o
 
 
 # Installation
-Install from pip:
+Install with pip:
 
 `pip install tributary`
 
-or from source
+or with conda:
+
+`conda install -c conda-forge tributary`
+
+or from source:
 
 `python setup.py install`
+
+Note: If installing from source or with pip, you'll also need [Graphviz itself](https://www.graphviz.org/download/) if you want to visualize the graph using the `.graphviz()` method.
 
 # Stream Types
 Tributary offers several kinds of streams:
