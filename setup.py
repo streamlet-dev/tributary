@@ -34,7 +34,6 @@ requires = [
     'ipydagred3>=0.1.5',
     'numpy>=1.15.3',
     'pandas>=0.19.0'
-    'pygraphviz>=1.5',
     'scipy>1.2.0',
     'six>=1.11.0',
     'socketIO-client-nexus>=0.7.6',
