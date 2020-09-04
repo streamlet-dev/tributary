@@ -1,27 +1,24 @@
 build:  ## Build the repository
-	python3.7 setup.py build 
-
-buildpy2:
-	python2 setup.py build 
+	python setup.py build 
 
 tests: ## Clean and Make unit tests
-	python3.7 -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
+	python -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
 
 lint: ## run linter
-	python3.7 -m flake8 tributary 
+	python -m flake8 tributary 
 
 fix:  ## run autopep8/tslint fix
-	python3.7 -m autopep8 --in-place -r -a -a tributary/
+	python -m autopep8 --in-place -r -a -a tributary/
 	make lint
 
 annotate: ## MyPy type annotation check
-	python3.7 -m mypy -s tributary  
+	python -m mypy -s tributary  
 
 annotate_l: ## MyPy type annotation check - count only
-	python3.7 -m mypy -s tributary | wc -l 
+	python -m mypy -s tributary | wc -l 
 
 clean: ## clean the repository
 	find . -name "__pycache__" | xargs  rm -rf 
@@ -32,7 +29,7 @@ clean: ## clean the repository
 	make -C ./docs clean
 
 install:  ## install to site-packages
-	pip3 install .
+	python -m pip install .
 
 docs:  ## make documentation
 	make -C ./docs html
@@ -40,9 +37,9 @@ docs:  ## make documentation
 
 dist:  ## dist to pypi
 	rm -rf dist build
-	python3 setup.py sdist
-	python3 setup.py bdist_wheel
-	twine check dist/* && twine upload dist/*
+	python setup.py sdist
+	python setup.py bdist_wheel
+	python -m twine check dist/* && twine upload dist/*
 
 # Thanks to Francoise at marmelab.com for this
 .DEFAULT_GOAL := help

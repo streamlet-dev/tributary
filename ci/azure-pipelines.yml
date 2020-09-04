@@ -10,6 +10,8 @@ jobs:
     matrix:
       Python37:
         python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   variables:
     TRIBUTARY_SKIP_DOCKER_TESTS: 0
@@ -52,6 +54,8 @@ jobs:
     matrix:
       Python37:
         python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   variables:
     TRIBUTARY_SKIP_DOCKER_TESTS: 1
@@ -94,6 +98,8 @@ jobs:
     matrix:
       Python37:
         python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   variables:
     TRIBUTARY_SKIP_DOCKER_TESTS: 1

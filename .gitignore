@@ -177,3 +177,9 @@ ipydagred3
 python_junit.xml
 tmps
 docs/index.md
+
+# codespaces
+lib64
+pyvenv.cfg
+pythonenv3.8/
+
