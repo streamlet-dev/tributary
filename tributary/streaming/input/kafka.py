@@ -16,6 +16,8 @@ class Kafka(Foo):
     '''
 
     def __init__(self, servers, group, topics, json=False, wrap=False, interval=1, **consumer_kwargs):
+        self._consumer = None
+
         async def _listen(json=json, wrap=wrap, interval=interval):
             if self._consumer is None:
                 self._consumer = AIOKafkaConsumer(
@@ -42,4 +44,3 @@ class Kafka(Foo):
 
         super().__init__(foo=_listen)
         self._name = 'Kafka'
-        self._consumer = None
