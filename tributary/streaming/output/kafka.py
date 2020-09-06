@@ -16,13 +16,14 @@ def Kafka(node, servers='', topic='', json=False, wrap=False, **producer_kwargs)
         interval (int): kafka poll interval
     '''
 
-    producer = AIOKafkaProducer(
-        bootstrap_servers=servers,
-        **producer_kwargs)
+    async def _send(data, topic=topic, json=json, wrap=wrap):
+        if ret._producer is None:
+            ret._producer = AIOKafkaProducer(
+                bootstrap_servers=servers,
+                **producer_kwargs)
 
-    async def _send(data, producer=producer, topic=topic, json=json, wrap=wrap):
-        # Get cluster layout and initial topic/partition leadership information
-        await producer.start()
+            # Get cluster layout and initial topic/partition leadership information
+            await ret._producer.start()
 
         if wrap:
             data = [data]
@@ -31,7 +32,7 @@ def Kafka(node, servers='', topic='', json=False, wrap=False, **producer_kwargs)
             data = JSON.dumps(data)
 
         # Produce message
-        await producer.send_and_wait(topic, data.encode('utf-8'))
+        await ret._producer.send_and_wait(topic, data.encode('utf-8'))
         return data
 
     # # Wait for all pending messages to be delivered or expire.
@@ -39,4 +40,6 @@ def Kafka(node, servers='', topic='', json=False, wrap=False, **producer_kwargs)
 
     ret = Node(foo=_send, name='Kafka', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node >> ret
+
+    ret.set('_producer', None)
     return ret

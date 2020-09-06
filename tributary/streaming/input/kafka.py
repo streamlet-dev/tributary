@@ -16,17 +16,18 @@ class Kafka(Foo):
     '''
 
     def __init__(self, servers, group, topics, json=False, wrap=False, interval=1, **consumer_kwargs):
-        consumer = AIOKafkaConsumer(
-            *topics,
-            bootstrap_servers=servers,
-            group_id=group,
-            **consumer_kwargs)
+        async def _listen(json=json, wrap=wrap, interval=interval):
+            if self._consumer is None:
+                self._consumer = AIOKafkaConsumer(
+                    *topics,
+                    bootstrap_servers=servers,
+                    group_id=group,
+                    **consumer_kwargs)
 
-        async def _listen(consumer=consumer, json=json, wrap=wrap, interval=interval):
-            # Get cluster layout and join group `my-group`
-            await consumer.start()
+                # Get cluster layout and join group `my-group`
+                await self._consumer.start()
 
-            async for msg in consumer:
+            async for msg in self._consumer:
                 # Consume messages
                 # msg.topic, msg.partition, msg.offset, msg.key, msg.value, msg.timestamp
 
@@ -37,7 +38,8 @@ class Kafka(Foo):
                 yield msg
 
             # Will leave consumer group; perform autocommit if enabled.
-            await consumer.stop()
+            await self._consumer.stop()
 
         super().__init__(foo=_listen)
         self._name = 'Kafka'
+        self._consumer = None
