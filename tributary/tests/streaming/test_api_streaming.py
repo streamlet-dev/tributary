@@ -86,6 +86,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'rollingFirst')
 
         # inputs
+        assert hasattr(ts, "Console")
         assert hasattr(ts, "File")
         assert hasattr(ts, "FileSource")
         assert hasattr(ts, "FileSink")

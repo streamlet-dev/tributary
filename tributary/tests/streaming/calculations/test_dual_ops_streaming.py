@@ -312,7 +312,7 @@ class TestDualOps:
         f = erf(x)
         f' = (2/sqrt(pi))*e^(-x^2)
         '''
-        expected = [(math.erf(x), (2/math.sqrt(math.pi))*math.exp(-x**2)) for x in rng]
+        expected = [(math.erf(x), (2 / math.sqrt(math.pi)) * math.exp(-x**2)) for x in rng]
         t = ts.Timer(foo_range, count=len(rng), use_dual=True)
         out = ts.Erf(t)
         assert ts.run(out) == expected

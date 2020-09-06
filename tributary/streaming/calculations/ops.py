@@ -141,7 +141,7 @@ Arctan = unary((lambda x: math.atan(x), lambda x: (math.atan(x[0]), x[1] / (1 + 
 Sqrt = unary((lambda x: math.sqrt(x), lambda x: (math.sqrt(x[0]), x[1] * 0.5 / math.sqrt(x[0]))), name='Sqrt')
 Abs = unary((lambda x: abs(x), lambda x: (abs(x[0]), x[1] * x[0] / abs(x[0]))), name='Abs')
 Exp = unary((lambda x: math.exp(x), lambda x: (math.exp(x[0]), x[1] * math.exp(x[0]))), name='Exp')
-Erf = unary((lambda x: math.erf(x), lambda x: (math.erf(x[0]), x[1]*(2/math.sqrt(math.pi))*math.exp(-1*math.pow(x[0], 2)))), name='Erf')
+Erf = unary((lambda x: math.erf(x), lambda x: (math.erf(x[0]), x[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(x[0], 2)))), name='Erf')
 Floor = unary((lambda x: math.floor(x), lambda x: (math.floor(x[0]), math.floor(x[1]))), name='Floor')
 Ceil = unary((lambda x: math.ceil(x), lambda x: (math.ceil(x[0]), math.ceil(x[1]))), name='Ceil')
 

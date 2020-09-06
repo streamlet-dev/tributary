@@ -1,14 +1,10 @@
 import requests
 import time
-from confluent_kafka import Consumer, KafkaError
 from json import loads as load_json
-from websocket import create_connection
-from socketIO_client_nexus import SocketIO as SIO
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
-
 
 from ..base import StreamNone, StreamEnd
 from ..thread import run
@@ -23,6 +19,8 @@ def ws(url, callback, json=False, wrap=False):
         json (bool): load websocket data as json
         wrap (bool): wrap result in a list
     '''
+    from websocket import create_connection
+
     ws = create_connection(url)
     for x in run(ws.recv):
         if isinstance(x, StreamNone):
@@ -88,6 +86,8 @@ def socketio(url, callback, channel='', field='', sendinit=None, json=False, wra
         wrap (bool): wrap result in a list
         interval (int): socketio wai interval
     '''
+    from socketIO_client_nexus import SocketIO as SIO
+
     o = urlparse(url)
     socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
     if sendinit:
@@ -122,6 +122,8 @@ def kafka(callback, servers, group, topics, json=False, wrap=False, interval=1):
         wrap (bool): wrap result in a list
         interval (int): socketio wai interval
     '''
+    from confluent_kafka import Consumer, KafkaError
+
     c = Consumer({
         'bootstrap.servers': servers,
         'group.id': group,

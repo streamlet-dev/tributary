@@ -9,8 +9,7 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False, 
     '''Connect to websocket and send data
 
     Args:
-        foo (callable): input stream
-        foo_kwargs (dict): kwargs for the input stream
+        node (Node): input tributary
         url (str): websocket url to connect to
         json (bool): dump data as json
         wrap (bool): wrap result in a list

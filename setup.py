@@ -22,11 +22,12 @@ with open(pjoin(here, 'README.md'), encoding='utf-8') as f:
 
 
 requires = [
-    'aiohttp>=3.5.4',
+    'aioconsole>=0.2.1',
     'aiofiles>=0.4.0',
+    'aiohttp>=3.5.4',
+    'aiokafka>=0.6.0',
     'asyncpg>=0.20.1',
     'boltons>=20.1.0',
-    'confluent-kafka>=0.11.6',
     'future>=0.17.1',
     'gevent>=1.3.7',
     'graphviz>=0.10.1',
@@ -65,6 +66,7 @@ setup(
     install_requires=requires,
     extras_require={
         'dev': requires_dev,
+        'functional': ['confluent-kafka>=0.11.6', 'websocket_client>=0.57.0']
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

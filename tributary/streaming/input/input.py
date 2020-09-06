@@ -1,6 +1,9 @@
+import json as JSON
 import math
 import numpy as np
+from aioconsole import ainput
 from ..node import Node
+from ...base import StreamEnd
 
 
 _INPUT_GRAPHVIZSHAPE = "box"
@@ -106,3 +109,29 @@ class Random(Foo):
                     step += 1
         super().__init__(foo=_random, count=count, interval=interval, **kwargs)
         self._name = 'Random'
+
+
+class Console(Foo):
+    '''Yield a random dictionary of data
+
+    Args:
+        message (str); message to print for input
+        json (bool); json-parse input
+    '''
+
+    def __init__(self, message='', json=False, **kwargs):
+
+        async def _input(message=message, json=json):
+            try:
+                val = await ainput(message)
+                if json:
+                    val = JSON.loads(val)
+                yield val
+            except KeyboardInterrupt:
+                yield StreamEnd()
+            except BaseException:
+                # TODO other options?
+                raise
+
+        super().__init__(foo=_input, message=message, json=json, **kwargs)
+        self._name = 'Console'
