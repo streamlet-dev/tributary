@@ -20,6 +20,10 @@ class Kafka(Foo):
 
         async def _listen(json=json, wrap=wrap, interval=interval):
             if self._consumer is None:
+
+                if isinstance(topics, (list, tuple)):
+                    topics = [topics]
+
                 self._consumer = AIOKafkaConsumer(
                     *topics,
                     bootstrap_servers=servers,
