@@ -24,7 +24,6 @@ class Kafka(Foo):
         async def _listen(servers=servers, group=group, topics=topics, json=json, wrap=wrap, interval=interval):
             if self._consumer is None:
 
-
                 self._consumer = AIOKafkaConsumer(
                     *topics,
                     bootstrap_servers=servers,
