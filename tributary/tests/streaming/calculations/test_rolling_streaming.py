@@ -30,10 +30,12 @@ def foo4():
     for _ in range(10):
         yield _
 
+
 def foo5():
-    yield [1,1,2]
-    yield [1,2,3]
-    yield [3,4,5]
+    yield [1, 1, 2]
+    yield [1, 2, 3]
+    yield [3, 4, 5]
+
 
 class TestRolling:
     def test_count(self):
@@ -62,15 +64,15 @@ class TestRolling:
         comp = pd.Series([_ for _ in range(10)]).ewm(span=10, adjust=False).mean()
         for i, x in enumerate(ret):
             assert (x - comp[i]) < .001
-    
+
     def test_last(self):
         assert ts.run(ts.RollingLast(ts.Foo(foo2))) == [1, 2, 0, 5, 4]
-    
+
     def test_first(self):
         assert ts.run(ts.RollingFirst(ts.Foo(foo2))) == [1, 1, 1, 1, 1]
 
     def test_last_iter(self):
         assert ts.run(ts.RollingLast(ts.Foo(foo5))) == [2, 3, 5]
-    
+
     def test_first_iter(self):
         assert ts.run(ts.RollingFirst(ts.Foo(foo5))) == [1, 1, 1]

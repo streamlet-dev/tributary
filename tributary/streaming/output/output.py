@@ -1,4 +1,5 @@
 import copy
+from aioconsole import aprint
 from IPython.display import display
 from ..node import Node, _gen_node
 from ...base import StreamEnd, StreamNone, StreamRepeat
@@ -8,8 +9,8 @@ _OUTPUT_GRAPHVIZSHAPE = "box"
 
 
 def Print(node, text=''):
-    def foo(val):
-        print(text + str(val))
+    async def foo(val):
+        await aprint(text + str(val))
         return val
 
     node = _gen_node(node)

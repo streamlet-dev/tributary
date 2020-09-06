@@ -192,7 +192,7 @@ def Exp(self):
 
 def Erf(self):
     return unary(self, 'erf(' + str(self._name_no_id()) + ')',
-                 (lambda x: math.erf(self.value()) if not self._use_dual else (math.erf(self.value()[0]), self.value()[1]*(2/math.sqrt(math.pi))*math.exp(-1*math.pow(self.value()[0], 2)))))
+                 (lambda x: math.erf(self.value()) if not self._use_dual else (math.erf(self.value()[0]), self.value()[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(self.value()[0], 2)))))
 
 
 def Floor(self):

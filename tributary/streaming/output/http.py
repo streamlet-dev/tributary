@@ -9,8 +9,7 @@ def HTTP(node, url='', json=False, wrap=False, field=None, proxies=None, cookies
     '''Connect to url and post results to it
 
     Args:
-        foo (callable): input stream
-        foo_kwargs (dict): kwargs for the input stream
+        node (Node): input tributary
         url (str): url to post to
         json (bool): dump data as json
         wrap (bool): wrap input in a list

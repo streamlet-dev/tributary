@@ -1,5 +1,5 @@
 import json as JSON
-from confluent_kafka import Consumer, KafkaError
+from aiokafka import AIOKafkaConsumer
 from .input import Foo
 
 
@@ -16,42 +16,28 @@ class Kafka(Foo):
     '''
 
     def __init__(self, servers, group, topics, json=False, wrap=False, interval=1, **consumer_kwargs):
-        options = {
-            'bootstrap.servers': servers,
-            'group.id': group,
-            'default.topic.config': {
-                'auto.offset.reset': 'smallest'
-            }
-        }
-        options.update(**consumer_kwargs)
-        c = Consumer(options)
+        consumer = AIOKafkaConsumer(
+            *topics,
+            bootstrap_servers=servers,
+            group_id=group,
+            **consumer_kwargs)
 
-        if not isinstance(topics, list):
-            topics = [topics]
-        c.subscribe(topics)
+        async def _listen(consumer=consumer, json=json, wrap=wrap, interval=interval):
+            # Get cluster layout and join group `my-group`
+            await consumer.start()
 
-        async def _listen(consumer=c, json=json, wrap=wrap, interval=interval):
-            while True:
-                msg = consumer.poll(interval)
+            async for msg in consumer:
+                # Consume messages
+                # msg.topic, msg.partition, msg.offset, msg.key, msg.value, msg.timestamp
 
-                if msg is None:
-                    continue
-                if msg.error():
-                    if msg.error().code() == KafkaError._PARTITION_EOF:
-                        continue
-                    else:
-                        print(msg.error())
-                        break
-
-                msg = msg.value().decode('utf-8')
-
-                if not msg:
-                    break
                 if json:
-                    msg = JSON.loads(msg)
+                    msg.value = JSON.loads(msg.value)
                 if wrap:
-                    msg = [msg]
+                    msg.value = [msg.value]
                 yield msg
+
+            # Will leave consumer group; perform autocommit if enabled.
+            await consumer.stop()
 
         super().__init__(foo=_listen)
         self._name = 'Kafka'
