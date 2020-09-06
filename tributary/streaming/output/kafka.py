@@ -4,14 +4,13 @@ from .output import _OUTPUT_GRAPHVIZSHAPE
 from ..node import Node
 
 
-def Kafka(node, servers='', group='', topic='', json=False, wrap=False, **producer_kwargs):
+def Kafka(node, servers='', topic='', json=False, wrap=False, **producer_kwargs):
     '''Connect to kafka server and send data
 
     Args:
         node (Node): input tributary
         servers (list): kafka bootstrap servers
-        group (str): kafka group id
-        topics (list): list of kafka topics to connect to
+        topic (str): kafka topic to connect to
         json (bool): load input data as json
         wrap (bool): wrap result in a list
         interval (int): kafka poll interval
@@ -19,7 +18,6 @@ def Kafka(node, servers='', group='', topic='', json=False, wrap=False, **produc
 
     producer = AIOKafkaProducer(
         bootstrap_servers=servers,
-        group_id=group,
         **producer_kwargs)
 
     async def _send(data, producer=producer, topic=topic, json=json, wrap=wrap):
