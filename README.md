@@ -1,16 +1,16 @@
-# <a href="https://tributary.readthedocs.io"><img src="docs/img/icon.png" width="300"></a>
+# <a href="https://tributary.readthedocs.io"><img src="https://raw.githubusercontent.com/timkpaine/tributary/main/docs/img/icon.png" width="300"></a>
 Python Data Streams
 
-[![Build Status](https://dev.azure.com/tpaine154/tributary/_apis/build/status/timkpaine.tributary?branchName=master)](https://dev.azure.com/tpaine154/tributary/_build/latest?definitionId=2&branchName=master)
+[![Build Status](https://dev.azure.com/tpaine154/tributary/_apis/build/status/timkpaine.tributary?branchName=main)](https://dev.azure.com/tpaine154/tributary/_build/latest?definitionId=2&branchName=main)
 [![GitHub issues](https://img.shields.io/github/issues/timkpaine/tributary.svg)](https://github.com/timkpaine/tributary/issues)
-[![Coverage](https://img.shields.io/azure-devops/coverage/tpaine154/tributary/2/master)](https://dev.azure.com/tpaine154/tributary/_build?definitionId=2&_a=summary)
+[![Coverage](https://img.shields.io/azure-devops/coverage/tpaine154/tributary/2/main)](https://dev.azure.com/tpaine154/tributary/_build?definitionId=2&_a=summary)
 [![PyPI](https://img.shields.io/pypi/l/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
 
 Tributary is a library for constructing dataflow graphs in python. Unlike many other DAG libraries in python ([airflow](https://airflow.apache.org), [luigi](https://luigi.readthedocs.io/en/stable/), [prefect](https://docs.prefect.io), [dagster](https://docs.dagster.io), [dask](https://dask.org), [kedro](https://github.com/quantumblacklabs/kedro), etc), tributary is not designed with data/etl pipelines or scheduling in mind. Instead, tributary is more similar to libraries like [mdf](https://github.com/man-group/mdf), [pyungo](https://github.com/cedricleroy/pyungo), [streamz](https://streamz.readthedocs.io/en/latest/), or [pyfunctional](https://github.com/EntilZha/PyFunctional), in that it is designed to be used as the implementation for a data model. One such example is the [greeks](https://github.com/timkpaine/greeks) library, which leverages tributary to build data models for [options pricing](https://www.investopedia.com/articles/optioninvestor/07/options_beat_market.asp). 
 
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/example.gif)
+![](https://raw.githubusercontent.com/timkpaine/tributary/main/docs/img/example.gif)
 
 
 # Installation
@@ -51,12 +51,12 @@ You can visualize the graph with Graphviz. All streaming and lazy nodes support 
 Streaming and lazy nodes also support [ipydagred3](https://github.com/timkpaine/ipydagred3) for live update monitoring.
 
 ## Streaming
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/streaming/dagred3.gif)
+![](https://raw.githubusercontent.com/timkpaine/tributary/main/docs/img/streaming/dagred3.gif)
 
 Here green indicates executing, yellow indicates stalled for backpressure, and red indicates that `StreamEnd` has been propogated (e.g. stream has ended).
 
 ## Lazy
-![](https://raw.githubusercontent.com/timkpaine/tributary/master/docs/img/lazy/dagred3.gif)
+![](https://raw.githubusercontent.com/timkpaine/tributary/main/docs/img/lazy/dagred3.gif)
 
 Here green indicates executing, and red indicates that the node is dirty. Note the the determination if a node is dirty is also done lazily (we can check with `isDirty` whcih will update the node's graph state.
 
