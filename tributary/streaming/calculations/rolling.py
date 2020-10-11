@@ -1,5 +1,5 @@
-import statistics
 import pandas as pd
+import statistics
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE
 from ..node import Node
 from ...base import StreamNone
@@ -117,7 +117,7 @@ def SMA(node, window_width=10, full_only=False):
     return node.window(window_width, full_only).apply(sma)
 
 
-def EMA(node, window_width=10, full_only=False):
+def EMA(node, window_width=10, full_only=False, alpha=None, adjust=False):
     '''Node to take the exponential moving average over a window of ticks
 
     Arguments:
@@ -131,17 +131,19 @@ def EMA(node, window_width=10, full_only=False):
         '''Calculates the EMA of prices within the window'''
         # Handle case where length is less than duration; EMA is SMA
         if len(val) < 1:
-            return 0
-        elif len(val) == 1:
+            return None
+
+        if len(val) == 1:
             ret._prev = val[-1]
         else:
             if full_only and ret._prev is None:
                 # we'll only receive a window on the first full tick, so we need to backfill
                 # the previous EMA
-                ret._prev = pd.Series(val).ewm(span=window_width, adjust=False)[-1]
+                ret._prev = pd.Series(val).ewm(alpha=alpha, adjust=adjust).mean().iloc[-1] if alpha else \
+                    pd.Series(val).ewm(span=window_width, adjust=adjust).mean().iloc[-1]
             else:
                 # calculate from last value
-                mult = 2 / (window_width + 1)
+                mult = alpha if alpha is not None else 2 / (window_width + 1)
                 ret._prev = ret._prev * (1 - mult) + val[-1] * mult
         return ret._prev
 
@@ -189,11 +191,30 @@ def First(node):
     return ret
 
 
+def Diff(node):
+    '''
+    Node to return the diff between values
+    '''
+    def foo(val):
+        if ret._last_val == StreamNone():
+            ret._last_val = val
+            return None
+        diff = val - ret._last_val
+        ret._last_val = val
+        return diff
+
+    ret = Node(foo=foo, name='Diff', inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    ret.set('_last_val', StreamNone())
+    node >> ret
+    return ret
+
+
 Node.rollingCount = Count
 Node.rollingMin = Min
 Node.rollingMax = Max
 Node.rollingSum = Sum
 Node.rollingAverage = Average
+Node.diff = Diff
 Node.sma = SMA
 Node.ema = EMA
 Node.rollingLast = Last

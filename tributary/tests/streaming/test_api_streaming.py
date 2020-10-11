@@ -80,6 +80,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'rollingMin')
         assert hasattr(ts.StreamingNode, 'rollingMax')
         assert hasattr(ts.StreamingNode, 'rollingAverage')
+        assert hasattr(ts.StreamingNode, 'diff')
         assert hasattr(ts.StreamingNode, 'sma')
         assert hasattr(ts.StreamingNode, 'ema')
         assert hasattr(ts.StreamingNode, 'rollingLast')

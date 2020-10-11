@@ -267,7 +267,10 @@ class Node(object):
             elif isinstance(self._foo, types.FunctionType):
                 try:
                     # could be a generator
-                    _last = self._foo(*self._active, **self._foo_kwargs)
+                    try:
+                        _last = self._foo(*self._active, **self._foo_kwargs)
+                    except ZeroDivisionError:
+                        _last = float('inf')
 
                 except ValueError:
                     # Swap back to function to get a new generator next iteration

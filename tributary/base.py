@@ -62,7 +62,12 @@ class StreamNone:
     __le__ = all_bin_ops
     __gt__ = all_bin_ops
     __ge__ = all_bin_ops
-    __eq__ = all_bin_ops
+
+    def __eq__(self, other):
+        if isinstance(other, StreamNone):
+            return True
+        return False
+
     __ne__ = all_bin_ops
     __neg__ = all_un_ops
     __nonzero__ = all_un_ops
