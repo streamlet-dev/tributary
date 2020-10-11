@@ -1,5 +1,4 @@
 import json as JSON
-from aiokafka import AIOKafkaConsumer
 from .input import Foo
 
 
@@ -16,6 +15,8 @@ class Kafka(Foo):
     '''
 
     def __init__(self, servers, group, topics, json=False, wrap=False, interval=1, **consumer_kwargs):
+        from aiokafka import AIOKafkaConsumer
+
         self._consumer = None
 
         if not isinstance(topics, (list, tuple)):

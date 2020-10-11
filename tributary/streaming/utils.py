@@ -1,6 +1,7 @@
 import asyncio
+import json as JSON
 from .node import Node
-from ..base import StreamNone, StreamRepeat
+from ..base import StreamNone, StreamRepeat, StreamEnd
 
 
 def Delay(node, delay=1):
@@ -243,6 +244,78 @@ def Reduce(*nodes, reducer=None):
     return ret
 
 
+def Subprocess(node, command, json=False, std_err=False, one_off=False, node_to_command=False):
+    '''Open up a subprocess and yield the results as they come
+
+    Args:
+        node (Node): input stream
+        command (str): command to run
+        std_err (bool): include std_err
+    '''
+    if node_to_command and not one_off:
+        raise Exception("Piping upstream values to command assumes one off")
+
+    async def _proc(value, command=command, std_err=std_err, one_off=one_off):
+        if ret._proc is None:
+            if node_to_command:
+                command = command.format(value)
+
+            proc = await asyncio.create_subprocess_shell(
+                command,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
+            ret._proc = proc
+
+        if one_off:
+            stdout, stderr = await proc.communicate()
+
+            if stdout:
+                stdout = stdout.decode()
+            if stderr:
+                stderr = stderr.decode()
+
+            ret._proc = None
+
+            if std_err:
+                return stdout, stderr
+            else:
+                return stdout
+
+        else:
+            if value == StreamEnd():
+                try:
+                    ret._proc.terminate()
+                except ProcessLookupError:
+                    pass
+
+                await ret._proc.wait()
+                ret._proc = None
+
+            if json:
+                value = JSON.dumps(value)
+
+            ret._proc.stdin.write('{}\n'.format(value).encode('utf8'))
+            await ret._proc.stdin.drain()
+
+            val = await asyncio.create_task(ret._proc.stdout.readline())
+            val = val.decode().strip()
+
+            if val == '':
+                await ret._proc.wait()
+                ret._proc = None
+                return StreamEnd()
+
+            if json:
+                val = JSON.loads(val)
+            return val
+
+    ret = Node(foo=_proc, name='Proc', inputs=1)
+    ret.set("_proc", None)
+    node >> ret
+    return ret
+
+
 Node.delay = Delay
 # Node.state = State
 Node.apply = Apply
@@ -254,3 +327,4 @@ Node.listMerge = ListMerge
 Node.dictMerge = DictMerge
 Node.map = FixedMap
 Node.reduce = Reduce
+Node.proc = Subprocess

@@ -1,7 +1,11 @@
+import time
 import tributary.streaming as ts
 
 
 class TestAPI:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_api(self):
         assert hasattr(ts.StreamingNode, '__add__')
         assert hasattr(ts.StreamingNode, '__add__')
@@ -62,6 +66,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, 'dictMerge')
         assert hasattr(ts.StreamingNode, 'map')
         assert hasattr(ts.StreamingNode, 'reduce')
+        assert hasattr(ts.StreamingNode, 'proc')
 
         assert hasattr(ts.StreamingNode, 'graph')
         assert hasattr(ts.StreamingNode, 'pprint')
@@ -121,6 +126,7 @@ class TestAPI:
         assert hasattr(ts, "SocketIO")
         assert hasattr(ts, "SocketIOSource")
         assert hasattr(ts, "SocketIOSink")
+        assert hasattr(ts, "SubprocessSource")
         assert hasattr(ts, "WebSocket")
         assert hasattr(ts, "WebSocketSource")
         assert hasattr(ts, "WebSocketSink")

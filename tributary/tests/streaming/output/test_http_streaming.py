@@ -3,7 +3,7 @@ import pytest
 
 
 class TestHttp:
-    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS'))")
+    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS', '1'))")
     def test_http(self):
         '''Test http server'''
         def foo():

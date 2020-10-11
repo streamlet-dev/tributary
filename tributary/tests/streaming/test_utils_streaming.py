@@ -1,3 +1,7 @@
+import asyncio
+import json as JSON
+import os.path
+import sys
 import time
 import tributary.streaming as ts
 
@@ -13,6 +17,9 @@ def foo2():
 
 
 class TestUtils:
+    def setup(self):
+        time.sleep(0.1)
+
     def test_delay(self):
         out = ts.Delay(ts.Foo(foo), delay=5)
         now = time.time()
@@ -76,3 +83,30 @@ class TestUtils:
 
         out = ts.Reduce(ts.Foo(foo1), ts.Foo(foo2), ts.Foo(foo3))
         assert ts.run(out) == [(1, 2, 3), (4, 5, 6)]
+
+    def test_process(self):
+        def foo():
+            yield {"a": 1, "b": 2}
+            yield {"a": 2, "b": 4}
+            yield {"a": 3, "b": 6}
+            yield {"a": 4, "b": 8}
+
+        def _json(val):
+            return JSON.dumps(val)
+
+        cmd = '{} {} --1'.format(sys.executable, os.path.join(os.path.dirname(__file__), 'echo.py'))
+        print(cmd)
+
+        ret = ts.run(
+            ts.Subprocess(ts.Foo(foo).print('in:'),
+                          cmd,
+                          json=True).print('out:')
+        )
+
+        print(ret)
+        assert ret == [
+            {"a": 1, "b": 2},
+            {"a": 2, "b": 4},
+            {"a": 3, "b": 6},
+            {"a": 4, "b": 8}
+        ]
