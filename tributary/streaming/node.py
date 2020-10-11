@@ -397,7 +397,8 @@ class Node(object):
     # Graph operations
     # ***********************
     def _construct_graph(self):
-        return _Graph(self)
+        from .output import Collect
+        return _Graph(Collect(self))
 
     def _collect(self, visited=None):
         '''return a set of all nodes in the graph'''
