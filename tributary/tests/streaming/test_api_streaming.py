@@ -74,17 +74,35 @@ class TestAPI:
         '''apis specific to streaming nodes'''
         # window functions
         assert hasattr(ts.StreamingNode, 'perspective')
+        assert hasattr(ts, 'Perspective')
         assert hasattr(ts.StreamingNode, 'rollingCount')
+        assert hasattr(ts, 'RollingCount')
         assert hasattr(ts.StreamingNode, 'rollingSum')
+        assert hasattr(ts, 'RollingSum')
         assert hasattr(ts.StreamingNode, 'rollingCount')
+        assert hasattr(ts, 'RollingCount')
         assert hasattr(ts.StreamingNode, 'rollingMin')
+        assert hasattr(ts, 'RollingMin')
         assert hasattr(ts.StreamingNode, 'rollingMax')
+        assert hasattr(ts, 'RollingMax')
         assert hasattr(ts.StreamingNode, 'rollingAverage')
+        assert hasattr(ts, 'RollingAverage')
         assert hasattr(ts.StreamingNode, 'diff')
+        assert hasattr(ts, 'Diff')
         assert hasattr(ts.StreamingNode, 'sma')
+        assert hasattr(ts, 'SMA')
         assert hasattr(ts.StreamingNode, 'ema')
+        assert hasattr(ts, 'EMA')
         assert hasattr(ts.StreamingNode, 'rollingLast')
+        assert hasattr(ts, 'RollingLast')
         assert hasattr(ts.StreamingNode, 'rollingFirst')
+        assert hasattr(ts, 'RollingFirst')
+
+        # Finance
+        assert hasattr(ts.StreamingNode, 'rsi')
+        assert hasattr(ts, 'RSI')
+        assert hasattr(ts.StreamingNode, 'macd')
+        assert hasattr(ts, 'MACD')
 
         # inputs
         assert hasattr(ts, "Console")

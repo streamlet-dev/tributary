@@ -130,6 +130,11 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - Exp (unary)
 - Erf (unary)
 
+### Financial Calculations
+- RSI - Relative Strength Index
+- MACD - Moving Average Convergence Divergence
+
+
 ## Converters
 - Int (unary)
 - Float (unary)
