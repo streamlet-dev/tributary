@@ -13,6 +13,21 @@ class TestStreaming:
         t = ts.Foo(foo, count=1)
         assert ts.run(t) == [5]
 
+    def test_run_stop(self):
+        import time
+        import tributary.streaming as ts
+
+
+        async def foo():
+            while True:
+                yield 1
+                await asyncio.sleep(1)
+
+        g = ts.run(ts.Print(ts.Foo(foo)), blocking=False)
+
+        time.sleep(5)
+        g.stop()
+
     def test_run_generator(self):
         def foo():
             yield 1
