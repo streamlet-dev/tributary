@@ -86,7 +86,7 @@ def Window(node, size=-1, full_only=False):
 
 
 def Unroll(node):
-    '''Streaming wrapper to unroll an iterable stream
+    '''Streaming wrapper to unroll an iterable stream. Similar to Curve
 
     Arguments:
         node (node): input stream

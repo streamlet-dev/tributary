@@ -21,7 +21,6 @@ class TestStreaming:
         import time
         import tributary.streaming as ts
 
-
         async def foo():
             while True:
                 yield 1

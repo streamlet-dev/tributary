@@ -197,7 +197,6 @@ def run_copyreadme(_):
                 else:
                     fp1.write(line)
 
-        fp1.write("# API Documentation\n\n")
         with open(api, 'r') as fp2:
             fp1.write(fp2.read())
 

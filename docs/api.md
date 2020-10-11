@@ -131,6 +131,13 @@
     :show-inheritance:
 ```
 
+```eval_rst
+.. automodule:: tributary.streaming.calculations.finance
+    :members:
+    :undoc-members:
+    :show-inheritance:
+```
+
 
 ## Functional
 
