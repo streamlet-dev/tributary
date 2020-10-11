@@ -1,8 +1,12 @@
 import asyncio
+import time
 import tributary.streaming as ts
 
 
 class TestStreaming:
+    def setup(self):
+        time.sleep(0.1)
+
     def test_run_simple(self):
         t = ts.Const(value=1, count=1)
         assert ts.run(t) == [1]
