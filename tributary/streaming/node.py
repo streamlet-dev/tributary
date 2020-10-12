@@ -1,7 +1,9 @@
 import asyncio
 import types
 from asyncio import Queue, QueueEmpty as Empty
+from collections import deque
 from .graph import _Graph
+from .serialize import NodeSerializeMixin
 from ..base import StreamEnd, StreamNone, StreamRepeat
 from ..lazy.node import Node as LazyNode
 from ..utils import LazyToStreaming
@@ -39,25 +41,45 @@ def _gen_node(n):
     return Const(n)
 
 
-class Node(object):
-    '''A representation of a node in the forward propogating graph.
-
-    Args:
-        foo (callable): the python callable to wrap in a forward propogating node, can be:
-                            - function
-                            - generator
-                            - async function
-                            - async generator
-        foo_kwargs (dict): kwargs for the wrapped callables, should be static call-to-call
-        name (str): name of the node
-        inputs (int): number of upstream inputs
-        kwargs (dict): extra kwargs:
-                        - delay_interval (int/float): rate limit
-                        - execution_max (int): max number of times to execute callable
-    '''
+class Node(NodeSerializeMixin, object):
     _id_ref = 0
 
-    def __init__(self, foo, foo_kwargs=None, name=None, inputs=0, drop=False, replace=False, repeat=False, **kwargs):
+    def __init__(self,
+                 foo,
+                 foo_kwargs=None,
+                 name=None,
+                 inputs=0,
+                 drop=False,
+                 replace=False,
+                 repeat=False,
+                 graphvizshape='ellipse',
+                 delay_interval=0,
+                 execution_max=0,
+                 use_dual=False,
+                 **kwargs):
+        '''A representation of a node in the forward propogating graph.
+
+        Args:
+            foo (callable); the python callable to wrap in a forward propogating node, can be:
+                                - function
+                                - generator
+                                - async function
+                                - async generator
+            foo_kwargs (dict); kwargs for the wrapped callables, should be static call-to-call
+            name (str); name of the node
+            inputs (int); number of upstream inputs
+            drop (bool); on mismatched tick timing, drop new ticks
+            replace (bool); on mismatched tick timing, replace new ticks
+            repeat (bool); on mismatched tick timing, replay old tick
+            graphvizshape (str); graphviz shape to use
+            delay_interval (int/float); rate limit
+            execution_max (int); max number of times to execute callable
+            use_dual (bool); use dual numbers for arithmetic
+
+            internal only:
+                _id_override (int); RESTORE ONLY. override default id allocation mechanism
+
+        '''
         # Instances get an id but one id tracker for all nodes so we can
         # uniquely identify them
         # TODO different scheme
@@ -65,16 +87,17 @@ class Node(object):
         Node._id_ref += 1
 
         # Graphviz shape
-        self._graphvizshape = kwargs.get('graphvizshape', 'ellipse')
+        self._graphvizshape = graphvizshape
 
         # dagred3 node if live updating
         self._dd3g = None
 
         # Every node gets a name so it can be uniquely identified in the graph
         self._name = '{}#{}'.format(name or self.__class__.__name__, self._id)
+        self._name_only = name
 
         # Inputs are async queues from upstream nodes
-        self._input = [Queue() for _ in range(inputs)]
+        self._input = [deque() for _ in range(inputs)]
 
         # Active are currently valid inputs, since inputs
         # may come at different rates
@@ -100,10 +123,10 @@ class Node(object):
 
         # Delay between executions, useful for rate-limiting
         # default is no rate limiting
-        self._delay_interval = kwargs.get('delay_interval', 0)
+        self._delay_interval = delay_interval
 
         # max number of times to execute callable
-        self._execution_max = kwargs.get('execution_max', 0)
+        self._execution_max = execution_max
 
         # current execution count
         self._execution_count = 0
@@ -115,7 +138,7 @@ class Node(object):
         self._finished = False
 
         # check if dual number
-        self._use_dual = kwargs.get('use_dual', False)
+        self._use_dual = use_dual
 
         # Replacement policy #
         # drop ticks
@@ -137,38 +160,6 @@ class Node(object):
     # ***********************
     def __repr__(self):
         return '{}'.format(self._name)
-
-    def save(self):
-        '''return a serializeable structure representing this node's state'''
-        ret = {}
-        ret["id"] = self._id
-        ret["graphvizshape"] = self._graphvizshape
-        # self._dd3g = None
-        ret["name"] = self._name
-
-        ret["input"] = []  # TODO
-        ret["active"] = []  # TODO
-
-        ret["downstream"] = []  # TODO
-        ret["upstream"] = []  # TODO
-
-        ret["foo"] = None  # TODO
-        ret["foo_kwargs"] = None  # TODO
-
-        ret["delay_interval"] = self._delay_interval
-        ret["execution_max"] = self._execution_max
-        ret["execution_count"] = self._execution_count
-
-        ret["last"] = self._last
-        ret["finished"] = self._finished
-        ret["use_dual"] = self._use_dual
-
-        ret["drop"] = self._drop
-        ret["replace"] = self._replace
-        ret["repeat"] = self._repeat
-
-        ret["attrs"] = self._initial_attrs
-        return ret
 
     def set(self, key, value):
         '''Use this method to set attributes
@@ -229,21 +220,20 @@ class Node(object):
         for i, inp in enumerate(self._input):
             # if input hasn't received value
             if isinstance(self._active[i], StreamNone):
-                try:
+                if len(inp) > 0:
                     # get from input queue
-                    val = inp.get_nowait()
+                    val = inp.popleft()
 
                     while isinstance(val, StreamRepeat):
                         # Skip entry
-                        val = inp.get_nowait()
+                        val = inp.popleft()
 
                     if isinstance(val, StreamEnd):
                         return await self._finish()
 
                     # set as active
                     self._active[i] = val
-
-                except Empty:
+                else:
                     # wait for value
                     self._active[i] = StreamNone()
                     ready = False
@@ -271,18 +261,16 @@ class Node(object):
 
     async def _push(self, inp, index):
         '''push value to downstream nodes'''
-        await self._input[index].put(inp)
+        self._input[index].append(inp)
 
     async def _empty(self, index):
         '''check if value'''
-        return self._input[index].empty() or self._active[index] != StreamNone()
+        return len(self._input[index]) == 0 or self._active[index] != StreamNone()
 
     async def _pop(self, index):
         '''pop value from downstream nodes'''
-        try:
-            return await self._input[index].get()
-        except Empty:
-            return
+        if len(self._input[index]) > 0:
+            return self._input[index].popleft()
 
     async def _execute(self):
         '''execute callable'''
@@ -363,7 +351,7 @@ class Node(object):
         if self._drop or self._replace:
             return False
 
-        ret = not all(n._input[i].empty() for n, i in self.downstream())
+        ret = not all(len(n._input[i]) == 0 for n, i in self.downstream())
         return ret
 
     async def _output(self, ret):
@@ -373,7 +361,7 @@ class Node(object):
             for down, i in self.downstream():
 
                 if self._drop:
-                    if not down._input[i].empty():
+                    if len(down._input[i]) > 0:
                         # do nothing
                         pass
 
@@ -385,7 +373,7 @@ class Node(object):
                         await down._push(ret, i)
 
                 elif self._replace:
-                    if not down._input[i].empty():
+                    if len(down._input[i]) > 0:
                         _ = await down._pop(i)
 
                     elif not isinstance(down._active[i], StreamNone):
