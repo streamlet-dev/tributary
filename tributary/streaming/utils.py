@@ -80,7 +80,7 @@ def Window(node, size=-1, full_only=False):
         else:
             return ret._accum
 
-    ret = Node(foo=foo, name='Window', inputs=1)
+    ret = Node(foo=foo, name='Window[{}]'.format(size if size > 0 else '∞'), inputs=1)
     ret.set('_accum', [])
     node >> ret
     return ret

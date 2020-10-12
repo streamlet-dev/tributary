@@ -93,7 +93,7 @@ class Node(object):
             self._callable = _callable
 
         # if always dirty, always reevaluate
-        self._always_dirty = always_dirty or not(self._callable is None)
+        self._always_dirty = always_dirty or self._callable is not None
 
         # parent nodes in graph
         self._parents = []

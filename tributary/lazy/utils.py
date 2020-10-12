@@ -32,5 +32,31 @@ def Interval(node, seconds=0, minutes=0, hours=0, days=0, weeks=0, months=0, yea
     return ret
 
 
+def Window(node, size=-1, full_only=False):
+    def foo(node=node, size=size, full_only=full_only):
+        if size == 0:
+            return node.value()
+
+        if ret._accum is None:
+            ret._accum = []
+            
+        ret._accum.append(node.value())
+
+        if size > 0:
+            ret._accum = ret._accum[-size:]
+
+        if full_only and len(ret._accum) == size:
+            return ret._accum
+        elif full_only:
+            return None
+        return ret._accum
+
+    # make new node
+    ret = Node(name='Window[{}]'.format(size if size > 0 else '∞'), callable=foo, foo_args=(node, size, full_only))
+    ret._accum = None
+    return ret
+
+
 Node.expire = Expire
 Node.interval = Interval
+Node.window = Window
