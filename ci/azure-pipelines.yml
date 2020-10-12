@@ -73,7 +73,7 @@ jobs:
       displayName: 'Lint'
 
     - script: |
-        make testsnocov
+        make tests
       displayName: 'Test'
 
     - task: PublishTestResults@2
