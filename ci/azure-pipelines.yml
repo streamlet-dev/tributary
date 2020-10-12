@@ -57,9 +57,6 @@ jobs:
       Python38:
         python.version: '3.8'
 
-  variables:
-    TRIBUTARY_SKIP_DOCKER_TESTS: 1
-
   steps:
     - task: UsePythonVersion@0
       inputs:
@@ -96,13 +93,10 @@ jobs:
 
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
-      # Python38:  # needs confluent-kafka
-      #   python.version: '3.8'
-
-  variables:
-    TRIBUTARY_SKIP_DOCKER_TESTS: 1
+      # Python37:  # Asyncio process issues
+      #   python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   steps:
     - task: UsePythonVersion@0

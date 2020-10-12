@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from threading import Thread
 from ..base import StreamEnd, StreamNone, StreamRepeat  # noqa: F401
 
@@ -45,7 +46,15 @@ class _Graph(object):
         return last
 
     def run(self, blocking=True):
-        loop = asyncio.get_event_loop()
+        if sys.platform == 'win32':
+            # Set to proactor event loop on window
+            # (default in python 3.8+)
+            loop = asyncio.ProactorEventLoop()
+        else:
+            loop = asyncio.get_event_loop()
+
+        asyncio.set_event_loop(loop)
+
         if loop.is_running():
             # return future
             return asyncio.create_task(self._run())

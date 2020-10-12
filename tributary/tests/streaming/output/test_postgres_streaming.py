@@ -3,8 +3,8 @@ import pytest
 
 
 class TestPostgres:
-    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS'))")
-    def test_http(self):
+    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS', '1'))")
+    def test_pg(self):
 
         def foo():
             yield 1

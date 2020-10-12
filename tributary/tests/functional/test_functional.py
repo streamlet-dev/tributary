@@ -1,14 +1,16 @@
-import time
+import pytest
 import random
+import time
 
 
 class TestFunctional:
     def setup(self):
-        pass
-        # setup() before each test method
+        time.sleep(1)
 
+
+    @pytest.mark.skipif("os.name == 'nt'")
     def test_general(self):
-        import tributary as t
+        import tributary.functional as t
 
         def foo1(on_data):
             x = 0

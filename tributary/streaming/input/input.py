@@ -112,7 +112,7 @@ class Random(Foo):
 
 
 class Console(Foo):
-    '''Yield a random dictionary of data
+    '''Read from console input, optionally parse as json
 
     Args:
         message (str); message to print for input
@@ -126,9 +126,9 @@ class Console(Foo):
                 val = await ainput(message)
                 if json:
                     val = JSON.loads(val)
-                yield val
+                return val
             except KeyboardInterrupt:
-                yield StreamEnd()
+                return StreamEnd()
             except BaseException:
                 # TODO other options?
                 raise

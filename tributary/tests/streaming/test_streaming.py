@@ -5,7 +5,7 @@ import tributary.streaming as ts
 
 class TestStreaming:
     def setup(self):
-        time.sleep(0.1)
+        time.sleep(0.5)
 
     def test_run_simple(self):
         t = ts.Const(value=1, count=1)

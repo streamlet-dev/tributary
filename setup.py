@@ -26,6 +26,7 @@ requires = [
     'aiofiles>=0.4.0',
     'aiohttp>=3.5.4',
     'aiokafka>=0.6.0',
+    'aiostream>=0.3.1',
     'asyncpg>=0.20.1',
     'boltons>=20.1.0',
     'future>=0.17.1',

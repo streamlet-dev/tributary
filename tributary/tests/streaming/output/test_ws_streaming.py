@@ -3,7 +3,7 @@ import pytest
 
 
 class TestWebSocket:
-    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS'))")
+    @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS', '1'))")
     def test_websocket(self):
         '''Test websocket streaming'''
         def foo():

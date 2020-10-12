@@ -2,7 +2,13 @@ build:  ## Build the repository
 	python setup.py build 
 
 tests: ## Clean and Make unit tests
-	python -m pytest -v tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
+	python -m pytest tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
+
+testsv: ## Clean and Make unit tests
+	python -m pytest -vvv tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
+
+testsnocov: ## Clean and Make unit tests
+	python -m pytest -v tributary
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh

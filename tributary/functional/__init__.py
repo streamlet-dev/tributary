@@ -1,17 +1,19 @@
 from __future__ import print_function
+import os
+if os.name != 'nt':
+    from gevent import monkey
+    _PATCHED = False
 
-import concurrent.futures.thread as cft
-from concurrent.futures import ThreadPoolExecutor, _base
-from concurrent.futures.thread import _WorkItem
-from functools import partial
-from .input import *  # noqa: F401, F403
-from .utils import *  # noqa: F401, F403
+    if not _PATCHED:
+        monkey.patch_all(thread=False, select=False)
+        _PATCHED = True
 
-try:
-    # For Travis/ python 3.6
-    from concurrent.futures.thread import BrokenThreadPool
-except ImportError:
-    BrokenThreadPool = Exception
+from functools import partial  # noqa: E402
+from concurrent.futures.thread import _WorkItem, BrokenThreadPool  # noqa: E402
+from concurrent.futures import ThreadPoolExecutor, _base  # noqa: E402
+import concurrent.futures.thread as cft  # noqa: E402
+from .input import *  # noqa: F401, F403, E402
+from .utils import *  # noqa: F401, F403, E402
 
 
 _EXECUTOR = ThreadPoolExecutor(max_workers=10)
