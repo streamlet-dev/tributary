@@ -57,6 +57,7 @@ Mod = binary((lambda x, y: x % y, lambda: _raise(NotImplementedError('Not Implem
 Pow = binary((lambda x, y: x ** y, lambda x, y: (x[0] ** y, y * x[1] * x[0] ** (y - 1))), name='Pow')
 Sum = n_ary((lambda *args: sum(args), lambda *args: (sum([x[0] for x in args]), sum(x[1] for x in args))), name='Sum')
 Average = n_ary((lambda *args: sum(args) / len(args), lambda *args: ((sum([x[0] for x in args]) / len(args), sum(x[1] for x in args) / len(args)))), name='Average')
+Mean = Average
 
 #####################
 # Logical Operators #
@@ -142,20 +143,6 @@ Sqrt = unary((lambda x: math.sqrt(x), lambda x: (math.sqrt(x[0]), x[1] * 0.5 / m
 Abs = unary((lambda x: abs(x), lambda x: (abs(x[0]), x[1] * x[0] / abs(x[0]))), name='Abs')
 Exp = unary((lambda x: math.exp(x), lambda x: (math.exp(x[0]), x[1] * math.exp(x[0]))), name='Exp')
 Erf = unary((lambda x: math.erf(x), lambda x: (math.erf(x[0]), x[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(x[0], 2)))), name='Erf')
-Floor = unary((lambda x: math.floor(x), lambda x: (math.floor(x[0]), math.floor(x[1]))), name='Floor')
-Ceil = unary((lambda x: math.ceil(x), lambda x: (math.ceil(x[0]), math.ceil(x[1]))), name='Ceil')
-
-
-def Round(self, ndigits=0):
-    downstream = Node(lambda x: round(x, ndigits=ndigits) if not self._use_dual else
-                      (round(x[0], ndigits=ndigits), round(x[1], ndigits=ndigits)),
-                      {},
-                      name="Round",
-                      inputs=1,
-                      graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
-    self.downstream().append((downstream, 0))
-    downstream.upstream().append(self)
-    return downstream
 
 
 ##############
@@ -176,7 +163,20 @@ def __Bool__(self):
 ###################
 # Python Builtins #
 ###################
-Len = unary((lambda x: len(x),), name='Len')
+Floor = unary((lambda x: math.floor(x), lambda x: (math.floor(x[0]), math.floor(x[1]))), name='Floor')
+Ceil = unary((lambda x: math.ceil(x), lambda x: (math.ceil(x[0]), math.ceil(x[1]))), name='Ceil')
+
+
+def Round(self, ndigits=0):
+    downstream = Node(lambda x: round(x, ndigits=ndigits) if not self._use_dual else
+                      (round(x[0], ndigits=ndigits), round(x[1], ndigits=ndigits)),
+                      {},
+                      name="Round",
+                      inputs=1,
+                      graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    self.downstream().append((downstream, 0))
+    downstream.upstream().append(self)
+    return downstream
 
 
 ########################
@@ -209,6 +209,7 @@ Node.__rmod__ = Mod
 
 Node.sum = Sum
 Node.average = Average
+Node.mean = Average
 Node.invert = Invert
 
 
@@ -250,11 +251,14 @@ Node.__neg__ = Negate
 ###################
 # Python Builtins #
 ###################
-Node.__len__ = Len
-# Node.__round__ = Len
 # Node.__trunc__ = Len
-# Node.__floor__ = Len
-# Node.__ceil__ = Len
+Node.round = Round
+Node.__round__ = Floor
+Node.floor = Floor
+Node.__floor__ = Floor
+Node.ceil = Ceil
+Node.__ceil__ = Ceil
+
 
 ###################
 # Numpy Functions #
@@ -277,6 +281,3 @@ Node.abs = Abs
 Node.sqrt = Sqrt
 Node.exp = Exp
 Node.erf = Erf
-Node.floor = Floor
-Node.ceil = Ceil
-Node.round = Round

@@ -7,7 +7,6 @@ class TestFunctional:
     def setup(self):
         time.sleep(1)
 
-
     @pytest.mark.skipif("os.name == 'nt'")
     def test_general(self):
         import tributary.functional as t

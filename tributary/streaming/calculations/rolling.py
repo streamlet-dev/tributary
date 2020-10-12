@@ -5,7 +5,7 @@ from ..node import Node
 from ...base import StreamNone
 
 
-def Count(node):
+def RollingCount(node):
     '''Node to count inputs
 
     Args:
@@ -21,7 +21,7 @@ def Count(node):
     return ret
 
 
-def Max(node):
+def RollingMax(node):
     '''Node to take rolling max of inputs
 
     Args:
@@ -37,7 +37,7 @@ def Max(node):
     return ret
 
 
-def Min(node):
+def RollingMin(node):
     '''Node to take rolling min of inputs
 
     Args:
@@ -53,7 +53,7 @@ def Min(node):
     return ret
 
 
-def Sum(node):
+def RollingSum(node):
     '''Node to take rolling sum inputs
 
     If stream type is iterable, will do += sum(input). If input
@@ -78,7 +78,7 @@ def Sum(node):
     return ret
 
 
-def Average(node):
+def RollingAverage(node):
     '''Node to take the running average
 
     If stream type is iterable, will do (average + sum(input))/(count+len(input)).
@@ -209,13 +209,13 @@ def Diff(node):
     return ret
 
 
-Node.rollingCount = Count
-Node.rollingMin = Min
-Node.rollingMax = Max
-Node.rollingSum = Sum
-Node.rollingAverage = Average
+Node.rollingCount = RollingCount
+Node.rollingMin = RollingMin
+Node.rollingMax = RollingMax
+Node.rollingSum = RollingSum
+Node.rollingAverage = RollingAverage
 Node.diff = Diff
 Node.sma = SMA
 Node.ema = EMA
-Node.rollingLast = Last
-Node.rollingFirst = First
+Node.last = Last
+Node.first = First

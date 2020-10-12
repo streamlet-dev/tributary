@@ -39,7 +39,7 @@ def RSI(node, period=14):
 
 
 def MACD(node, period_fast=12, period_slow=26, signal=9):
-    '''Relative Strength Index
+    '''Moving Average Convergence/Divergence
 
     Args:
         node (Node); input data

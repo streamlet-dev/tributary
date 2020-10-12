@@ -81,13 +81,13 @@ class TestRolling:
             assert (x - comp[i]) < .001
 
     def test_last(self):
-        assert ts.run(ts.RollingLast(ts.Foo(foo2))) == [1, 2, 0, 5, 4]
+        assert ts.run(ts.Last(ts.Foo(foo2))) == [1, 2, 0, 5, 4]
 
     def test_first(self):
-        assert ts.run(ts.RollingFirst(ts.Foo(foo2))) == [1, 1, 1, 1, 1]
+        assert ts.run(ts.First(ts.Foo(foo2))) == [1, 1, 1, 1, 1]
 
     def test_last_iter(self):
-        assert ts.run(ts.RollingLast(ts.Foo(foo5))) == [2, 3, 5]
+        assert ts.run(ts.Last(ts.Foo(foo5))) == [2, 3, 5]
 
     def test_first_iter(self):
-        assert ts.run(ts.RollingFirst(ts.Foo(foo5))) == [1, 1, 1]
+        assert ts.run(ts.First(ts.Foo(foo5))) == [1, 1, 1]
