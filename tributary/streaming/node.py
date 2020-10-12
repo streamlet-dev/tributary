@@ -138,6 +138,38 @@ class Node(object):
     def __repr__(self):
         return '{}'.format(self._name)
 
+    def save(self):
+        '''return a serializeable structure representing this node's state'''
+        ret = {}
+        ret["id"] = self._id
+        ret["graphvizshape"] = self._graphvizshape
+        # self._dd3g = None
+        ret["name"] = self._name
+
+        ret["input"] = []  # TODO
+        ret["active"] = []  # TODO
+
+        ret["downstream"] = []  # TODO
+        ret["upstream"] = []  # TODO
+
+        ret["foo"] = None  # TODO
+        ret["foo_kwargs"] = None  # TODO
+
+        ret["delay_interval"] = self._delay_interval
+        ret["execution_max"] = self._execution_max
+        ret["execution_count"] = self._execution_count
+
+        ret["last"] = self._last
+        ret["finished"] = self._finished
+        ret["use_dual"] = self._use_dual
+
+        ret["drop"] = self._drop
+        ret["replace"] = self._replace
+        ret["repeat"] = self._repeat
+
+        ret["attrs"] = self._initial_attrs
+        return ret
+
     def set(self, key, value):
         '''Use this method to set attributes
 
