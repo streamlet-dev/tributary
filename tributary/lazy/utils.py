@@ -38,9 +38,9 @@ def Window(node, size=-1, full_only=False):
             return node.value()
 
         if ret._accum is None:
-            ret._accum = []
-            
-        ret._accum.append(node.value())
+            ret._accum = [node.value()]
+        elif ret._dirty_dependency[node]:
+            ret._accum.append(node.value())
 
         if size > 0:
             ret._accum = ret._accum[-size:]
@@ -52,7 +52,7 @@ def Window(node, size=-1, full_only=False):
         return ret._accum
 
     # make new node
-    ret = Node(name='Window[{}]'.format(size if size > 0 else '∞'), callable=foo, foo_args=(node, size, full_only))
+    ret = node._gennode('Window[{}]'.format(size if size > 0 else '∞'), foo, [node])
     ret._accum = None
     return ret
 

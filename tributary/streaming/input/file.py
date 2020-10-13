@@ -11,13 +11,20 @@ class File(Foo):
         json (bool): load file line as json
     '''
 
-    def __init__(self, filename, json=True):
-        async def _file(filename=filename, json=json):
-            async with aiofiles.open(filename) as f:
-                async for line in f:
-                    if json:
-                        yield JSON.loads(line)
-                    else:
-                        yield line
+    def __init__(self, filename, json=False, csv=False):
+        assert not (json and csv)
+
+        async def _file(filename=filename, json=json, csv=csv):
+            if csv:
+                async with aiofiles.open(filename) as f:
+                    async for line in f:
+                        yield line.strip().split(',')
+            else:
+                async with aiofiles.open(filename) as f:
+                    async for line in f:
+                        if json:
+                            yield JSON.loads(line)
+                        else:
+                            yield line
         super().__init__(foo=_file)
         self._name = 'File'
