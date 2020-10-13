@@ -115,8 +115,8 @@ class Console(Foo):
     '''Read from console input, optionally parse as json
 
     Args:
-        message (str); message to print for input
-        json (bool); json-parse input
+        message (str): message to print for input
+        json (bool): json-parse input
     '''
 
     def __init__(self, message='', json=False, **kwargs):
