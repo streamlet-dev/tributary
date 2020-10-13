@@ -55,5 +55,5 @@ class TestUtils:
 
     def test_window_fixed_size_full_only(self):
         n = tl.Window(tl.Node(callable=foo), size=2, full_only=True)
-        assert n() == None
+        assert n() is None
         assert n() == [1, 2]
