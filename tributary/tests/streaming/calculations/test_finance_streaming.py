@@ -28,8 +28,6 @@ class TestFinance:
 
     def test_macd(self):
         vals = pd.DataFrame(pd.util.testing.getTimeSeriesData(20))
-        curve = ts.Curve(vals['A'].tolist())
-
         period_fast = 12
         period_slow = 26
         signal = 9
@@ -49,6 +47,8 @@ class TestFinance:
         )
 
         expected = pd.concat([MACD, MACD_signal], axis=1).values
+
+        curve = ts.Curve(vals['A'].tolist())
         ret = ts.run(ts.MACD(curve).print('macd:'))
 
         for i, (macd, signal) in enumerate(ret):

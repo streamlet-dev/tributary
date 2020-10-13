@@ -93,7 +93,7 @@ class Node(object):
             self._callable = _callable
 
         # if always dirty, always reevaluate
-        self._always_dirty = always_dirty or not(self._callable is None)
+        self._always_dirty = always_dirty or self._callable is not None
 
         # parent nodes in graph
         self._parents = []
@@ -181,12 +181,15 @@ class Node(object):
             self._dd3g.setNode(self._name, tooltip=str(self.value()), style='fill: #fff')
 
     def _compute_from_dependencies(self):
+        # setup dependency dirty map
+        self._dirty_dependency = {}
+
         if self._dependencies:
             self._greendd3g()
             for deps in six.itervalues(self._dependencies):
                 # recompute args
                 for arg in deps[0]:
-                    arg._recompute()
+                    self._dirty_dependency[arg] = arg._recompute()
 
                     # Set yourself as parent
                     if self not in arg._parents:
@@ -194,7 +197,7 @@ class Node(object):
 
                 # recompute kwargs
                 for kwarg in six.itervalues(deps[1]):
-                    kwarg._recompute()
+                    self._dirty_dependency[kwarg] = kwarg._recompute()
 
                     # Set yourself as parent
                     if self not in kwarg._parents:
@@ -215,6 +218,9 @@ class Node(object):
                 raise Exception('Value should not itself be a node!')
 
             self._value = new_value
+
+        # reset to empty
+        self._dirty_dependency = {}
 
         self._whited3g()
         return self._value
@@ -252,14 +258,17 @@ class Node(object):
         return self._dirty
 
     def _recompute(self):
+        ret = False
         self.isDirty()
         if self._dirty:
+            ret = True
             if self._parents:
                 for parent in self._parents:
                     # let your parents know you were dirty!
                     parent._dirty = True
             self._value = self._compute_from_dependencies()
         self._dirty = False
+        return ret
 
     def _gennode(self, name, foo, foo_args, **kwargs):
         if name not in self._node_op_cache:

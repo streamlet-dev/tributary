@@ -10,7 +10,7 @@ vals = ['__init__.py', '__pycache__', 'test_file_data.csv', 'test_file_streaming
 
 class TestProcess:
     def setup(self):
-        time.sleep(.1)
+        time.sleep(.5)
 
     @pytest.mark.skipif("'--cov=tributary' in sys.argv")
     def test_process(self):
