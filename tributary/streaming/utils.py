@@ -292,7 +292,6 @@ def Subprocess(node, command, json=False, std_err=False, one_off=False, node_to_
                 except ProcessLookupError:
                     pass
 
-
                 await ret._proc.wait()
                 ret._proc = None
 
