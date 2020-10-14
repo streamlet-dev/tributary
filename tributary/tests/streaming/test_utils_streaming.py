@@ -1,6 +1,7 @@
 import asyncio
 import json as JSON
 import os.path
+import pytest
 import sys
 import time
 import tributary.streaming as ts
@@ -84,6 +85,7 @@ class TestUtils:
         out = ts.Reduce(ts.Foo(foo1), ts.Foo(foo2), ts.Foo(foo3))
         assert ts.run(out) == [(1, 2, 3), (4, 5, 6)]
 
+    @pytest.mark.skipif((sys.version_info.major, sys.version_info.minor) == (3, 7) and os.name == 'nt', reason="bug on windows py3.7 where pytest hangs")
     def test_process(self):
         def foo():
             yield {"a": 1, "b": 2}
