@@ -1,5 +1,6 @@
 import asyncio
 import json as JSON
+import os
 from .node import Node
 from ..base import StreamNone, StreamRepeat, StreamEnd
 
@@ -286,8 +287,11 @@ def Subprocess(node, command, json=False, std_err=False, one_off=False, node_to_
             if value == StreamEnd():
                 try:
                     ret._proc.terminate()
+                    ret._proc.kill()
+                    os.kill(ret._proc.pid)
                 except ProcessLookupError:
                     pass
+
 
                 await ret._proc.wait()
                 ret._proc = None
