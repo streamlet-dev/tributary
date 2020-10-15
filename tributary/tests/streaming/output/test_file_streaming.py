@@ -5,7 +5,7 @@ import pytest
 
 class TestFile:
     def test_file(self):
-        file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_file_data.csv'))
+        file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_file_data.json'))
         if os.path.exists(file):
             os.remove(file)
 
@@ -21,5 +21,5 @@ class TestFile:
             return [int(x) for x in data]
 
         # Test that output is equal to what is read (generalized)
-        out = ts.FileSink(ts.Foo(foo), filename=file)
+        out = ts.FileSink(ts.Foo(foo), filename=file, json=True)
         assert ts.run(out) == read_file(file)
