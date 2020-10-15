@@ -170,7 +170,7 @@ package-lock.json
 tmp.py
 tmp2.py
 docs/api/
-tributary/tests/streaming/output/test_file_data.csv
+tributary/tests/streaming/output/test_file_data.json
 examples/tributary
 examples/ipydagred3
 ipydagred3
