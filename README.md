@@ -136,15 +136,19 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - RSI - Relative Strength Index
 - MACD - Moving Average Convergence Divergence
 
-
 ## Converters
 - Int (unary)
 - Float (unary)
 - Bool (unary)
 - Str (unary)
 
-## Python Builtins
+## Basket Functions
 - Len (unary)
+- Count (unary)
+- Min (unary)
+- Max (unary)
+- Sum (unary)
+- Average (unary)
 
 ## Rolling
 - RollingCount - Node to count inputs
