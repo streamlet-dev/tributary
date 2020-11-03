@@ -34,58 +34,76 @@ def n_nary(node, others, name, lam):
 
 
 def Add(self, other):
+    '''Compute n1 + n2 for nodes n1, n2'''
     other = self._tonode(other)
     other._use_dual = self._use_dual
-    return binary(self, other, self._name_no_id() + '+' + other._name_no_id(),
+    return binary(self, other, '{}+{}'.format(self._name_no_id(), other._name_no_id()),
                   (lambda x, y: x.value() + y.value() if not self._use_dual else (x.value()[0] + y.value()[0], x.value()[1] + y.value()[1])))
 
 
 def Sub(self, other):
+    '''Compute n1 - n2 for nodes n1, n2'''
     other = self._tonode(other)
     other._use_dual = self._use_dual
-    return binary(self, other, self._name_no_id() + '-' + other._name_no_id(),
+    return binary(self, other, '{}-{}'.format(self._name_no_id(), other._name_no_id()),
                   (lambda x, y: x.value() - y.value() if not self._use_dual else (x.value()[0] - y.value()[0], x.value()[1] - y.value()[1])))
 
 
 def Mult(self, other):
+    '''Compute n1 * n2 for nodes n1, n2'''
     other = self._tonode(other)
     other._use_dual = self._use_dual
-    return binary(self, other, self._name_no_id() + '*' + other._name_no_id(),
+    return binary(self, other, '{}*{}'.format(self._name_no_id(), other._name_no_id()),
                   (lambda x, y: x.value() * y.value() if not self._use_dual else (x.value()[0] * y.value()[0], x.value()[0] * y.value()[1] + x.value()[1] * y.value()[0])))
 
 
 def Div(self, other):
+    '''Compute n1 / n2 for nodes n1, n2'''
     other = self._tonode(other)
     other._use_dual = self._use_dual
-    return binary(self, other, self._name_no_id() + '/' + other._name_no_id(),
+    return binary(self, other, '{}/{}'.format(self._name_no_id(), other._name_no_id()),
                   (lambda x, y: x.value() / y.value() if not self._use_dual else (x.value()[0] / y.value()[0], (x.value()[1] * y.value()[0] - x.value()[0] * y.value()[1]) / y.value()[0]**2)))
 
 
-def Pow(self, other):
+def RDiv(self, other):
+    '''Compute n2 / n1 for nodes n1, n2'''
     other = self._tonode(other)
     other._use_dual = self._use_dual
-    return binary(self, other, self._name_no_id() + '^' + other._name_no_id(),
+    return binary(self, other, '{}\\{}'.format(self._name_no_id(), other._name_no_id()),
+                  (lambda x, y: y.value() / x.value() if not self._use_dual else (y.value()[0] / x.value()[0], (y.value()[1] * x.value()[0] - y.value()[0] * x.value()[1]) / x.value()[0]**2)))
+
+
+def Pow(self, other):
+    '''Compute n1 ^ n2 for nodes n1, n2'''
+    other = self._tonode(other)
+    other._use_dual = self._use_dual
+    return binary(self, other, '{}^{}'.format(self._name_no_id(), other._name_no_id()),
                   (lambda x, y: x.value() ** y.value() if not self._use_dual else (x.value()[0] ** y.value(), y.value() * x.value()[1] * x.value()[0] ** (y.value() - 1))))
 
 
 def Mod(self, other):
+    '''Compute n1 % n2 for nodes n1, n2'''
     if self._use_dual:
         raise NotImplementedError('Not Implemented!')
     other = self._tonode(other)
-    return binary(self, other, self._name_no_id() + '%' + other._name_no_id(), (lambda x, y: x.value() % y.value()))
+    return binary(self, other, '{}%{}'.format(self._name_no_id(), other._name_no_id()),
+                  (lambda x, y: x.value() % y.value()))
 
 
 def Negate(self):
-    return unary(self, '(-' + self._name_no_id() + ')',
+    '''Compute -1 * n for node n'''
+    return unary(self, '(-{})'.format(self._name_no_id()),
                  (lambda x: -self.value() if not self._use_dual else (-1 * self.value()[0], -1 * self.value()[1])))
 
 
 def Invert(self):
-    return unary(self, '1/' + self._name_no_id(),
+    '''Compute 1 / n for node n'''
+    return unary(self, '1/{}'.format(self._name_no_id()),
                  (lambda x: 1 / self.value() if not self._use_dual else (1 / self.value()[0], -self.value()[1] / (self.value()[0]**2))))
 
 
 def Sum(self, *others):
+    '''Compute sum(n1, n2, ....) for nodes n1, n2, ...'''
     others_nodes = []
     for other in others:
         if isinstance(other, Node):
@@ -97,11 +115,12 @@ def Sum(self, *others):
 
     return n_nary(self,
                   others_nodes,
-                  'Sum(' + self._name_no_id() + ',' + ','.join(other._name_no_id() for other in others_nodes) + ')',
+                  'Sum({},{})'.format(self._name_no_id(), ','.join(other._name_no_id() for other in others_nodes)),
                   (lambda *args: sum(x.value() for x in args) if not self._use_dual else (sum([x.value()[0] for x in args]), sum(x.value()[1] for x in args))))
 
 
 def Average(self, *others):
+    '''Compute mean(n1, n2, ....) for nodes n1, n2, ...'''
     others_nodes = []
     for other in others:
         if isinstance(other, Node):
@@ -113,118 +132,124 @@ def Average(self, *others):
 
     return n_nary(self,
                   others_nodes,
-                  'Average(' + self._name_no_id() + ',' + ','.join(other._name_no_id() for other in others_nodes) + ')',
+                  'Average({},{})'.format(self._name_no_id(), ','.join(other._name_no_id() for other in others_nodes)),
                   (lambda *args: sum(x.value() for x in args) / len(args) if not self._use_dual else ((sum([x.value()[0] for x in args]) / len(args),
                                                                                                        sum(x.value()[1] for x in args) / len(args)))))
 
 
+Mean = Average
+
 #####################
 # Logical Operators #
 #####################
+
+
 def Or(self, other):
+    '''Compute n1 or n2 for nodes n1, n2'''
     other = self._tonode(other)
     other._use_dual = self._use_dual
-    return binary(self, other, self._name_no_id() + '||' + other._name_no_id(), (lambda x, y: x.value() or y.value()))
+    return binary(self, other, '{}||{}'.format(self._name_no_id(), other._name_no_id()), (lambda x, y: x.value() or y.value()))
 
 
 def And(self, other):
+    '''Compute n1 and n2 for nodes n1, n2'''
     other = self._tonode(other)
     other._use_dual = self._use_dual
-    return binary(self, other, self._name_no_id() + '&&' + other._name_no_id(), (lambda x, y: x.value() and y.value()))
+    return binary(self, other, '{}&&{}'.format(self._name_no_id(), other._name_no_id()), (lambda x, y: x.value() and y.value()))
 
 
 def Not(self):
-    return unary(self, '!' + self._name_no_id(), (lambda x: not x.value()))
+    '''Compute not n for node n'''
+    return unary(self, '!{}'.format(self._name_no_id()), (lambda x: not x.value()))
 
 
 ##########################
 # Mathematical Functions #
 ##########################
 def Sin(self):
-    return unary(self, 'sin(' + self._name_no_id() + ')',
+    '''Compute sin(n) for node n'''
+    return unary(self, 'sin({})'.format(self._name_no_id()),
                  (lambda x: math.sin(self.value()) if not self._use_dual else (math.sin(self.value()[0]), math.cos(self.value()[0]) * self.value()[1])))
 
 
 def Cos(self):
-    return unary(self, 'cos(' + self._name_no_id() + ')',
+    '''Compute cos(n) for node n'''
+    return unary(self, 'cos({})'.format(self._name_no_id()),
                  (lambda x: math.cos(self.value()) if not self._use_dual else (math.cos(self.value()[0]), -1 * math.sin(self.value()[0]) * self.value()[1])))
 
 
 def Tan(self):
-    return unary(self, 'tan(' + self._name_no_id() + ')',
+    '''Compute tan(n) for node n'''
+    return unary(self, 'tan({})'.format(self._name_no_id()),
                  (lambda x: math.tan(self.value()) if not self._use_dual else (math.tan(self.value()[0]), self.value()[1] * (1 / math.cos(self.value()[0]))**2)))
 
 
 def Arcsin(self):
-    return unary(self, 'arcsin(' + self._name_no_id() + ')',
+    '''Compute arcsin(n) for node n'''
+    return unary(self, 'arcsin({})'.format(self._name_no_id()),
                  (lambda x: math.asin(self.value()) if not self._use_dual else (math.asin(self.value()[0]), self.value()[1] / math.sqrt(1 - self.value()[0]**2))))
 
 
 def Arccos(self):
-    return unary(self, 'arccos(' + self._name_no_id() + ')',
+    '''Compute arccos(n) for node n'''
+    return unary(self, 'arccos({})'.format(self._name_no_id()),
                  (lambda x: math.acos(self.value()) if not self._use_dual else (math.acos(self.value()[0]), -1 * self.value()[1] / math.sqrt(1 - self.value()[0]**2))))
 
 
 def Arctan(self):
-    return unary(self, 'arctan(' + self._name_no_id() + ')',
+    '''Compute arctan(n) for node n'''
+    return unary(self, 'arctan({})'.format(self._name_no_id()),
                  (lambda x: math.atan(self.value()) if not self._use_dual else (math.atan(self.value()[0]), self.value()[1] / (1 + self.value()[0]**2))))
 
 
 def Abs(self):
-    return unary(self, '||' + self._name_no_id() + '||',
+    '''Compute abs(n) for node n'''
+    return unary(self, '||{}||'.format(self._name_no_id()),
                  (lambda x: abs(self.value()) if not self._use_dual else (abs(self.value()[0]), self.value()[1] * self.value()[0] / abs(self.value()[0]))))
 
 
 def Sqrt(self):
-    return unary(self, 'sqrt(' + str(self._name_no_id()) + ')',
+    '''Compute sqrt(n) for node n'''
+    return unary(self, 'sqrt({})'.format(self._name_no_id()),
                  (lambda x: math.sqrt(self.value()) if not self._use_dual else (math.sqrt(self.value()[0]), self.value()[1] * 0.5 / math.sqrt(self.value()[0]))))
 
 
 def Log(self):
-    return unary(self, 'log(' + str(self._name_no_id()) + ')',
+    '''Compute log(n) for node n'''
+    return unary(self, 'log({})'.format(self._name_no_id()),
                  (lambda x: math.log(self.value()) if not self._use_dual else (math.log(self.value()[0]), self.value()[1] / self.value()[0])))
 
 
 def Exp(self):
-    return unary(self, 'exp(' + str(self._name_no_id()) + ')',
+    '''Compute exp(n) for node n'''
+    return unary(self, 'exp({})'.format(self._name_no_id()),
                  (lambda x: math.exp(self.value()) if not self._use_dual else (math.exp(self.value()[0]), self.value()[1] * math.exp(self.value()[0]))))
 
 
 def Erf(self):
-    return unary(self, 'erf(' + str(self._name_no_id()) + ')',
+    '''Compute erf(n) for node n'''
+    return unary(self, 'erf({})'.format(self._name_no_id()),
                  (lambda x: math.erf(self.value()) if not self._use_dual else (math.erf(self.value()[0]), self.value()[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(self.value()[0], 2)))))
-
-
-def Floor(self):
-    return unary(self, 'floor(' + str(self._name_no_id()) + ')',
-                 (lambda x: math.floor(self.value()) if not self._use_dual else (math.floor(self.value()[0]), math.floor(self.value()[1]))))
-
-
-def Ceil(self):
-    return unary(self, 'ceil(' + str(self._name_no_id()) + ')',
-                 (lambda x: math.ceil(self.value()) if not self._use_dual else (math.ceil(self.value()[0]), math.ceil(self.value()[1]))))
-
-
-def Round(self, ndigits=0):
-    return unary(self, 'round(' + str(self._name_no_id()) + ')',
-                 (lambda x: round(self.value(), ndigits=ndigits) if not self._use_dual else (round(self.value()[0], ndigits=ndigits), round(self.value()[1], ndigits=ndigits))))
 
 
 ##############
 # Converters #
 ##############
 def Float(self):
-    return unary(self, 'float(' + str(self._name_no_id()) + ')',
+    '''Compute float(n) for node n'''
+    return unary(self, 'float({})'.format(self._name_no_id()),
                  (lambda x: float(self.value()) if not self._use_dual else float(self.value()[0])))
 
 
 def Int(self):
-    return unary(self, 'int(' + str(self._name_no_id()) + ')',
+    '''Compute int(n) for node n'''
+    return unary(self, 'int({})'.format(self._name_no_id()),
                  (lambda x: int(self.value()) if not self._use_dual else int(self.value()[0])))
 
 
 def Bool(self):
-    return unary(self, 'bool(' + str(self._name_no_id()) + ')',
+    '''Compute bool(n) for node n'''
+    return unary(self, 'bool({})'.format(self._name_no_id()),
                  (lambda x: bool(self.value()) if not self._use_dual else bool(self.value()[0])))
 
 
@@ -235,15 +260,30 @@ def __Bool__(self):
 
 
 def Str(self):
-    return unary(self, 'str(' + str(self._name_no_id()) + ')',
+    '''Compute str(n) for node n'''
+    return unary(self, 'str({})'.format(self._name_no_id()),
                  (lambda x: str(self.value()) if not self._use_dual else str(self.value()[0]) + '+' + str(self.value()[1]) + 'ε'))
 
 
 ###################
 # Python Builtins #
 ###################
-def Len(self):
-    return unary(self, 'len(' + str(self._name_no_id()) + ')', (lambda x: len(self.value())))
+def Floor(self):
+    '''Compute floor(n) for node n'''
+    return unary(self, 'floor({})'.format(self._name_no_id()),
+                 (lambda x: math.floor(self.value()) if not self._use_dual else (math.floor(self.value()[0]), math.floor(self.value()[1]))))
+
+
+def Ceil(self):
+    '''Compute ceil(n) for node n'''
+    return unary(self, 'ceil({})'.format(self._name_no_id()),
+                 (lambda x: math.ceil(self.value()) if not self._use_dual else (math.ceil(self.value()[0]), math.ceil(self.value()[1]))))
+
+
+def Round(self, ndigits=0):
+    '''Compute round(n, ndigits) for node n'''
+    return unary(self, 'round({}, {})'.format(self._name_no_id(), ndigits),
+                 (lambda x: round(self.value(), ndigits=ndigits) if not self._use_dual else (round(self.value()[0], ndigits=ndigits), round(self.value()[1], ndigits=ndigits))))
 
 
 ###################
@@ -301,6 +341,7 @@ def __array_function__(self, func, method, *inputs, **kwargs):
 # Comparators #
 ###############
 def Equal(self, other):
+    '''Compute n1 == n2 for nodes n1 and n2'''
     if isinstance(other, Node) and super(Node, self).__eq__(other):
         return True
     other = self._tonode(other)
@@ -310,6 +351,7 @@ def Equal(self, other):
 
 
 def NotEqual(self, other):
+    '''Compute n1 != n2 for nodes n1 and n2'''
     if isinstance(other, Node) and super(Node, self).__eq__(other):
         return False
     other = self._tonode(other)
@@ -319,6 +361,7 @@ def NotEqual(self, other):
 
 
 def Ge(self, other):
+    '''Compute n1 >= n2 for nodes n1 and n2'''
     if isinstance(other, Node) and super(Node, self).__eq__(other):
         return True
     other = self._tonode(other)
@@ -328,6 +371,7 @@ def Ge(self, other):
 
 
 def Gt(self, other):
+    '''Compute n1 > n2 for nodes n1 and n2'''
     if isinstance(other, Node) and super(Node, self).__eq__(other):
         return False
     other = self._tonode(other)
@@ -337,6 +381,7 @@ def Gt(self, other):
 
 
 def Le(self, other):
+    '''Compute n1 <= n2 for nodes n1 and n2'''
     if isinstance(other, Node) and super(Node, self).__eq__(other):
         return True
     other = self._tonode(other)
@@ -346,6 +391,7 @@ def Le(self, other):
 
 
 def Lt(self, other):
+    '''Compute n1 < n2 for nodes n1 and n2'''
     if isinstance(other, Node) and super(Node, self).__eq__(other):
         return False
     other = self._tonode(other)
@@ -366,7 +412,7 @@ Node.__rmul__ = Mult
 # Node.__matmul__ = MatMult
 # Node.__rmatmul__ = MatMult
 Node.__div__ = Div
-Node.__rdiv__ = Div
+Node.__rdiv__ = RDiv
 # Node.__divmod__ = DivMod
 # Node.__rdivmod__ = DivMod
 Node.__truediv__ = Div
@@ -384,6 +430,7 @@ Node.__rmod__ = Mod
 
 Node.sum = Sum
 Node.average = Average
+Node.mean = Average
 Node.invert = Invert
 
 #####################
@@ -420,11 +467,13 @@ Node.__nonzero__ = Bool  # Py2 compat
 ###################
 # Python Builtins #
 ###################
-Node.__len__ = Len
-# Node.__round__ = Len
 # Node.__trunc__ = Len
-# Node.__floor__ = Len
-# Node.__ceil__ = Len
+Node.round = Round
+Node.__round__ = Round
+Node.floor = Floor
+Node.__floor__ = Floor
+Node.ceil = Ceil
+Node.__ceil__ = Ceil
 
 ###################
 # Numpy Functions #
@@ -446,6 +495,3 @@ Node.abs = Abs
 Node.sqrt = Sqrt
 Node.exp = Exp
 Node.erf = Erf
-Node.floor = Floor
-Node.ceil = Ceil
-Node.round = Round

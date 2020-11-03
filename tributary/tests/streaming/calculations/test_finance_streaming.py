@@ -24,12 +24,10 @@ class TestFinance:
             if pd.isna(y):
                 continue
             print('({}, {})'.format(x, y))
-            assert (x - y) < 0.001
+            assert abs(x - y) < 0.001
 
     def test_macd(self):
         vals = pd.DataFrame(pd.util.testing.getTimeSeriesData(20))
-        curve = ts.Curve(vals['A'].tolist())
-
         period_fast = 12
         period_slow = 26
         signal = 9
@@ -49,8 +47,10 @@ class TestFinance:
         )
 
         expected = pd.concat([MACD, MACD_signal], axis=1).values
+
+        curve = ts.Curve(vals['A'].tolist())
         ret = ts.run(ts.MACD(curve).print('macd:'))
 
         for i, (macd, signal) in enumerate(ret):
-            assert expected[i][0] - macd < 0.001
-            assert expected[i][1] - signal < 0.001
+            assert abs(expected[i][0] - macd) < 0.001
+            assert abs(expected[i][1] - signal) < 0.001

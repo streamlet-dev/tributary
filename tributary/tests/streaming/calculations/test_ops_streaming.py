@@ -244,8 +244,3 @@ class TestOps:
         t = ts.Timer(foo, count=2)
         out = ts.Str(t)
         assert ts.run(out) == ['1', '2']
-
-    def test_Len(self):
-        t = ts.Timer(foo4, count=3)
-        out = ts.Len(t)
-        assert ts.run(out) == [1, 2, 3]

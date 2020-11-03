@@ -7,6 +7,8 @@ Python Data Streams
 [![PyPI](https://img.shields.io/pypi/l/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/timkpaine/tributary/main?urlpath=lab)
+
 
 Tributary is a library for constructing dataflow graphs in python. Unlike many other DAG libraries in python ([airflow](https://airflow.apache.org), [luigi](https://luigi.readthedocs.io/en/stable/), [prefect](https://docs.prefect.io), [dagster](https://docs.dagster.io), [dask](https://dask.org), [kedro](https://github.com/quantumblacklabs/kedro), etc), tributary is not designed with data/etl pipelines or scheduling in mind. Instead, tributary is more similar to libraries like [mdf](https://github.com/man-group/mdf), [pyungo](https://github.com/cedricleroy/pyungo), [streamz](https://streamz.readthedocs.io/en/latest/), or [pyfunctional](https://github.com/EntilZha/PyFunctional), in that it is designed to be used as the implementation for a data model. One such example is the [greeks](https://github.com/timkpaine/greeks) library, which leverages tributary to build data models for [options pricing](https://www.investopedia.com/articles/optioninvestor/07/options_beat_market.asp). 
 
@@ -134,15 +136,19 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - RSI - Relative Strength Index
 - MACD - Moving Average Convergence Divergence
 
-
 ## Converters
 - Int (unary)
 - Float (unary)
 - Bool (unary)
 - Str (unary)
 
-## Python Builtins
+## Basket Functions
 - Len (unary)
+- Count (unary)
+- Min (unary)
+- Max (unary)
+- Sum (unary)
+- Average (unary)
 
 ## Rolling
 - RollingCount - Node to count inputs

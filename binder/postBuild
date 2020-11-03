@@ -1,0 +1,11 @@
+#!/bin/bash
+EXTENSIONS="
+@jupyter-widgets/jupyterlab-manager@2.0.0
+ipydagred3@0.2.5
+ipyregulartable@0.1.2
+"
+
+jupyter labextension install $EXTENSIONS --no-build
+jupyter lab build --dev-build=False --minimize=False
+
+jupyter serverextension enable --py jupyterlab

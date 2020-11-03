@@ -20,13 +20,16 @@ class Node(object):
                  callable_kwargs=None,
                  callable_is_method=False,
                  always_dirty=False,
+                 override_callable_dirty=False,
                  **kwargs
                  ):
         '''Construct a new lazy node, wrapping a callable or a value
 
         Args:
             name (str): name to use to represent the node
-            derived (bool):
+            derived (bool): node is note instantiated directly,
+                            e.g. via n + 10 where n is a preexisting node.
+                            These default to dirty state
             readonly (bool): whether a node is settable
             nullable (bool): whether a node can have value None
             value (any): initial value of the node
@@ -35,6 +38,8 @@ class Node(object):
             callable_kwargs (dict): kwargs for the wrapped callable
             callable_is_method (bool): is the callable a method of an object
             always_dirty (bool): node should not be lazy - always access underlying value
+            override_callable_dirty (bool): treat callable as dirty-able. This is an override of the default
+                                                behavior where a callable will be re-evaluated
         '''
         # Instances get an id but one id tracker for all nodes so we can
         # uniquely identify them
@@ -94,7 +99,7 @@ class Node(object):
             self._callable = _callable
 
         # if always dirty, always reevaluate
-        self._always_dirty = always_dirty or not(self._callable is None)
+        self._always_dirty = always_dirty or (not override_callable_dirty and self._callable is not None)
 
         # parent nodes in graph
         self._parents = []
@@ -104,6 +109,9 @@ class Node(object):
 
         # cache node operations that have already been done
         self._node_op_cache = {}
+
+        # setup dependency dirty map
+        self._dirty_dependency = {}
 
         # dependencies can be nodes
         if self._callable:
@@ -181,13 +189,19 @@ class Node(object):
         if self._dd3g:
             self._dd3g.setNode(self._name, tooltip=str(self.value()), style='fill: #fff')
 
+    def dependencyIsDirty(self, dep):
+        '''In a callable, use this method to determine if a dependency WAS dirty.
+        Since the dependency will be reevaluated before the callable is executed,
+        you would otherwise lose the information'''
+        return self._dirty_dependency.get(dep, False)
+
     def _compute_from_dependencies(self):
         if self._dependencies:
             self._greendd3g()
             for deps in six.itervalues(self._dependencies):
                 # recompute args
                 for arg in deps[0]:
-                    arg._recompute()
+                    self._dirty_dependency[arg] = arg._recompute()
 
                     # Set yourself as parent
                     if self not in arg._parents:
@@ -195,7 +209,7 @@ class Node(object):
 
                 # recompute kwargs
                 for kwarg in six.itervalues(deps[1]):
-                    kwarg._recompute()
+                    self._dirty_dependency[kwarg] = kwarg._recompute()
 
                     # Set yourself as parent
                     if self not in kwarg._parents:
@@ -216,6 +230,9 @@ class Node(object):
                 raise TributaryException('Value should not itself be a node!')
 
             self._value = new_value
+
+        # reset to empty
+        self._dirty_dependency = {}
 
         self._whited3g()
         return self._value
@@ -253,14 +270,17 @@ class Node(object):
         return self._dirty
 
     def _recompute(self):
+        ret = False
         self.isDirty()
         if self._dirty:
+            ret = True
             if self._parents:
                 for parent in self._parents:
                     # let your parents know you were dirty!
                     parent._dirty = True
             self._value = self._compute_from_dependencies()
         self._dirty = False
+        return ret
 
     def _gennode(self, name, foo, foo_args, **kwargs):
         if name not in self._node_op_cache:
@@ -269,6 +289,7 @@ class Node(object):
                      derived=True,
                      callable=foo,
                      callable_args=foo_args,
+                     override_callable_dirty=True,
                      **kwargs)
         return self._node_op_cache[name]
 
@@ -287,6 +308,16 @@ class Node(object):
             self._value = value  # leave for dagre
             self._dirty = True
         self._value = value
+
+    def append(self, value):
+        # TODO is this better or worse than
+        # lst = []
+        # n = Node(value=lst)
+        # lst.append(x)
+        # n._dirty = True
+        iter(self._value)
+        self._value.append(value)
+        self._dirty = True
 
     def set(self, *args, **kwargs):
         for k, v in six.iteritems(kwargs):

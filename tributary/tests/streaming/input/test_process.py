@@ -5,12 +5,21 @@ import time
 
 import tributary.streaming as ts
 
-vals = ['__init__.py', '__pycache__', 'test_file_data.csv', 'test_file_streaming.py', 'test_http_streaming.py', 'test_input_streaming.py', 'test_postgres_streaming.py', 'test_process.py']
+vals = [
+    '__init__.py',
+    '__pycache__',
+    'test_file_data.csv',
+    'test_file_data.json',
+    'test_file_streaming.py',
+    'test_http_streaming.py',
+    'test_input_streaming.py',
+    'test_postgres_streaming.py',
+    'test_process.py']
 
 
 class TestProcess:
     def setup(self):
-        time.sleep(.1)
+        time.sleep(.5)
 
     @pytest.mark.skipif("'--cov=tributary' in sys.argv")
     def test_process(self):

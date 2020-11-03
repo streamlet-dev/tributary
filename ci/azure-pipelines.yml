@@ -93,8 +93,8 @@ jobs:
 
   strategy:
     matrix:
-      # Python37:  # Asyncio process issues
-      #   python.version: '3.7'
+      Python37:
+        python.version: '3.7'
       Python38:
         python.version: '3.8'
 

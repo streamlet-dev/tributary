@@ -1,5 +1,6 @@
 import asyncio
 import json as JSON
+import os
 from .node import Node
 from ..base import StreamNone, StreamRepeat, StreamEnd, TributaryException
 
@@ -80,7 +81,7 @@ def Window(node, size=-1, full_only=False):
         else:
             return ret._accum
 
-    ret = Node(foo=foo, name='Window', inputs=1)
+    ret = Node(foo=foo, name='Window[{}]'.format(size if size > 0 else '∞'), inputs=1)
     ret.set('_accum', [])
     node >> ret
     return ret
@@ -286,6 +287,8 @@ def Subprocess(node, command, json=False, std_err=False, one_off=False, node_to_
             if value == StreamEnd():
                 try:
                     ret._proc.terminate()
+                    ret._proc.kill()
+                    os.kill(ret._proc.pid)
                 except ProcessLookupError:
                     pass
 
