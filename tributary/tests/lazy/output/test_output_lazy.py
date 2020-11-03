@@ -5,7 +5,6 @@ class TestOutput:
     def test_graphviz(self):
         def foo():
             return 1
-
         assert tl.GraphViz(tl.Node(callable=foo, always_dirty=True))
 
     def test_dagre(self):

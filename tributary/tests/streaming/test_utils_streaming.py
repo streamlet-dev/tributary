@@ -94,13 +94,13 @@ class TestUtils:
         def _json(val):
             return JSON.dumps(val)
 
-        cmd = "{} {} --1".format(
-            sys.executable, os.path.join(os.path.dirname(__file__), "echo.py")
-        )
+        cmd = '{} {} --1'.format(sys.executable, os.path.join(os.path.dirname(__file__), 'echo.py'))
         print(cmd)
 
         ret = ts.run(
-            ts.Subprocess(ts.Foo(foo).print("in:"), cmd, json=True).print("out:")
+            ts.Subprocess(ts.Foo(foo).print('in:'),
+                          cmd,
+                          json=True).print('out:')
         )
 
         print(ret)
@@ -108,5 +108,5 @@ class TestUtils:
             {"a": 1, "b": 2},
             {"a": 2, "b": 4},
             {"a": 3, "b": 6},
-            {"a": 4, "b": 8},
+            {"a": 4, "b": 8}
         ]

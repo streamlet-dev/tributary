@@ -213,12 +213,12 @@ class TestOps:
     def test_Floor(self):
         t = ts.Timer(foofloat, count=2)
         out = ts.Floor(t)
-        assert ts.run(out) == [1.0, 2.0]
+        assert ts.run(out) == [1., 2.]
 
     def test_Ceil(self):
         t = ts.Timer(foofloat, count=2)
         out = ts.Ceil(t)
-        assert ts.run(out) == [2.0, 3.0]
+        assert ts.run(out) == [2., 3.]
 
     def test_Round(self):
         t = ts.Timer(foofloat, count=2)
@@ -243,7 +243,7 @@ class TestOps:
     def test_Str(self):
         t = ts.Timer(foo, count=2)
         out = ts.Str(t)
-        assert ts.run(out) == ["1", "2"]
+        assert ts.run(out) == ['1', '2']
 
     def test_Len(self):
         t = ts.Timer(foo4, count=3)

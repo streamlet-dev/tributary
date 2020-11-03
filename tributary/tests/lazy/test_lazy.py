@@ -4,16 +4,16 @@ import random
 
 class Foo1(t.LazyGraph):
     def __init__(self, *args, **kwargs):
-        self.x = self.node("x", readonly=False, value=1)
+        self.x = self.node('x', readonly=False, value=1)
 
 
 class Foo2(t.LazyGraph):
     def __init__(self, *args, **kwargs):
-        self.y = self.node("y", readonly=False, value=2)
+        self.y = self.node('y', readonly=False, value=2)
 
         # ensure no __nodes clobber
-        self.test = self.node("test", readonly=False, value=2)
-        self.x = self.node("x", readonly=False, value=2)
+        self.test = self.node('test', readonly=False, value=2)
+        self.x = self.node('x', readonly=False, value=2)
 
 
 class Foo3(t.LazyGraph):

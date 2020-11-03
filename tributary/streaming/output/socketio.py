@@ -5,10 +5,8 @@ from .output import _OUTPUT_GRAPHVIZSHAPE
 from ..node import Node
 
 
-def SocketIO(
-    node, url, channel="", field="", sendinit=None, json=False, wrap=False, interval=1
-):
-    """Connect to socketIO server and send updates
+def SocketIO(node, url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
+    '''Connect to socketIO server and send updates
 
     Args:
         node (Node): input stream
@@ -19,10 +17,10 @@ def SocketIO(
         json (bool): load websocket data as json
         wrap (bool): wrap result in a list
         interval (int): socketio wai interval
-    """
+    '''
 
     o = urlparse(url)
-    socketIO = SIO(o.scheme + "://" + o.netloc, o.port)
+    socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
     if sendinit:
         socketIO.emit(sendinit)
 
@@ -40,6 +38,6 @@ def SocketIO(
         socketIO.wait(seconds=interval)
         return data
 
-    ret = Node(foo=_sio, name="SocketIO", inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    ret = Node(foo=_sio, name='SocketIO', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node >> ret
     return ret

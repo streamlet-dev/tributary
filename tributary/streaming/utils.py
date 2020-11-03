@@ -5,18 +5,18 @@ from ..base import StreamNone, StreamRepeat, StreamEnd, TributaryException
 
 
 def Delay(node, delay=1):
-    """Streaming wrapper to delay a stream
+    '''Streaming wrapper to delay a stream
 
     Arguments:
         node (node): input stream
         delay (float): time to delay input stream
-    """
+    '''
 
     async def foo(val):
         await asyncio.sleep(delay)
         return val
 
-    ret = Node(foo=foo, name="Delay", inputs=1)
+    ret = Node(foo=foo, name='Delay', inputs=1)
     node >> ret
     return ret
 
@@ -40,33 +40,30 @@ def Delay(node, delay=1):
 
 
 def Apply(node, foo, foo_kwargs=None):
-    """Streaming wrapper to apply a function to an input stream
+    '''Streaming wrapper to apply a function to an input stream
 
     Arguments:
         node (node): input stream
         foo (callable): function to apply
         foo_kwargs (dict): kwargs for function
-    """
-
+    '''
     def _foo(val):
         return ret._apply(val, **ret._apply_kwargs)
-
-    ret = Node(foo=_foo, name="Apply", inputs=1)
-    ret.set("_apply", foo)
-    ret.set("_apply_kwargs", foo_kwargs or {})
+    ret = Node(foo=_foo, name='Apply', inputs=1)
+    ret.set('_apply', foo)
+    ret.set('_apply_kwargs', foo_kwargs or {})
     node >> ret
     return ret
 
 
 def Window(node, size=-1, full_only=False):
-    """Streaming wrapper to collect a window of values
+    '''Streaming wrapper to collect a window of values
 
     Arguments:
         node (node): input stream
         size (int): size of windows to use
         full_only (bool): only return if list is full
-    """
-
+    '''
     def foo(val, size=size, full_only=full_only):
         if size == 0:
             return val
@@ -83,19 +80,18 @@ def Window(node, size=-1, full_only=False):
         else:
             return ret._accum
 
-    ret = Node(foo=foo, name="Window", inputs=1)
-    ret.set("_accum", [])
+    ret = Node(foo=foo, name='Window', inputs=1)
+    ret.set('_accum', [])
     node >> ret
     return ret
 
 
 def Unroll(node):
-    """Streaming wrapper to unroll an iterable stream. Similar to Curve
+    '''Streaming wrapper to unroll an iterable stream. Similar to Curve
 
     Arguments:
         node (node): input stream
-    """
-
+    '''
     async def foo(value):
         # unrolled
         if ret._count > 0:
@@ -112,19 +108,18 @@ def Unroll(node):
         else:
             return StreamRepeat()
 
-    ret = Node(foo=foo, name="Unroll", inputs=1)
-    ret.set("_count", 0)
+    ret = Node(foo=foo, name='Unroll', inputs=1)
+    ret.set('_count', 0)
     node >> ret
     return ret
 
 
 def UnrollDataFrame(node, json=False, wrap=False):
-    """Streaming wrapper to unroll a dataframe into a stream
+    '''Streaming wrapper to unroll a dataframe into a stream
 
     Arguments:
         node (node): input stream
-    """
-
+    '''
     async def foo(value, json=json, wrap=wrap):
         # unrolled
         if ret._count > 0:
@@ -138,7 +133,7 @@ def UnrollDataFrame(node, json=False, wrap=False):
 
                 if json:
                     data = row.to_dict()
-                    data["index"] = row.name
+                    data['index'] = row.name
                 else:
                     data = row
                 ret._count += 1
@@ -149,86 +144,83 @@ def UnrollDataFrame(node, json=False, wrap=False):
         else:
             return StreamRepeat()
 
-    ret = Node(foo=foo, name="UnrollDF", inputs=1)
-    ret.set("_count", 0)
+    ret = Node(foo=foo, name='UnrollDF', inputs=1)
+    ret.set('_count', 0)
     node >> ret
     return ret
 
 
 def Merge(node1, node2):
-    """Streaming wrapper to merge 2 inputs into a single output
+    '''Streaming wrapper to merge 2 inputs into a single output
 
     Arguments:
         node1 (node): input stream
         node2 (node): input stream
-    """
-
+    '''
     def foo(value1, value2):
         return value1, value2
 
-    ret = Node(foo=foo, name="Merge", inputs=2)
+    ret = Node(foo=foo, name='Merge', inputs=2)
     node1 >> ret
     node2 >> ret
     return ret
 
 
 def ListMerge(node1, node2):
-    """Streaming wrapper to merge 2 input lists into a single output list
+    '''Streaming wrapper to merge 2 input lists into a single output list
 
     Arguments:
         node1 (node): input stream
         node2 (node): input stream
-    """
+    '''
 
     def foo(value1, value2):
         return list(value1) + list(value2)
 
-    ret = Node(foo=foo, name="ListMerge", inputs=2)
+    ret = Node(foo=foo, name='ListMerge', inputs=2)
     node1 >> ret
     node2 >> ret
     return ret
 
 
 def DictMerge(node1, node2):
-    """Streaming wrapper to merge 2 input dicts into a single output dict.
+    '''Streaming wrapper to merge 2 input dicts into a single output dict.
        Preference is given to the second input (e.g. if keys overlap)
 
     Arguments:
         node1 (node): input stream
         node2 (node): input stream
-    """
-
+    '''
     def foo(value1, value2):
         ret = {}
         ret.update(value1)
         ret.update(value2)
         return ret
 
-    ret = Node(foo=foo, name="DictMerge", inputs=2)
+    ret = Node(foo=foo, name='DictMerge', inputs=2)
     node1 >> ret
     node2 >> ret
     return ret
 
 
 def FixedMap(node, count, mapper=None):
-    """Streaming wrapper to split stream into a fixed number of outputs
+    '''Streaming wrapper to split stream into a fixed number of outputs
 
     Arguments:
         node (Node): input stream
         count (int): number of output nodes to generate
         mapper (function): how to map the inputs into `count` streams
-    """
+    '''
     rets = []
 
     def _default_mapper(value, i):
         return value[i]
 
     for _ in range(count):
-
         def foo(value, i=_, mapper=mapper or _default_mapper):
             return mapper(value, i)
 
-        ret = Node(foo=foo, name="FixedMap", inputs=1)
+        ret = Node(foo=foo, name='FixedMap', inputs=1)
         node >> ret
         rets.append(ret)
 
@@ -236,32 +228,30 @@ def FixedMap(node, count, mapper=None):
 
 
 def Reduce(*nodes, reducer=None):
-    """Streaming wrapper to merge any number of inputs
+    '''Streaming wrapper to merge any number of inputs
 
     Arguments:
         nodes (tuple): input streams
         reducer (function): how to map the outputs into one stream
-    """
+    '''
 
     def foo(*values, reducer=reducer):
         return values if reducer is None else reducer(*values)
 
-    ret = Node(foo=foo, name="Reduce", inputs=len(nodes))
+    ret = Node(foo=foo, name='Reduce', inputs=len(nodes))
     for i, n in enumerate(nodes):
         n >> ret
     return ret
 
 
-def Subprocess(
-    node, command, json=False, std_err=False, one_off=False, node_to_command=False
-):
-    """Open up a subprocess and yield the results as they come
+def Subprocess(node, command, json=False, std_err=False, one_off=False, node_to_command=False):
+    '''Open up a subprocess and yield the results as they come
 
     Args:
         node (Node): input stream
         command (str): command to run
         std_err (bool): include std_err
-    """
+    '''
     if node_to_command and not one_off:
         raise TributaryException("Piping upstream values to command assumes one off")
 
@@ -274,8 +264,7 @@ def Subprocess(
                 command,
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
+                stderr=asyncio.subprocess.PIPE)
             ret._proc = proc
 
         if one_off:
@@ -306,13 +295,13 @@ def Subprocess(
             if json:
                 value = JSON.dumps(value)
 
-            ret._proc.stdin.write("{}\n".format(value).encode("utf8"))
+            ret._proc.stdin.write('{}\n'.format(value).encode('utf8'))
             await ret._proc.stdin.drain()
 
             val = await asyncio.create_task(ret._proc.stdout.readline())
             val = val.decode().strip()
 
-            if val == "":
+            if val == '':
                 await ret._proc.wait()
                 ret._proc = None
                 return StreamEnd()
@@ -321,7 +310,7 @@ def Subprocess(
                 val = JSON.loads(val)
             return val
 
-    ret = Node(foo=_proc, name="Proc", inputs=1)
+    ret = Node(foo=_proc, name='Proc', inputs=1)
     ret.set("_proc", None)
     node >> ret
     return ret

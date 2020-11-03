@@ -12,10 +12,10 @@ class TestLazyToStreaming:
         lazy_node = tl.Node(callable=foo) + 5
         # 5 6 7 8 9
 
-        streaming_node = ts.Print(ts.Foo(foo) - 5, "streaming:")
+        streaming_node = ts.Print(ts.Foo(foo) - 5, 'streaming:')
         # -5 -4 -3 -2 -1
 
-        out = ts.Print(t.LazyToStreaming(lazy_node), "lazy:") + streaming_node
+        out = ts.Print(t.LazyToStreaming(lazy_node), 'lazy:') + streaming_node
         x = ts.run(out)
 
         # 0 2 4 6 8
@@ -30,10 +30,10 @@ class TestLazyToStreaming:
         lazy_node = tl.Node(callable=foo) + 5
         # 5 6 7 8 9
 
-        streaming_node = ts.Print(ts.Foo(foo) - 5, "streaming:")
+        streaming_node = ts.Print(ts.Foo(foo) - 5, 'streaming:')
         # -5 -4 -3 -2 -1
 
-        out = streaming_node + ts.Print(lazy_node, "lazy:")
+        out = streaming_node + ts.Print(lazy_node, 'lazy:')
         x = ts.run(out)
 
         # 0 2 4 6 8
@@ -49,10 +49,10 @@ class TestLazyToStreaming:
         lazy_node = tl.Node(value=0)
         # 5 6 7 8 9
 
-        streaming_node = ts.Print(ts.Foo(foo) - 5, "streaming:")
+        streaming_node = ts.Print(ts.Foo(foo) - 5, 'streaming:')
         # -5 -4 -3 -2 -1
 
-        out = ts.Print(t.LazyToStreaming(lazy_node) + 5, "lazy:") + streaming_node
+        out = ts.Print(t.LazyToStreaming(lazy_node) + 5, 'lazy:') + streaming_node
         x = ts.run(out)
         # 0 2 4 6 8
         print(x)
@@ -67,10 +67,10 @@ class TestLazyToStreaming:
                 yield _
                 lazy_node.setValue(_ + 1)
 
-        streaming_node = ts.Print(ts.Foo(foo) - 5, "streaming:")
+        streaming_node = ts.Print(ts.Foo(foo) - 5, 'streaming:')
         # -5 -4 -3 -2 -1
 
-        out = streaming_node + ts.Print(lazy_node + 5, "lazy:")
+        out = streaming_node + ts.Print(lazy_node + 5, 'lazy:')
         x = ts.run(out)
         # 0 2 4 6 8
         print(x)

@@ -1,9 +1,7 @@
 from __future__ import print_function
 import os
-
-if os.name != "nt":
+if os.name != 'nt':
     from gevent import monkey
-
     _PATCHED = False
 
     if not _PATCHED:
@@ -22,26 +20,25 @@ _EXECUTOR = ThreadPoolExecutor(max_workers=10)
 
 
 def submit(fn, *args, **kwargs):
-    """Submit a function to be run on the executor (internal)
+    '''Submit a function to be run on the executor (internal)
 
     Args:
         fn (callable): function to call
         args (tuple): args to pass to function
         kwargs (dict): kwargs to pass to function
-    """
+    '''
     if _EXECUTOR is None:
-        raise RuntimeError("Already stopped!")
+        raise RuntimeError('Already stopped!')
     self = _EXECUTOR
     with self._shutdown_lock:
-        if hasattr(self, "_broken") and self._broken:
+        if hasattr(self, '_broken') and self._broken:
             raise BrokenThreadPool(self._broken)
 
-        if hasattr(self, "_shutdown") and self._shutdown:
-            raise RuntimeError("cannot schedule new futures after shutdown")
+        if hasattr(self, '_shutdown') and self._shutdown:
+            raise RuntimeError('cannot schedule new futures after shutdown')
         if cft._shutdown:
-            raise RuntimeError(
-                "cannot schedule new futures after" "interpreter shutdown"
-            )
+            raise RuntimeError('cannot schedule new futures after'
+                               'interpreter shutdown')
 
         f = _base.Future()
         w = _WorkItem(f, fn, args, kwargs)
@@ -59,13 +56,11 @@ def run_submit(fn, function_to_call, *args, **kwargs):
         return
 
     if function_to_call:
-        f.add_done_callback(
-            lambda fut: function_to_call(fut.result()) if fut.result() else None
-        )
+        f.add_done_callback(lambda fut: function_to_call(fut.result()) if fut.result() else None)
 
 
 def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs=None):
-    """Pipeline a sequence of functions together via callbacks
+    '''Pipeline a sequence of functions together via callbacks
 
     Args:
         foos (list of callables): list of functions to pipeline
@@ -73,7 +68,7 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
         foo_kwargs (List[dict]):
         on_data (callable): callable to call at the end of the pipeline
         on_data_kwargs (dict): kwargs to pass to the on_data function>?
-    """
+    '''
     global _EXECUTOR
     if _EXECUTOR is None:
         _EXECUTOR = ThreadPoolExecutor(max_workers=2)
@@ -84,7 +79,7 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
     # organize args for functional pipeline
     assembled = []
     for i, foo in enumerate(foos):
-        cb = foo_callbacks[i] if i < len(foo_callbacks) else "on_data"
+        cb = foo_callbacks[i] if i < len(foo_callbacks) else 'on_data'
         kwargs = foo_kwargs[i] if i < len(foo_kwargs) else {}
         assembled.append((foo, cb, kwargs))
 
@@ -97,14 +92,10 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
         kwargs[cb] = function_to_call
 
         if i != len(assembled) - 1:
-            lambdas.append(
-                lambda d, kw=kwargs, f=foo: run_submit(f, function_to_call, d, **kw)
-            )
+            lambdas.append(lambda d, kw=kwargs, f=foo: run_submit(f, function_to_call, d, **kw))
             lambdas[-1].__name__ = foo.__name__
         else:
-            lambdas.append(
-                lambda kw=kwargs, f=foo: run_submit(f, function_to_call, **kw)
-            )
+            lambdas.append(lambda kw=kwargs, f=foo: run_submit(f, function_to_call, **kw))
             lambdas[-1].__name__ = foo.__name__
 
     # start entrypoint
@@ -112,7 +103,7 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
 
 
 def stop():
-    """Stop the executor for the pipeline runtime"""
+    '''Stop the executor for the pipeline runtime'''
     global _EXECUTOR
     _EXECUTOR.shutdown(False)
     _EXECUTOR._threads.clear()
@@ -121,7 +112,7 @@ def stop():
 
 
 def wrap(function, *args, **kwargs):
-    """wrap a function in a partial"""
+    '''wrap a function in a partial'''
     foo = partial(function, *args, **kwargs)
     foo.__name__ = function.__name__
     return foo
