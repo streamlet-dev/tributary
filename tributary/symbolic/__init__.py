@@ -1,5 +1,6 @@
 import tributary.lazy as tl
 import tributary.streaming as ts
+from tributary import TributaryException
 
 from sympy.utilities.lambdify import lambdify
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations as _st, implicit_multiplication_application as _ima
@@ -92,7 +93,7 @@ def construct_streaming(expr, modules=None):
             self._kwargs = {}
             for n in names:
                 if n not in kwargs:
-                    raise Exception("Must provide input source for: {}".format(n))
+                    raise TributaryException("Must provide input source for: {}".format(n))
                 setattr(self, n, kwargs.get(n))
                 self._kwargs[n] = kwargs.get(n)
 

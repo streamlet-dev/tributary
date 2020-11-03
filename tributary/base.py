@@ -1,4 +1,9 @@
 
+
+class TributaryException(Exception):
+    pass
+
+
 class StreamEnd:
     '''Indicates that a stream has nothing left in it'''
     instance = None

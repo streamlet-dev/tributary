@@ -4,7 +4,7 @@ from threading import Thread
 from ..base import StreamEnd, StreamNone, StreamRepeat  # noqa: F401
 
 
-class _Graph(object):
+class StreamingGraph(object):
     '''internal representation of the entire graph state'''
 
     def __init__(self, node):
@@ -67,3 +67,12 @@ class _Graph(object):
         t.daemon = True
         t.start()
         return loop
+
+    def graph(self):
+        return self._starting_node.graph()
+
+    def graphviz(self):
+        return self._starting_node.graphviz()
+
+    def dagre(self):
+        return self._starting_node.dagre()

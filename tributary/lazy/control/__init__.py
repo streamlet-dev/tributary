@@ -1,6 +1,7 @@
 
 from .utils import _CONTROL_GRAPHVIZSHAPE
 from ..node import Node
+from ...base import TributaryException
 
 
 def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
@@ -13,7 +14,7 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
         elseifs (Tuple(Node)): input of boolean/value pairs to evaluate as else if statements
     '''
     if len(elseifs) % 2 != 0:
-        raise Exception('Else ifs must be in pairs')
+        raise TributaryException('Else ifs must be in pairs')
 
     def foo(cond, if_, else_=None):
         # TODO else ifs

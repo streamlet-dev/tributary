@@ -1,7 +1,7 @@
 import asyncio
 import json as JSON
 from .node import Node
-from ..base import StreamNone, StreamRepeat, StreamEnd
+from ..base import StreamNone, StreamRepeat, StreamEnd, TributaryException
 
 
 def Delay(node, delay=1):
@@ -253,7 +253,7 @@ def Subprocess(node, command, json=False, std_err=False, one_off=False, node_to_
         std_err (bool): include std_err
     '''
     if node_to_command and not one_off:
-        raise Exception("Piping upstream values to command assumes one off")
+        raise TributaryException("Piping upstream values to command assumes one off")
 
     async def _proc(value, command=command, std_err=std_err, one_off=one_off):
         if ret._proc is None:

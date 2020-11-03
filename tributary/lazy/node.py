@@ -2,6 +2,7 @@ import six
 import inspect
 from boltons.funcutils import wraps
 from ..utils import _either_type
+from ..base import TributaryException
 
 
 class Node(object):
@@ -45,7 +46,7 @@ class Node(object):
         self._name = '{}#{}'.format(name or self.__class__.__name__, self._id)
 
         if isinstance(value, Node):
-            raise Exception('Cannot set value to be itself a node')
+            raise TributaryException('Cannot set value to be itself a node')
 
         # Graphviz shape
         self._graphvizshape = kwargs.get('graphvizshape', 'box')  # default is box instead of ellipse
@@ -212,7 +213,7 @@ class Node(object):
                 new_value = new_value()  # get value
 
             if isinstance(new_value, Node):
-                raise Exception('Value should not itself be a node!')
+                raise TributaryException('Value should not itself be a node!')
 
             self._value = new_value
 
@@ -351,13 +352,13 @@ def node(meth, memoize=True, **default_attrs):
     # kwonlydefaults = args.kwonlydefaults
 
     if argspec.varargs:
-        raise Exception('varargs not supported yet!')
+        raise TributaryException('varargs not supported yet!')
 
     if argspec.varkw:
-        raise Exception('varargs not supported yet!')
+        raise TributaryException('varargs not supported yet!')
 
     if inspect.isgeneratorfunction(meth) and default_attrs:
-        raise Exception('Not a supported pattern yet!')
+        raise TributaryException('Not a supported pattern yet!')
 
     node_args = []
     node_kwargs = {}
@@ -407,7 +408,7 @@ def node(meth, memoize=True, **default_attrs):
     node_kwargs.update(default_attrs)
 
     if (len([arg for arg in argspec.args if arg != 'self']) + len(argspec.kwonlydefaults or {})) != (len(node_args) + len(node_kwargs)):
-        raise Exception('Missing args (call or preprocessing error has occurred)')
+        raise TributaryException('Missing args (call or preprocessing error has occurred)')
 
     @wraps(meth)
     def meth_wrapper(self, *args, **kwargs):

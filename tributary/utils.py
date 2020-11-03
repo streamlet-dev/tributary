@@ -21,9 +21,10 @@ def _either_type(f):
 def LazyToStreaming(lazy_node):
     from .streaming import StreamingNode, Foo
     from .lazy import LazyNode
+    from .base import TributaryException
     if isinstance(lazy_node, StreamingNode):
         return lazy_node
     if not isinstance(lazy_node, LazyNode):
-        raise Exception("Malformed input:{}".format(lazy_node))
+        raise TributaryException("Malformed input:{}".format(lazy_node))
 
     return Foo(foo=lambda node=lazy_node: node())

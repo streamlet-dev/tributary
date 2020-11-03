@@ -7,6 +7,8 @@ from .serialize import NodeSerializeMixin
 from ..base import StreamEnd, StreamNone, StreamRepeat
 from ..lazy.node import Node as LazyNode
 from ..utils import LazyToStreaming
+from ..base import TributaryException
+
 
 _DD3_TRANSITION_DELAY = 0.1  # used so you can visually see the
 # transition e.g. not too fast
@@ -168,7 +170,7 @@ class Node(NodeSerializeMixin, object):
         if hasattr(self, '_initial_attrs') and key in self._initial_attrs:
 
             # if we've completed our construction, ensure critical attrs arent overloaded
-            raise Exception('Overloading node-critical attribute: {}'.format(key))
+            raise TributaryException('Overloading node-critical attribute: {}'.format(key))
 
         self._initial_attrs.append(key)
         super().__setattr__(key, value)
@@ -176,7 +178,7 @@ class Node(NodeSerializeMixin, object):
     def __setattr__(self, key, value):
         if hasattr(self, '_initial_attrs') and key not in self._initial_attrs:
             # if we've completed our construction, ensure critical attrs arent overloaded
-            raise Exception('Use set() to set attribute, to avoid overloading node-critical attribute: {}'.format(key))
+            raise TributaryException('Use set() to set attribute, to avoid overloading node-critical attribute: {}'.format(key))
 
         super().__setattr__(key, value)
 
@@ -298,7 +300,7 @@ class Node(NodeSerializeMixin, object):
                     continue
 
             else:
-                raise Exception('Cannot use type:{}'.format(type(self._foo)))
+                raise TributaryException('Cannot use type:{}'.format(type(self._foo)))
 
             # calculation was valid
             valid = True
