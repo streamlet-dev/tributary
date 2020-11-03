@@ -85,7 +85,10 @@ class TestUtils:
         out = ts.Reduce(ts.Foo(foo1), ts.Foo(foo2), ts.Foo(foo3))
         assert ts.run(out) == [(1, 2, 3), (4, 5, 6)]
 
-    @pytest.mark.skipif((sys.version_info.major, sys.version_info.minor) == (3, 7) and os.name == 'nt', reason="bug on windows py3.7 where pytest hangs")
+    @pytest.mark.skipif(
+        (sys.version_info.major, sys.version_info.minor) == (3, 7) and os.name == "nt",
+        reason="bug on windows py3.7 where pytest hangs",
+    )
     def test_process(self):
         def foo():
             yield {"a": 1, "b": 2}
@@ -96,13 +99,13 @@ class TestUtils:
         def _json(val):
             return JSON.dumps(val)
 
-        cmd = '{} {} --1'.format(sys.executable, os.path.join(os.path.dirname(__file__), 'echo.py'))
+        cmd = "{} {} --1".format(
+            sys.executable, os.path.join(os.path.dirname(__file__), "echo.py")
+        )
         print(cmd)
 
         ret = ts.run(
-            ts.Subprocess(ts.Foo(foo).print('in:'),
-                          cmd,
-                          json=True).print('out:')
+            ts.Subprocess(ts.Foo(foo).print("in:"), cmd, json=True).print("out:")
         )
 
         print(ret)
@@ -110,5 +113,5 @@ class TestUtils:
             {"a": 1, "b": 2},
             {"a": 2, "b": 4},
             {"a": 3, "b": 6},
-            {"a": 4, "b": 8}
+            {"a": 4, "b": 8},
         ]

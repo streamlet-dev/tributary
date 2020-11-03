@@ -4,14 +4,15 @@ from ...base import StreamNone
 
 
 def RSI(node, period=14):
-    '''Relative Strength Index
+    """Relative Strength Index
 
     Args:
         node (Node): input data
         period (int): RSI period
     Returns:
         Node: stream of RSI calculations
-    '''
+    """
+
     def _filter(up=True):
         def filter(val, up=up):
             if val is None:
@@ -25,12 +26,21 @@ def RSI(node, period=14):
             if val < 0:
                 return abs(val)
             return 0
+
         return filter
 
     diff = node.diff()
 
-    ups = diff.apply(_filter(up=True)).ema(window_width=period, alpha=1 / period, adjust=True).print('up:')
-    downs = diff.apply(_filter(up=False)).ema(window_width=period, alpha=1 / period, adjust=True).print('down:')
+    ups = (
+        diff.apply(_filter(up=True))
+        .ema(window_width=period, alpha=1 / period, adjust=True)
+        .print("up:")
+    )
+    downs = (
+        diff.apply(_filter(up=False))
+        .ema(window_width=period, alpha=1 / period, adjust=True)
+        .print("down:")
+    )
 
     RS = ups / downs
 
@@ -39,7 +49,7 @@ def RSI(node, period=14):
 
 
 def MACD(node, period_fast=12, period_slow=26, signal=9):
-    '''Moving Average Convergence/Divergence
+    """Moving Average Convergence/Divergence
 
     Args:
         node (Node): input data
@@ -48,7 +58,7 @@ def MACD(node, period_fast=12, period_slow=26, signal=9):
         signal (int): MACD moving average period
     Returns:
         Node: node that emits tuple of (macd, macd_signal)
-    '''
+    """
     fast = node.ema(window_width=period_fast)
     slow = node.ema(window_width=period_slow)
     macd = fast - slow

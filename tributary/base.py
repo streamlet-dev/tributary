@@ -1,11 +1,10 @@
-
-
 class TributaryException(Exception):
     pass
 
 
 class StreamEnd:
-    '''Indicates that a stream has nothing left in it'''
+    """Indicates that a stream has nothing left in it"""
+
     instance = None
 
     def __new__(cls):
@@ -16,8 +15,9 @@ class StreamEnd:
 
 
 class StreamRepeat:
-    '''Indicates that a stream has a gap, this object should be ignored
-    and the previous action repeated'''
+    """Indicates that a stream has a gap, this object should be ignored
+    and the previous action repeated"""
+
     instance = None
 
     def __new__(cls):
@@ -28,7 +28,8 @@ class StreamRepeat:
 
 
 class StreamNone:
-    '''indicates that a stream does not have a value'''
+    """indicates that a stream does not have a value"""
+
     instance = None
 
     def __new__(cls):
@@ -60,9 +61,16 @@ class StreamNone:
     __and__ = all_bin_ops
     __or__ = all_bin_ops
     __invert__ = all_un_ops
-    def __bool__(self): return False
-    def int(self): return 0
-    def float(self): return 0
+
+    def __bool__(self):
+        return False
+
+    def int(self):
+        return 0
+
+    def float(self):
+        return 0
+
     __lt__ = all_bin_ops
     __le__ = all_bin_ops
     __gt__ = all_bin_ops

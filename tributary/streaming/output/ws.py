@@ -5,16 +5,27 @@ from ..node import Node
 from ...base import StreamNone, StreamEnd
 
 
-def WebSocket(node, url='', json=False, wrap=False, field=None, response=False, response_timeout=1):
-    '''Connect to websocket and send data
+def WebSocket(
+    node, url="", json=False, wrap=False, field=None, response=False, response_timeout=1
+):
+    """Connect to websocket and send data
 
     Args:
         node (Node): input tributary
         url (str): websocket url to connect to
         json (bool): dump data as json
         wrap (bool): wrap result in a list
-    '''
-    async def _send(data, url=url, json=json, wrap=wrap, field=field, response=response, response_timeout=response_timeout):
+    """
+
+    async def _send(
+        data,
+        url=url,
+        json=json,
+        wrap=wrap,
+        field=field,
+        response=response,
+        response_timeout=response_timeout,
+    ):
         if isinstance(data, (StreamNone, StreamEnd)):
             return data
 
@@ -32,11 +43,11 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False, 
                 if msg.type == aiohttp.WSMsgType.TEXT:
                     x = msg.data
                 elif msg.type == aiohttp.WSMsgType.CLOSED:
-                    x = '{}'
+                    x = "{}"
                 elif msg.type == aiohttp.WSMsgType.ERROR:
-                    x = '{}'
+                    x = "{}"
             else:
-                x = '{}'
+                x = "{}"
 
         await session.close()
 
@@ -51,6 +62,8 @@ def WebSocket(node, url='', json=False, wrap=False, field=None, response=False, 
 
         return x
 
-    ret = Node(foo=_send, name='WebSocket', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    ret = Node(
+        foo=_send, name="WebSocket", inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE
+    )
     node >> ret
     return ret

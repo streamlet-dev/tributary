@@ -1,6 +1,5 @@
 import asyncio
 import types
-from asyncio import Queue, QueueEmpty as Empty
 from collections import deque
 from .graph import _Graph
 from .serialize import NodeSerializeMixin
@@ -34,6 +33,7 @@ async def _agen_to_foo(generator):
 
 def _gen_node(n):
     from .input import Const, Foo
+
     if isinstance(n, Node):
         return n
     elif isinstance(n, LazyNode):
@@ -46,20 +46,22 @@ def _gen_node(n):
 class Node(NodeSerializeMixin, object):
     _id_ref = 0
 
-    def __init__(self,
-                 foo,
-                 foo_kwargs=None,
-                 name=None,
-                 inputs=0,
-                 drop=False,
-                 replace=False,
-                 repeat=False,
-                 graphvizshape='ellipse',
-                 delay_interval=0,
-                 execution_max=0,
-                 use_dual=False,
-                 **kwargs):
-        '''A representation of a node in the forward propogating graph.
+    def __init__(
+        self,
+        foo,
+        foo_kwargs=None,
+        name=None,
+        inputs=0,
+        drop=False,
+        replace=False,
+        repeat=False,
+        graphvizshape="ellipse",
+        delay_interval=0,
+        execution_max=0,
+        use_dual=False,
+        **kwargs
+    ):
+        """A representation of a node in the forward propogating graph.
 
         Args:
             foo (callable); the python callable to wrap in a forward propogating node, can be:
@@ -81,7 +83,7 @@ class Node(NodeSerializeMixin, object):
             internal only:
                 _id_override (int); RESTORE ONLY. override default id allocation mechanism
 
-        '''
+        """
         # Instances get an id but one id tracker for all nodes so we can
         # uniquely identify them
         # TODO different scheme
@@ -95,7 +97,7 @@ class Node(NodeSerializeMixin, object):
         self._dd3g = None
 
         # Every node gets a name so it can be uniquely identified in the graph
-        self._name = '{}#{}'.format(name or self.__class__.__name__, self._id)
+        self._name = "{}#{}".format(name or self.__class__.__name__, self._id)
         self._name_only = name
 
         # Inputs are async queues from upstream nodes
@@ -155,47 +157,53 @@ class Node(NodeSerializeMixin, object):
         self._repeat = repeat
 
         # for safety
-        self._initial_attrs = dir(self) + ['_old_foo', '_initial_attrs']
+        self._initial_attrs = dir(self) + ["_old_foo", "_initial_attrs"]
 
     # ***********************
     # Public interface
     # ***********************
     def __repr__(self):
-        return '{}'.format(self._name)
+        return "{}".format(self._name)
 
     def set(self, key, value):
-        '''Use this method to set attributes
+        """Use this method to set attributes
 
-        Since we often use attributes to track node state, let's make sure we don't clobber any important ones'''
-        if hasattr(self, '_initial_attrs') and key in self._initial_attrs:
+        Since we often use attributes to track node state, let's make sure we don't clobber any important ones"""
+        if hasattr(self, "_initial_attrs") and key in self._initial_attrs:
 
             # if we've completed our construction, ensure critical attrs arent overloaded
-            raise TributaryException('Overloading node-critical attribute: {}'.format(key))
+            raise TributaryException(
+                "Overloading node-critical attribute: {}".format(key)
+            )
 
         self._initial_attrs.append(key)
         super().__setattr__(key, value)
 
     def __setattr__(self, key, value):
-        if hasattr(self, '_initial_attrs') and key not in self._initial_attrs:
+        if hasattr(self, "_initial_attrs") and key not in self._initial_attrs:
             # if we've completed our construction, ensure critical attrs arent overloaded
-            raise TributaryException('Use set() to set attribute, to avoid overloading node-critical attribute: {}'.format(key))
+            raise TributaryException(
+                "Use set() to set attribute, to avoid overloading node-critical attribute: {}".format(
+                    key
+                )
+            )
 
         super().__setattr__(key, value)
 
     def upstream(self, node=None):
-        '''Access list of upstream nodes'''
+        """Access list of upstream nodes"""
         return self._upstream
 
     def downstream(self, node=None):
-        '''Access list of downstream nodes'''
+        """Access list of downstream nodes"""
         return self._downstream
 
     def value(self):
-        '''get value from node'''
+        """get value from node"""
         return self._last
 
     async def __call__(self):
-        '''execute the callable if possible, and propogate values downstream'''
+        """execute the callable if possible, and propogate values downstream"""
         # Downstream nodes can't process
         if self._backpressure():
             await self._waitdd3g()
@@ -243,6 +251,7 @@ class Node(NodeSerializeMixin, object):
         if ready:
             # execute function
             return await self._execute()
+
     # ***********************
 
     # ***********************
@@ -252,30 +261,30 @@ class Node(NodeSerializeMixin, object):
         return self._id
 
     def __rshift__(self, other):
-        '''wire self to other'''
+        """wire self to other"""
         self.downstream().append((other, len(other.upstream())))
         other.upstream().append(self)
 
     def __lshift__(self, other):
-        '''wire other to self'''
+        """wire other to self"""
         other.downstream().append((self, len(self.upstream())))
         self.upstream().append(other)
 
     async def _push(self, inp, index):
-        '''push value to downstream nodes'''
+        """push value to downstream nodes"""
         self._input[index].append(inp)
 
     async def _empty(self, index):
-        '''check if value'''
+        """check if value"""
         return len(self._input[index]) == 0 or self._active[index] != StreamNone()
 
     async def _pop(self, index):
-        '''pop value from downstream nodes'''
+        """pop value from downstream nodes"""
         if len(self._input[index]) > 0:
             return self._input[index].popleft()
 
     async def _execute(self):
-        '''execute callable'''
+        """execute callable"""
         # assume no valid input
         valid = False
 
@@ -292,7 +301,7 @@ class Node(NodeSerializeMixin, object):
                     try:
                         _last = self._foo(*self._active, **self._foo_kwargs)
                     except ZeroDivisionError:
-                        _last = float('inf')
+                        _last = float("inf")
 
                 except ValueError:
                     # Swap back to function to get a new generator next iteration
@@ -300,7 +309,7 @@ class Node(NodeSerializeMixin, object):
                     continue
 
             else:
-                raise TributaryException('Cannot use type:{}'.format(type(self._foo)))
+                raise TributaryException("Cannot use type:{}".format(type(self._foo)))
 
             # calculation was valid
             valid = True
@@ -309,8 +318,10 @@ class Node(NodeSerializeMixin, object):
             self._execution_count += 1
 
         if isinstance(_last, types.AsyncGeneratorType):
+
             async def _foo(g=_last):
                 return await _agen_to_foo(g)
+
             self._foo = _foo
             _last = await self._foo()
 
@@ -342,14 +353,14 @@ class Node(NodeSerializeMixin, object):
             await self._finish()
 
     async def _finish(self):
-        '''mark this node as finished'''
+        """mark this node as finished"""
         self._finished = True
         self._last = StreamEnd()
         await self._finishdd3g()
         await self._output(self._last)
 
     def _backpressure(self):
-        '''check if downstream() are all empty, if not then don't propogate'''
+        """check if downstream() are all empty, if not then don't propogate"""
         if self._drop or self._replace:
             return False
 
@@ -357,7 +368,7 @@ class Node(NodeSerializeMixin, object):
         return ret
 
     async def _output(self, ret):
-        '''output value to downstream nodes'''
+        """output value to downstream nodes"""
         # if downstreams, output
         if not isinstance(ret, (StreamNone, StreamRepeat)):
             for down, i in self.downstream():
@@ -387,6 +398,7 @@ class Node(NodeSerializeMixin, object):
                 else:
                     await down._push(ret, i)
         return ret
+
     # ***********************
 
     # ***********************
@@ -394,28 +406,29 @@ class Node(NodeSerializeMixin, object):
     # ***********************
 
     async def _startdd3g(self):
-        '''represent start of calculation with a dd3 node'''
+        """represent start of calculation with a dd3 node"""
         if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #0f0')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #0f0")
             await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     async def _waitdd3g(self):
-        '''represent a node waiting for its input to tick'''
+        """represent a node waiting for its input to tick"""
         if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #ff0')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #ff0")
             await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     async def _finishdd3g(self):
-        '''represent a node that has finished its calculation'''
+        """represent a node that has finished its calculation"""
         if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #f00')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #f00")
             await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     async def _enddd3g(self):
-        '''represent a node that has finished all calculations'''
+        """represent a node that has finished all calculations"""
         if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style='fill: #fff')
+            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #fff")
             await asyncio.sleep(_DD3_TRANSITION_DELAY)
+
     # ***********************
 
     # ***********************
@@ -423,10 +436,11 @@ class Node(NodeSerializeMixin, object):
     # ***********************
     def _construct_graph(self):
         from .output import Collect
+
         return _Graph(Collect(self))
 
     def _collect(self, visited=None):
-        '''return a set of all nodes in the graph'''
+        """return a set of all nodes in the graph"""
         visited = visited or []
 
         for node in visited:
@@ -449,7 +463,7 @@ class Node(NodeSerializeMixin, object):
         pass
 
     def _deep_bfs(self, reverse=True, tops_only=False):
-        '''get nodes by level in tree, reversed relative to output node.
+        """get nodes by level in tree, reversed relative to output node.
            e.g. given a tree that looks like:
         A -> B -> D -> F
          \\-> C -> E /
@@ -458,7 +472,7 @@ class Node(NodeSerializeMixin, object):
          This will be the order we synchronously execute, so that within a
          level nodes' execution will be asynchronous but from level to level
          they will be synchronous
-        '''
+        """
         # collect all nodes
         all_nodes = self._collect()
 
@@ -496,4 +510,5 @@ class Node(NodeSerializeMixin, object):
             nodes.reverse()
 
         return nodes
+
     # ***********************

@@ -14,6 +14,7 @@ class TestStreaming:
     def test_run_foo(self):
         def foo():
             return 5
+
         t = ts.Foo(foo, count=1)
         assert ts.run(t) == [5]
 
@@ -35,12 +36,13 @@ class TestStreaming:
         def foo():
             yield 1
             yield 2
+
         t = ts.Foo(foo)
         assert ts.run(t) == [1, 2]
 
     def test_run_async_foo(self):
         async def foo():
-            await asyncio.sleep(.1)
+            await asyncio.sleep(0.1)
             return 5
 
         t = ts.Foo(foo, count=1)
@@ -50,6 +52,7 @@ class TestStreaming:
         async def foo():
             yield 1
             yield 2
+
         t = ts.Foo(foo)
         assert ts.run(t) == [1, 2]
 

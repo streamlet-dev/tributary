@@ -5,7 +5,7 @@ from ..base import StreamEnd, StreamNone, StreamRepeat  # noqa: F401
 
 
 class StreamingGraph(object):
-    '''internal representation of the entire graph state'''
+    """internal representation of the entire graph state"""
 
     def __init__(self, node):
         self._stop = False
@@ -46,7 +46,7 @@ class StreamingGraph(object):
         return last
 
     def run(self, blocking=True):
-        if sys.platform == 'win32':
+        if sys.platform == "win32":
             # Set to proactor event loop on window
             # (default in python 3.8+)
             loop = asyncio.ProactorEventLoop()

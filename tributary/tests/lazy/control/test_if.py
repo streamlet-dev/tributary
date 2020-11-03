@@ -1,4 +1,3 @@
-
 def foo():
     yield True
     yield False

@@ -1,6 +1,7 @@
 import requests
 import time
 from json import loads as load_json
+
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -11,14 +12,14 @@ from ..thread import run
 
 
 def ws(url, callback, json=False, wrap=False):
-    '''Connect to websocket and pipe results through the callback
+    """Connect to websocket and pipe results through the callback
 
     Args:
         url (str): websocket url to connect to
         callback (callable): function to call on websocket data
         json (bool): load websocket data as json
         wrap (bool): wrap result in a list
-    '''
+    """
     from websocket import create_connection
 
     ws = create_connection(url)
@@ -35,8 +36,18 @@ def ws(url, callback, json=False, wrap=False):
         callback(x)
 
 
-def http(url, callback, interval=1, repeat=1, json=False, wrap=False, field=None, proxies=None, cookies=None):
-    '''Connect to url and pipe results through the callback
+def http(
+    url,
+    callback,
+    interval=1,
+    repeat=1,
+    json=False,
+    wrap=False,
+    field=None,
+    proxies=None,
+    cookies=None,
+):
+    """Connect to url and pipe results through the callback
 
     Args:
         url (str): url to connect to
@@ -48,7 +59,7 @@ def http(url, callback, interval=1, repeat=1, json=False, wrap=False, field=None
         field (str): field to index result by
         proxies (list): list of URL proxies to pass to requests.get
         cookies (list): list of cookies to pass to requests.get
-    '''
+    """
     count = 0
     while count < repeat:
         msg = requests.get(url, cookies=cookies, proxies=proxies)
@@ -73,8 +84,17 @@ def http(url, callback, interval=1, repeat=1, json=False, wrap=False, field=None
             count += 1
 
 
-def socketio(url, callback, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
-    '''Connect to socketIO server and pipe results through the callback
+def socketio(
+    url,
+    callback,
+    channel="",
+    field="",
+    sendinit=None,
+    json=False,
+    wrap=False,
+    interval=1,
+):
+    """Connect to socketIO server and pipe results through the callback
 
     Args:
         url (str): url to connect to
@@ -85,11 +105,11 @@ def socketio(url, callback, channel='', field='', sendinit=None, json=False, wra
         json (bool): load websocket data as json
         wrap (bool): wrap result in a list
         interval (int): socketio wai interval
-    '''
+    """
     from socketIO_client_nexus import SocketIO as SIO
 
     o = urlparse(url)
-    socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
+    socketIO = SIO(o.scheme + "://" + o.netloc, o.port)
     if sendinit:
         socketIO.emit(sendinit)
 
@@ -111,7 +131,7 @@ def socketio(url, callback, channel='', field='', sendinit=None, json=False, wra
 
 
 def kafka(callback, servers, group, topics, json=False, wrap=False, interval=1):
-    '''Connect to kafka server and pipe results through the callback
+    """Connect to kafka server and pipe results through the callback
 
     Args:
         callback (callable): function to call on websocket data
@@ -121,16 +141,16 @@ def kafka(callback, servers, group, topics, json=False, wrap=False, interval=1):
         json (bool): load websocket data as json
         wrap (bool): wrap result in a list
         interval (int): socketio wai interval
-    '''
+    """
     from confluent_kafka import Consumer, KafkaError
 
-    c = Consumer({
-        'bootstrap.servers': servers,
-        'group.id': group,
-        'default.topic.config': {
-            'auto.offset.reset': 'smallest'
+    c = Consumer(
+        {
+            "bootstrap.servers": servers,
+            "group.id": group,
+            "default.topic.config": {"auto.offset.reset": "smallest"},
         }
-    })
+    )
 
     if not isinstance(topics, list):
         topics = [topics]
@@ -148,7 +168,7 @@ def kafka(callback, servers, group, topics, json=False, wrap=False, interval=1):
                 else:
                     break
 
-            msg = msg.value().decode('utf-8')
+            msg = msg.value().decode("utf-8")
 
             if not msg:
                 break

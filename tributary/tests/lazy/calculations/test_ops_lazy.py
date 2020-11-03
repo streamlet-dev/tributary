@@ -159,12 +159,12 @@ class TestOps:
     def test_Floor(self):
         t = tl.Node(value=2.2)
         out = tl.Floor(t)
-        assert out() == 2.
+        assert out() == 2.0
 
     def test_Ceil(self):
         t = tl.Node(value=2.2)
         out = tl.Ceil(t)
-        assert out() == 3.
+        assert out() == 3.0
 
     def test_Round(self):
         t = tl.Node(value=2.222222)
@@ -189,7 +189,7 @@ class TestOps:
     def test_Str(self):
         t = tl.Node(value=2)
         out = tl.Str(t)
-        assert out() == '2'
+        assert out() == "2"
 
     def test_Len(self):
         t = tl.Node(value=[1, 2, 3])

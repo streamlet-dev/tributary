@@ -1,7 +1,6 @@
-
 class NodeSerializeMixin(object):
     def save(self):
-        '''return a serializeable structure representing this node's state'''
+        """return a serializeable structure representing this node's state"""
         import dill
 
         ret = {}
@@ -12,7 +11,9 @@ class NodeSerializeMixin(object):
 
         ret["input"] = [dill.dumps(_) for _ in self._input]
         ret["active"] = [dill.dumps(_) for _ in self._active]
-        ret["downstream"] = []  # TODO think about this more [_.save() for _ in self._downstream]
+        ret[
+            "downstream"
+        ] = []  # TODO think about this more [_.save() for _ in self._downstream]
         ret["upstream"] = [_.save() for _ in self._upstream]
 
         ret["foo"] = dill.dumps(self._foo)
@@ -54,21 +55,23 @@ class NodeSerializeMixin(object):
         use_dual = ret["use_dual"]
 
         # construct node
-        n = Node(foo=foo,
-                 foo_kwargs=foo_kwargs,
-                 name=name,
-                 inputs=inputs,
-                 drop=drop,
-                 replace=replace,
-                 repeat=repeat,
-                 graphvizshape=graphvizshape,
-                 delay_interval=delay_interval,
-                 execution_max=execution_max,
-                 use_dual=use_dual)
+        n = Node(
+            foo=foo,
+            foo_kwargs=foo_kwargs,
+            name=name,
+            inputs=inputs,
+            drop=drop,
+            replace=replace,
+            repeat=repeat,
+            graphvizshape=graphvizshape,
+            delay_interval=delay_interval,
+            execution_max=execution_max,
+            use_dual=use_dual,
+        )
 
         # restore private attrs
         n._id = ret["id"]
-        n._name = '{}#{}'.format(name, n._id)
+        n._name = "{}#{}".format(name, n._id)
         n._input = [dill.loads(_) for _ in ret["input"]]
         n._active = [dill.loads(_) for _ in ret["active"]]
         # n._downstream = [] # TODO upstream don't get saved
@@ -92,7 +95,6 @@ if __name__ == "__main__":
     import asyncio
     import tributary.streaming as ts
     import time
-
 
     async def foo():
         await asyncio.sleep(2)

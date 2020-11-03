@@ -6,7 +6,7 @@ from .input import Foo
 
 
 class SocketIO(Foo):
-    '''Connect to socketIO server and yield back results
+    """Connect to socketIO server and yield back results
 
     Args:
         url (str): url to connect to
@@ -16,15 +16,31 @@ class SocketIO(Foo):
         json (bool): load websocket data as json
         wrap (bool): wrap result in a list
         interval (int): socketio wai interval
-    '''
+    """
 
-    def __init__(self, url, channel='', field='', sendinit=None, json=False, wrap=False, interval=1):
+    def __init__(
+        self,
+        url,
+        channel="",
+        field="",
+        sendinit=None,
+        json=False,
+        wrap=False,
+        interval=1,
+    ):
         o = urlparse(url)
-        socketIO = SIO(o.scheme + '://' + o.netloc, o.port)
+        socketIO = SIO(o.scheme + "://" + o.netloc, o.port)
         if sendinit:
             socketIO.emit(sendinit)
 
-        async def _sio(url=url, channel=channel, field=field, json=json, wrap=wrap, interval=interval):
+        async def _sio(
+            url=url,
+            channel=channel,
+            field=field,
+            json=json,
+            wrap=wrap,
+            interval=interval,
+        ):
             while True:
                 _data = []
                 socketIO.on(channel, lambda data: _data.append(data))
@@ -41,5 +57,6 @@ class SocketIO(Foo):
                         msg = [msg]
 
                     yield msg
+
         super().__init__(foo=_sio)
-        self._name = 'SocketIO'
+        self._name = "SocketIO"
