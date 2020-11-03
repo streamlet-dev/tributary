@@ -8,9 +8,17 @@ from ..node import Node, _gen_node
 def unary(foos, name):
     def _foo(self):
         foo = foos[0] if len(foos) == 1 or not self._use_dual else foos[1]
-        downstream = Node(foo, {}, name=name, inputs=1, use_dual=self._use_dual, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+        downstream = Node(
+            foo,
+            {},
+            name=name,
+            inputs=1,
+            use_dual=self._use_dual,
+            graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
+        )
         self >> downstream
         return downstream
+
     return _foo
 
 
@@ -18,14 +26,22 @@ def binary(foos, name):
     def _foo(self, other):
         if not isinstance(other, Node):
             other = _gen_node(other)
-            setattr(other, '_use_dual', self._use_dual)
+            setattr(other, "_use_dual", self._use_dual)
         if self._use_dual != other._use_dual:
-            raise NotImplementedError('Dual/Non-dual mismatch')
+            raise NotImplementedError("Dual/Non-dual mismatch")
         foo = foos[0] if len(foos) == 1 or not self._use_dual else foos[1]
-        downstream = Node(foo, {}, name=name, inputs=2, use_dual=self._use_dual, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+        downstream = Node(
+            foo,
+            {},
+            name=name,
+            inputs=2,
+            use_dual=self._use_dual,
+            graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
+        )
         self >> downstream
         other >> downstream
         return downstream
+
     return _foo
 
 
@@ -33,37 +49,81 @@ def n_ary(foos, name):
     def _foo(*others):
         use_dual = [x._use_dual for x in others]
         if np.any(use_dual) != np.all(use_dual):
-            raise NotImplementedError('Dual/Non-dual mismatch')
+            raise NotImplementedError("Dual/Non-dual mismatch")
         foo = foos[0] if len(foos) == 1 or not np.all(use_dual) else foos[1]
-        downstream = Node(foo, {}, name=name, inputs=len(others), graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+        downstream = Node(
+            foo,
+            {},
+            name=name,
+            inputs=len(others),
+            graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
+        )
         for i, other in enumerate(others):
             other >> downstream
         return downstream
+
     return _foo
 
 
 ########################
 # Arithmetic Operators #
 ########################
-Noop = unary((lambda x: x,), name='Noop')
-Negate = unary((lambda x: -1 * x, lambda x: (-1 * x[0], -1 * x[1])), name='Negate')
-Invert = unary((lambda x: 1 / x, lambda x: (1 / x[0], -x[1] / (x[0]**2))), name='Invert')
-Add = binary((lambda x, y: x + y, lambda x, y: (x[0] + y[0], x[1] + y[1])), name='Add')
-Sub = binary((lambda x, y: x - y, lambda x, y: (x[0] - y[0], x[1] - y[1])), name='Sub')
-Mult = binary((lambda x, y: x * y, lambda x, y: (x[0] * y[0], x[0] * y[1] + x[1] * y[0])), name='Mult')
-Div = binary((lambda x, y: x / y, lambda x, y: (x[0] / y[0], (x[1] * y[0] - x[0] * y[1]) / y[0]**2)), name='Div')
-RDiv = binary((lambda x, y: y / x, lambda x, y: (y[0] / x[0], (y[1] * x[0] - y[0] * x[1]) / x[0]**2)), name='RDiv')
-Mod = binary((lambda x, y: x % y, lambda: _raise(NotImplementedError('Not Implemented!'))), name='Mod')
-Pow = binary((lambda x, y: x ** y, lambda x, y: (x[0] ** y, y * x[1] * x[0] ** (y - 1))), name='Pow')
-Sum = n_ary((lambda *args: sum(args), lambda *args: (sum([x[0] for x in args]), sum(x[1] for x in args))), name='Sum')
-Average = n_ary((lambda *args: sum(args) / len(args), lambda *args: ((sum([x[0] for x in args]) / len(args), sum(x[1] for x in args) / len(args)))), name='Average')
+Noop = unary((lambda x: x,), name="Noop")
+Negate = unary((lambda x: -1 * x, lambda x: (-1 * x[0], -1 * x[1])), name="Negate")
+Invert = unary(
+    (lambda x: 1 / x, lambda x: (1 / x[0], -x[1] / (x[0] ** 2))), name="Invert"
+)
+Add = binary((lambda x, y: x + y, lambda x, y: (x[0] + y[0], x[1] + y[1])), name="Add")
+Sub = binary((lambda x, y: x - y, lambda x, y: (x[0] - y[0], x[1] - y[1])), name="Sub")
+Mult = binary(
+    (lambda x, y: x * y, lambda x, y: (x[0] * y[0], x[0] * y[1] + x[1] * y[0])),
+    name="Mult",
+)
+Div = binary(
+    (
+        lambda x, y: x / y,
+        lambda x, y: (x[0] / y[0], (x[1] * y[0] - x[0] * y[1]) / y[0] ** 2),
+    ),
+    name="Div",
+)
+RDiv = binary(
+    (
+        lambda x, y: y / x,
+        lambda x, y: (y[0] / x[0], (y[1] * x[0] - y[0] * x[1]) / x[0] ** 2),
+    ),
+    name="RDiv",
+)
+Mod = binary(
+    (lambda x, y: x % y, lambda: _raise(NotImplementedError("Not Implemented!"))),
+    name="Mod",
+)
+Pow = binary(
+    (lambda x, y: x ** y, lambda x, y: (x[0] ** y, y * x[1] * x[0] ** (y - 1))),
+    name="Pow",
+)
+Sum = n_ary(
+    (
+        lambda *args: sum(args),
+        lambda *args: (sum([x[0] for x in args]), sum(x[1] for x in args)),
+    ),
+    name="Sum",
+)
+Average = n_ary(
+    (
+        lambda *args: sum(args) / len(args),
+        lambda *args: (
+            (sum([x[0] for x in args]) / len(args), sum(x[1] for x in args) / len(args))
+        ),
+    ),
+    name="Average",
+)
 
 #####################
 # Logical Operators #
 #####################
-Not = unary((lambda x: not x,), name='Not')
-And = binary((lambda x, y: x and y,), name='And')
-Or = binary((lambda x, y: x or y,), name='Or')
+Not = unary((lambda x: not x,), name="Not")
+And = binary((lambda x, y: x and y,), name="And")
+Or = binary((lambda x, y: x or y,), name="Or")
 
 
 ###################
@@ -106,7 +166,7 @@ def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         return inputs[0].exp()
     elif ufunc == sp.special.erf:
         return inputs[0].erf()
-    raise NotImplementedError('Not Implemented!')
+    raise NotImplementedError("Not Implemented!")
 
 
 def __array_function__(self, func, method, *inputs, **kwargs):
@@ -114,45 +174,104 @@ def __array_function__(self, func, method, *inputs, **kwargs):
         return inputs[0][0].log()
     elif func == np.lib.scimath.sqrt:
         return inputs[0][0].sqrt()
-    raise NotImplementedError('Not Implemented!')
+    raise NotImplementedError("Not Implemented!")
 
 
 ###############
 # Comparators #
 ###############
-Equal = binary((lambda x, y: x == y, lambda x, y: x[0] == y[0]), name='Equal')
-NotEqual = binary((lambda x, y: x != y, lambda x, y: x[0] != y[0]), name='NotEqual')
-Lt = binary((lambda x, y: x < y, lambda x, y: x[0] < y[0]), name='Less')
-Le = binary((lambda x, y: x <= y, lambda x, y: x[0] <= y[0] or x[0] == y[0]), name='LessOrEqual')
-Gt = binary((lambda x, y: x > y, lambda x, y: x[0] > y[0]), name='Greater')
-Ge = binary((lambda x, y: x >= y, lambda x, y: x[0] > y[0] or x[0] == y[0]), name='GreaterOrEqual')
+Equal = binary((lambda x, y: x == y, lambda x, y: x[0] == y[0]), name="Equal")
+NotEqual = binary((lambda x, y: x != y, lambda x, y: x[0] != y[0]), name="NotEqual")
+Lt = binary((lambda x, y: x < y, lambda x, y: x[0] < y[0]), name="Less")
+Le = binary(
+    (lambda x, y: x <= y, lambda x, y: x[0] <= y[0] or x[0] == y[0]), name="LessOrEqual"
+)
+Gt = binary((lambda x, y: x > y, lambda x, y: x[0] > y[0]), name="Greater")
+Ge = binary(
+    (lambda x, y: x >= y, lambda x, y: x[0] > y[0] or x[0] == y[0]),
+    name="GreaterOrEqual",
+)
 
 
 ##########################
 # Mathematical Functions #
 ##########################
-Log = unary((lambda x: math.log(x), lambda x: (math.log(x[0]), x[1] / x[0])), name='Log')
-Sin = unary((lambda x: math.sin(x), lambda x: (math.sin(x[0]), math.cos(x[0]) * x[1])), name='Sin')
-Cos = unary((lambda x: math.cos(x), lambda x: (math.cos(x[0]), -1 * math.sin(x[0]) * x[1])), name='Cos')
-Tan = unary((lambda x: math.tan(x), lambda x: (math.tan(x[0]), x[1] * (1 / math.cos(x[0]))**2)), name='Tan')
-Arcsin = unary((lambda x: math.asin(x), lambda x: (math.asin(x[0]), x[1] / math.sqrt(1 - x[0]**2))), name='Arcsin')
-Arccos = unary((lambda x: math.acos(x), lambda x: (math.acos(x[0]), -1 * x[1] / math.sqrt(1 - x[0]**2))), name='Arccos')
-Arctan = unary((lambda x: math.atan(x), lambda x: (math.atan(x[0]), x[1] / (1 + x[0]**2))), name='Arctan')
-Sqrt = unary((lambda x: math.sqrt(x), lambda x: (math.sqrt(x[0]), x[1] * 0.5 / math.sqrt(x[0]))), name='Sqrt')
-Abs = unary((lambda x: abs(x), lambda x: (abs(x[0]), x[1] * x[0] / abs(x[0]))), name='Abs')
-Exp = unary((lambda x: math.exp(x), lambda x: (math.exp(x[0]), x[1] * math.exp(x[0]))), name='Exp')
-Erf = unary((lambda x: math.erf(x), lambda x: (math.erf(x[0]), x[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(x[0], 2)))), name='Erf')
-Floor = unary((lambda x: math.floor(x), lambda x: (math.floor(x[0]), math.floor(x[1]))), name='Floor')
-Ceil = unary((lambda x: math.ceil(x), lambda x: (math.ceil(x[0]), math.ceil(x[1]))), name='Ceil')
+Log = unary(
+    (lambda x: math.log(x), lambda x: (math.log(x[0]), x[1] / x[0])), name="Log"
+)
+Sin = unary(
+    (lambda x: math.sin(x), lambda x: (math.sin(x[0]), math.cos(x[0]) * x[1])),
+    name="Sin",
+)
+Cos = unary(
+    (lambda x: math.cos(x), lambda x: (math.cos(x[0]), -1 * math.sin(x[0]) * x[1])),
+    name="Cos",
+)
+Tan = unary(
+    (
+        lambda x: math.tan(x),
+        lambda x: (math.tan(x[0]), x[1] * (1 / math.cos(x[0])) ** 2),
+    ),
+    name="Tan",
+)
+Arcsin = unary(
+    (
+        lambda x: math.asin(x),
+        lambda x: (math.asin(x[0]), x[1] / math.sqrt(1 - x[0] ** 2)),
+    ),
+    name="Arcsin",
+)
+Arccos = unary(
+    (
+        lambda x: math.acos(x),
+        lambda x: (math.acos(x[0]), -1 * x[1] / math.sqrt(1 - x[0] ** 2)),
+    ),
+    name="Arccos",
+)
+Arctan = unary(
+    (lambda x: math.atan(x), lambda x: (math.atan(x[0]), x[1] / (1 + x[0] ** 2))),
+    name="Arctan",
+)
+Sqrt = unary(
+    (lambda x: math.sqrt(x), lambda x: (math.sqrt(x[0]), x[1] * 0.5 / math.sqrt(x[0]))),
+    name="Sqrt",
+)
+Abs = unary(
+    (lambda x: abs(x), lambda x: (abs(x[0]), x[1] * x[0] / abs(x[0]))), name="Abs"
+)
+Exp = unary(
+    (lambda x: math.exp(x), lambda x: (math.exp(x[0]), x[1] * math.exp(x[0]))),
+    name="Exp",
+)
+Erf = unary(
+    (
+        lambda x: math.erf(x),
+        lambda x: (
+            math.erf(x[0]),
+            x[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(x[0], 2)),
+        ),
+    ),
+    name="Erf",
+)
+Floor = unary(
+    (lambda x: math.floor(x), lambda x: (math.floor(x[0]), math.floor(x[1]))),
+    name="Floor",
+)
+Ceil = unary(
+    (lambda x: math.ceil(x), lambda x: (math.ceil(x[0]), math.ceil(x[1]))), name="Ceil"
+)
 
 
 def Round(self, ndigits=0):
-    downstream = Node(lambda x: round(x, ndigits=ndigits) if not self._use_dual else
-                      (round(x[0], ndigits=ndigits), round(x[1], ndigits=ndigits)),
-                      {},
-                      name="Round",
-                      inputs=1,
-                      graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE)
+    downstream = Node(
+        lambda x: round(x, ndigits=ndigits)
+        if not self._use_dual
+        else (round(x[0], ndigits=ndigits), round(x[1], ndigits=ndigits)),
+        {},
+        name="Round",
+        inputs=1,
+        graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
+    )
     self.downstream().append((downstream, 0))
     downstream.upstream().append(self)
     return downstream
@@ -161,13 +280,14 @@ def Round(self, ndigits=0):
 ##############
 # Converters #
 ##############
-Int = unary((lambda x: int(x), lambda x: int(x[0])), name='Int')
-Float = unary((lambda x: float(x), lambda x: float(x[0])), name='Float')
-Bool = unary((lambda x: bool(x), lambda x: bool(x[0])), name='Bool')
-Str = unary((lambda x: str(x), lambda x: str(x[0]) + '+' + str(x[1]) + 'ε'), name='Str')
+Int = unary((lambda x: int(x), lambda x: int(x[0])), name="Int")
+Float = unary((lambda x: float(x), lambda x: float(x[0])), name="Float")
+Bool = unary((lambda x: bool(x), lambda x: bool(x[0])), name="Bool")
+Str = unary((lambda x: str(x), lambda x: str(x[0]) + "+" + str(x[1]) + "ε"), name="Str")
 
 
 # __Bool__ = unary(lambda x: bool(x), name='Noop')
+
 
 def __Bool__(self):
     return True
@@ -176,7 +296,7 @@ def __Bool__(self):
 ###################
 # Python Builtins #
 ###################
-Len = unary((lambda x: len(x),), name='Len')
+Len = unary((lambda x: len(x),), name="Len")
 
 
 ########################

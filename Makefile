@@ -14,11 +14,10 @@ notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
 
 lint: ## run linter
-	python -m flake8 tributary 
+	python -m flake8 tributary setup.py
 
 fix:  ## run autopep8/tslint fix
-	python -m autopep8 --in-place -r -a -a tributary/
-	make lint
+	python -m black tributary/ setup.py
 
 annotate: ## MyPy type annotation check
 	python -m mypy -s tributary  

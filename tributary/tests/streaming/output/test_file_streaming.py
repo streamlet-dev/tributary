@@ -5,7 +5,9 @@ import pytest
 
 class TestFile:
     def test_file(self):
-        file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_file_data.csv'))
+        file = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "test_file_data.csv")
+        )
         if os.path.exists(file):
             os.remove(file)
 
@@ -16,7 +18,7 @@ class TestFile:
             yield 4
 
         def read_file(file):
-            with open(file, 'r') as fp:
+            with open(file, "r") as fp:
                 data = fp.read()
             return [int(x) for x in data]
 

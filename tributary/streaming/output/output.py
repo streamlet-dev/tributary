@@ -8,13 +8,19 @@ from ...base import StreamEnd, StreamNone, StreamRepeat
 _OUTPUT_GRAPHVIZSHAPE = "box"
 
 
-def Print(node, text=''):
+def Print(node, text=""):
     async def foo(val):
         await aprint(text + str(val))
         return val
 
     node = _gen_node(node)
-    ret = Node(foo=foo, foo_kwargs=None, name='Print', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    ret = Node(
+        foo=foo,
+        foo_kwargs=None,
+        name="Print",
+        inputs=1,
+        graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
+    )
     node >> ret
     return ret
 
@@ -30,7 +36,13 @@ def Collect(node, limit=None):
         return ret
 
     node = _gen_node(node)
-    ret = Node(foo=foo, foo_kwargs=None, name='Collect', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    ret = Node(
+        foo=foo,
+        foo_kwargs=None,
+        name="Collect",
+        inputs=1,
+        graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
+    )
     node >> ret
     return ret
 
@@ -43,20 +55,26 @@ def Graph(node):
 
 
 def PPrint(node, level=0):
-    ret = '    ' * (level - 1) if level else ''
+    ret = "    " * (level - 1) if level else ""
 
     if not node.upstream():
         # leaf node
-        return ret + '  \\  ' + repr(node)
-    return '    ' * level + repr(node) + '\n' + '\n'.join(_.pprint(level + 1) for _ in node.upstream())
+        return ret + "  \\  " + repr(node)
+    return (
+        "    " * level
+        + repr(node)
+        + "\n"
+        + "\n".join(_.pprint(level + 1) for _ in node.upstream())
+    )
 
 
 def GraphViz(node):
     d = Graph(node)
 
     from graphviz import Digraph
+
     dot = Digraph("Graph", strict=False)
-    dot.format = 'png'
+    dot.format = "png"
 
     def rec(nodes, parent):
         for d in nodes:
@@ -79,6 +97,7 @@ def GraphViz(node):
 
 def Dagre(node):
     import ipydagred3 as dd3
+
     G = dd3.Graph()
     d = Graph(node)
 
@@ -86,35 +105,50 @@ def Dagre(node):
         for d in nodes:
             if not isinstance(d, dict):
                 d._dd3g = G
-                G.setNode(d._name, shape="rect" if d._graphvizshape == "box" else d._graphvizshape)
+                G.setNode(
+                    d._name,
+                    shape="rect" if d._graphvizshape == "box" else d._graphvizshape,
+                )
                 G.setEdge(d._name, parent)
             else:
                 for k in d:
                     k._dd3g = G
-                    G.setNode(k._name, shape="rect" if k._graphvizshape == "box" else k._graphvizshape)
+                    G.setNode(
+                        k._name,
+                        shape="rect" if k._graphvizshape == "box" else k._graphvizshape,
+                    )
                     G.setEdge(k._name, parent._name)
                     rec(d[k], k)
 
     for k in d:
         k._dd3g = G
-        G.setNode(k._name, shape="rect" if k._graphvizshape == "box" else k._graphvizshape)
+        G.setNode(
+            k._name, shape="rect" if k._graphvizshape == "box" else k._graphvizshape
+        )
         rec(d[k], k)
 
     graph = dd3.DagreD3Widget(graph=G)
     return graph
 
 
-def Perspective(node, text='', **psp_kwargs):
+def Perspective(node, text="", **psp_kwargs):
     psp_kwargs = psp_kwargs or {}
     from perspective import PerspectiveWidget
-    p = PerspectiveWidget(psp_kwargs.pop('schema', []), **psp_kwargs)
+
+    p = PerspectiveWidget(psp_kwargs.pop("schema", []), **psp_kwargs)
 
     def foo(val):
         p.update(val)
         return val
 
     node = _gen_node(node)
-    ret = Node(foo=foo, foo_kwargs=None, name='Perspective', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    ret = Node(
+        foo=foo,
+        foo_kwargs=None,
+        name="Perspective",
+        inputs=1,
+        graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
+    )
 
     display(p)
     node >> ret
