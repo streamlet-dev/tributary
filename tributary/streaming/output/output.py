@@ -1,4 +1,5 @@
 import copy
+import logging
 from aioconsole import aprint
 from IPython.display import display
 from ..node import Node, _gen_node
@@ -9,8 +10,12 @@ _OUTPUT_GRAPHVIZSHAPE = "box"
 
 
 def Print(node, text=""):
+    async def foo2(val):
+        await aprint(text + str(val), flush=True)
+        return val
+
     async def foo(val):
-        await aprint(text + str(val))
+        print(text + str(val))
         return val
 
     node = _gen_node(node)
@@ -18,6 +23,32 @@ def Print(node, text=""):
         foo=foo,
         foo_kwargs=None,
         name="Print",
+        inputs=1,
+        graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
+    )
+    node >> ret
+    return ret
+
+
+def Log(node, level=logging.CRITICAL):
+    def foo(val):
+        if level == logging.DEBUG:
+            logging.debug(node)
+        elif level == logging.INFO:
+            logging.info(node)
+        elif level == logging.WARNING:
+            logging.warn(val)
+        elif level == logging.ERROR:
+            logging.error(val)
+        else:
+            logging.critical(val)
+        return val
+
+    node = _gen_node(node)
+    ret = Node(
+        foo=foo,
+        foo_kwargs=None,
+        name="Log",
         inputs=1,
         graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
     )
@@ -160,4 +191,5 @@ Node.pprint = PPrint
 Node.graphviz = GraphViz
 Node.dagre = Dagre
 Node.print = Print
+Node.log = Log
 Node.perspective = Perspective

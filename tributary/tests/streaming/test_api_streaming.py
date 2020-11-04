@@ -122,6 +122,8 @@ class TestAPI:
         assert hasattr(ts, "Dagre")
         assert hasattr(ts.StreamingNode, "print")
         assert hasattr(ts, "Print")
+        assert hasattr(ts.StreamingNode, "log")
+        assert hasattr(ts, "Log")
         assert hasattr(ts.StreamingNode, "perspective")
         assert hasattr(ts, "Perspective")
 

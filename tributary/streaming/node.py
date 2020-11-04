@@ -1,7 +1,7 @@
 import asyncio
 import types
 from collections import deque
-from .graph import _Graph
+from .graph import StreamingGraph
 from .serialize import NodeSerializeMixin
 from ..base import StreamEnd, StreamNone, StreamRepeat
 from ..lazy.node import Node as LazyNode
@@ -434,10 +434,10 @@ class Node(NodeSerializeMixin, object):
     # ***********************
     # Graph operations
     # ***********************
-    def _construct_graph(self):
+    def constructGraph(self):
         from .output import Collect
 
-        return _Graph(Collect(self))
+        return StreamingGraph(Collect(self))
 
     def _collect(self, visited=None):
         """return a set of all nodes in the graph"""

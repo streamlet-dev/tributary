@@ -45,13 +45,16 @@ class StreamingGraph(object):
 
         return last
 
-    def run(self, blocking=True):
+    def run(self, blocking=True, newloop=False):
         if sys.platform == "win32":
             # Set to proactor event loop on window
             # (default in python 3.8+)
             loop = asyncio.ProactorEventLoop()
         else:
-            loop = asyncio.get_event_loop()
+            if newloop:
+                loop = asyncio.new_event_loop()
+            else:
+                loop = asyncio.get_event_loop()
 
         asyncio.set_event_loop(loop)
 
