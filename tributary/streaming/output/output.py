@@ -29,7 +29,7 @@ def Print(node, text=""):
     return ret
 
 
-def Log(node, level=logging.CRITICAL):
+def Logging(node, level=logging.CRITICAL):
     def foo(val):
         if level == logging.DEBUG:
             logging.debug(node)
@@ -190,5 +190,5 @@ Node.pprint = PPrint
 Node.graphviz = GraphViz
 Node.dagre = Dagre
 Node.print = Print
-Node.log = Log
+Node.logging = Logging
 Node.perspective = Perspective
