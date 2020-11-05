@@ -103,10 +103,10 @@ def construct_streaming(expr, modules=None):
                 setattr(self, n, kwargs.get(n))
                 self._kwargs[n] = kwargs.get(n)
 
-            self._nodes = [getattr(self, n) for n in names]
+            self._set_nodes = [getattr(self, n) for n in names]
             self._lambda = lambdify(syms, expr, modules=modules)(**self._kwargs)
             self._expr = expr
 
-            super(Streaming, self).__init__(output_node=self._lambda)
+            super(Streaming, self).__init__(node=self._lambda)
 
     return Streaming

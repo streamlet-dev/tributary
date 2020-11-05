@@ -100,7 +100,7 @@ class TestConfig:
             cp=tss.Const(-1),
         )
 
-        ret = tss.run(tss.Print(price._node))
+        ret = tss.run(tss.Print(price._starting_node))
         time.sleep(2)
         print(ret)
         assert len(ret) == 7
