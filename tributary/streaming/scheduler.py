@@ -4,6 +4,7 @@ from io import StringIO
 from datetime import datetime, timedelta
 from multiprocessing import Process
 from threading import Thread
+from .node import Node
 from ..base import TributaryException
 
 
@@ -12,6 +13,9 @@ def _waitToRun(stdout, stderr, startsafter, endsafter, graph):
     # TODO
     # sys.stderr = stderr
     # sys.stdout = stdout
+
+    # Fix issue with aioconsole
+    Node.print._multiprocess = "yes"
 
     if (startsafter - datetime.now()).total_seconds() > 0:
         # in the future

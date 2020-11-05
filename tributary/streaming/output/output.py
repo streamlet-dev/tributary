@@ -10,12 +10,11 @@ _OUTPUT_GRAPHVIZSHAPE = "box"
 
 
 def Print(node, text=""):
-    async def foo2(val):
-        await aprint(text + str(val), flush=True)
-        return val
-
     async def foo(val):
-        print(text + str(val))
+        if getattr(Print, "_multiprocess", None):
+            print(text + str(val))
+        else:
+            await aprint(text + str(val))
         return val
 
     node = _gen_node(node)
