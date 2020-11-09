@@ -4,8 +4,8 @@ from threading import Thread
 from ..base import StreamEnd, StreamNone, StreamRepeat  # noqa: F401
 
 
-class _Graph(object):
-    '''internal representation of the entire graph state'''
+class StreamingGraph(object):
+    """internal representation of the entire graph state"""
 
     def __init__(self, node):
         self._stop = False
@@ -45,13 +45,16 @@ class _Graph(object):
 
         return last
 
-    def run(self, blocking=True):
-        if sys.platform == 'win32':
+    def run(self, blocking=True, newloop=False):
+        if sys.platform == "win32":
             # Set to proactor event loop on window
             # (default in python 3.8+)
             loop = asyncio.ProactorEventLoop()
         else:
-            loop = asyncio.get_event_loop()
+            if newloop:
+                loop = asyncio.new_event_loop()
+            else:
+                loop = asyncio.get_event_loop()
 
         asyncio.set_event_loop(loop)
 
@@ -67,3 +70,12 @@ class _Graph(object):
         t.daemon = True
         t.start()
         return loop
+
+    def graph(self):
+        return self._starting_node.graph()
+
+    def graphviz(self):
+        return self._starting_node.graphviz()
+
+    def dagre(self):
+        return self._starting_node.dagre()

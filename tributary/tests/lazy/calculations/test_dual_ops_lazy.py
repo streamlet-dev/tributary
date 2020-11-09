@@ -11,7 +11,7 @@ class TestOps:
     def test_Invert(self):
         t = tl.Node(value=(5, 1), use_dual=True)
         out = tl.Invert(t)
-        assert out() == (1 / 5, -5**(-2))
+        assert out() == (1 / 5, -(5 ** (-2)))
 
     def test_Add(self):
         t = tl.Node(value=(5, 1), use_dual=True)
@@ -113,22 +113,22 @@ class TestOps:
     def test_Tan(self):
         t = tl.Node(value=(5, 1), use_dual=True)
         out = tl.Tan(t)
-        assert out() == (math.tan(5), (1 / math.cos(5))**2)
+        assert out() == (math.tan(5), (1 / math.cos(5)) ** 2)
 
     def test_Arcsin(self):
         t = tl.Node(value=(0.5, 1), use_dual=True)
         out = tl.Arcsin(t)
-        assert out() == (math.asin(0.5), 1 / math.sqrt(1 - 0.5**2))
+        assert out() == (math.asin(0.5), 1 / math.sqrt(1 - 0.5 ** 2))
 
     def test_Arccos(self):
         t = tl.Node(value=(0.5, 1), use_dual=True)
         out = tl.Arccos(t)
-        assert out() == (math.acos(0.5), -1 / math.sqrt(1 - 0.5**2))
+        assert out() == (math.acos(0.5), -1 / math.sqrt(1 - 0.5 ** 2))
 
     def test_Arctan(self):
         t = tl.Node(value=(0.5, 1), use_dual=True)
         out = tl.Arctan(t)
-        assert out() == (math.atan(0.5), 1 / (1 + 0.5**2))
+        assert out() == (math.atan(0.5), 1 / (1 + 0.5 ** 2))
 
     def test_Sqrt(self):
         t = tl.Node(value=(9, 1), use_dual=True)
@@ -148,7 +148,7 @@ class TestOps:
     def test_Erf(self):
         t = tl.Node(value=(5, 1), use_dual=True)
         out = tl.Erf(t)
-        assert out() == (math.erf(5), (2 / math.sqrt(math.pi)) * math.exp(-5**2))
+        assert out() == (math.erf(5), (2 / math.sqrt(math.pi)) * math.exp(-(5 ** 2)))
 
     def test_Floor(self):
         t = tl.Node(value=(5.333, 1.333), use_dual=True)
@@ -183,7 +183,7 @@ class TestOps:
     def test_Str(self):
         t = tl.Node(value=(5, 1), use_dual=True)
         out = tl.Str(t)
-        assert out() == '5+1ε'
+        assert out() == "5+1ε"
 
     def test_Len(self):
         t = tl.Node(value=(5, 1), use_dual=True)

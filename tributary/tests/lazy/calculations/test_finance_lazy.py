@@ -7,7 +7,7 @@ class TestFinance:
         df = pd.DataFrame(pd.util.testing.getTimeSeriesData(20))
         adjust = False
         period = 14
-        delta = df['A'].diff().shift(-1)
+        delta = df["A"].diff().shift(-1)
         up, down = delta.copy(), delta.copy()
         up[up < 0] = 0
         down[down > 0] = 0
@@ -16,14 +16,14 @@ class TestFinance:
         RS = _gain / _loss
         rsi = pd.Series(100 - (100 / (1 + RS)))
 
-        val = [df['A'].iloc[0]]
+        val = [df["A"].iloc[0]]
         n = tl.Node(value=val)
         n_rsi = n.rsi(period=period)
 
-        for i, x in enumerate(df['A'][1:]):
+        for i, x in enumerate(df["A"][1:]):
             val.append(x)
             n._dirty = True
-            print('data\t', i, x, n_rsi(), rsi[i])
+            print("data\t", i, x, n_rsi(), rsi[i])
             assert abs(n_rsi() - rsi[i]) < 0.003
 
         n = tl.Node(value=val)
@@ -39,11 +39,11 @@ class TestFinance:
         adjust = False
 
         EMA_fast = pd.Series(
-            df['A'].ewm(ignore_na=False, span=period_fast, adjust=adjust).mean(),
+            df["A"].ewm(ignore_na=False, span=period_fast, adjust=adjust).mean(),
             name="EMA_fast",
         )
         EMA_slow = pd.Series(
-            df['A'].ewm(ignore_na=False, span=period_slow, adjust=adjust).mean(),
+            df["A"].ewm(ignore_na=False, span=period_slow, adjust=adjust).mean(),
             name="EMA_slow",
         )
         MACD = pd.Series(EMA_fast - EMA_slow, name="MACD")
@@ -57,7 +57,7 @@ class TestFinance:
         n = tl.Node(value=val)
         n_macd = n.macd(period_fast=period_fast, period_slow=period_slow, signal=signal)
 
-        for i, x in enumerate(df['A']):
+        for i, x in enumerate(df["A"]):
             val.append(x)
             n_macd._dirty = True
             ret = n_macd()
@@ -65,6 +65,8 @@ class TestFinance:
             assert expected.values[i][1] - ret[1] < 0.001
 
         n = tl.Node(value=val)
-        n_macd = n.macd(period_fast=period_fast, period_slow=period_slow, signal=signal, basket=True)
+        n_macd = n.macd(
+            period_fast=period_fast, period_slow=period_slow, signal=signal, basket=True
+        )
 
         assert n_macd().tolist() == expected.values.tolist()

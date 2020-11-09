@@ -5,8 +5,8 @@ from ..node import Node
 from ...base import StreamEnd
 
 
-def HTTP(node, url='', json=False, wrap=False, field=None, proxies=None, cookies=None):
-    '''Connect to url and post results to it
+def HTTP(node, url="", json=False, wrap=False, field=None, proxies=None, cookies=None):
+    """Connect to url and post results to it
 
     Args:
         node (Node): input tributary
@@ -16,9 +16,17 @@ def HTTP(node, url='', json=False, wrap=False, field=None, proxies=None, cookies
         field (str): field to index result by
         proxies (list): list of URL proxies to pass to requests.post
         cookies (list): list of cookies to pass to requests.post
-    '''
+    """
 
-    async def _send(data, url=url, json=json, wrap=wrap, field=field, proxies=proxies, cookies=cookies):
+    async def _send(
+        data,
+        url=url,
+        json=json,
+        wrap=wrap,
+        field=field,
+        proxies=proxies,
+        cookies=cookies,
+    ):
         if wrap:
             data = [data]
         if json:
@@ -43,6 +51,6 @@ def HTTP(node, url='', json=False, wrap=False, field=None, proxies=None, cookies
 
         return msg
 
-    ret = Node(foo=_send, name='Http', inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
+    ret = Node(foo=_send, name="Http", inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node >> ret
     return ret

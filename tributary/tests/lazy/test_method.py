@@ -23,5 +23,15 @@ class ExamplePoint(tl.LazyGraph):
 class TestMethod:
     def test_args_kwargs(self):
         pt = ExamplePoint()
-        assert pt.asof(date=None)() == pt.asof()(date=None) == pt.asof(date=pt.now()())(date=None) == 2
-        assert pt.asof(date=pt.now()())() == pt.asof()(date=pt.now()()) == pt.asof(date=None)(date=pt.now()()) == 1
+        assert (
+            pt.asof(date=None)()
+            == pt.asof()(date=None)
+            == pt.asof(date=pt.now()())(date=None)
+            == 2
+        )
+        assert (
+            pt.asof(date=pt.now()())()
+            == pt.asof()(date=pt.now()())
+            == pt.asof(date=None)(date=pt.now()())
+            == 1
+        )

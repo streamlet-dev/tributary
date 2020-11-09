@@ -3,13 +3,14 @@ from ..node import Node
 
 
 def RSI(node, period=14, basket=False):
-    '''Relative Strength Index.
+    """Relative Strength Index.
 
     Args:
         node (Node): input node.
         period (int): RSI period
         basket (bool): given a list as input, return a list as output (as opposed to the last value)
-    '''
+    """
+
     def _rsi(node=node, period=period, basket=basket):
         delta = pd.Series(node.value()).diff().shift(-1)
         up, down = delta.copy(), delta.copy()
@@ -25,12 +26,12 @@ def RSI(node, period=14, basket=False):
         return rsi.iloc[-1]
 
     # make new node
-    ret = node._gennode('RSI[{}]'.format(period), _rsi, [node])
+    ret = node._gennode("RSI[{}]".format(period), _rsi, [node])
     return ret
 
 
 def MACD(node, period_fast=12, period_slow=26, signal=9, basket=False):
-    '''Moving Average Convergence/Divergence
+    """Moving Average Convergence/Divergence
 
     Args:
         node (Node): input data
@@ -40,14 +41,25 @@ def MACD(node, period_fast=12, period_slow=26, signal=9, basket=False):
         basket (bool): given a list as input, return a list as output (as opposed to the last value)
     Returns:
         Node: node that emits tuple of (macd, macd_signal)
-    '''
-    def _macd(node=node, period_fast=period_fast, period_slow=period_slow, signal=signal, basket=basket):
+    """
+
+    def _macd(
+        node=node,
+        period_fast=period_fast,
+        period_slow=period_slow,
+        signal=signal,
+        basket=basket,
+    ):
         EMA_fast = pd.Series(
-            pd.Series(node.value()).ewm(ignore_na=False, span=period_fast, adjust=False).mean(),
+            pd.Series(node.value())
+            .ewm(ignore_na=False, span=period_fast, adjust=False)
+            .mean(),
             name="EMA_fast",
         )
         EMA_slow = pd.Series(
-            pd.Series(node.value()).ewm(ignore_na=False, span=period_slow, adjust=False).mean(),
+            pd.Series(node.value())
+            .ewm(ignore_na=False, span=period_slow, adjust=False)
+            .mean(),
             name="EMA_slow",
         )
         MACD = pd.Series(EMA_fast - EMA_slow, name="MACD")
@@ -61,7 +73,9 @@ def MACD(node, period_fast=12, period_slow=26, signal=9, basket=False):
         return macd.iloc[-1]
 
     # make new node
-    ret = node._gennode('MACD[{},{},{}]'.format(period_fast, period_slow, signal), _macd, [node])
+    ret = node._gennode(
+        "MACD[{},{},{}]".format(period_fast, period_slow, signal), _macd, [node]
+    )
     return ret
 
 
