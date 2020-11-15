@@ -69,3 +69,35 @@ class HTTP(Foo):
 
         super().__init__(foo=_req)
         self._name = "Http"
+
+
+class HTTPServer(Foo):
+    """Host a server and yield posted data
+
+    Args:
+        json (bool): load http content data as json
+        wrap (bool): wrap result in a list
+        field (str): field to index result by
+        proxies (list): list of URL proxies to pass to requests.get
+        cookies (list): list of cookies to pass to requests.get
+    """
+
+    def __init__(
+        self,
+        json=False,
+        wrap=False,
+        field=None,
+        proxies=None,
+        cookies=None,
+    ):
+        async def _req(
+            json=json,
+            wrap=wrap,
+            field=field,
+            proxies=proxies,
+            cookies=cookies,
+        ):
+            raise NotImplementedError()
+
+        super().__init__(foo=_req)
+        self._name = "HttpServer"

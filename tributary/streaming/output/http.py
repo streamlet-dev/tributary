@@ -54,3 +54,28 @@ def HTTP(node, url="", json=False, wrap=False, field=None, proxies=None, cookies
     ret = Node(foo=_send, name="Http", inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
     node >> ret
     return ret
+
+
+def HTTPServer(node, json=False, wrap=False, field=None):
+    """Host a server and yield results from get requests
+
+    Args:
+        node (Node): input tributary
+        json (bool): dump data as json
+        wrap (bool): wrap input in a list
+        field (str): field to index result by
+    """
+
+    async def _send(
+        data,
+        json=json,
+        wrap=wrap,
+        field=field,
+    ):
+        raise NotImplementedError()
+
+    ret = Node(
+        foo=_send, name="HttpServer", inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE
+    )
+    node >> ret
+    return ret

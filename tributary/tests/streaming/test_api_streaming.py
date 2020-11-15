@@ -170,7 +170,10 @@ class TestAPI:
         assert hasattr(ts, "FileSink")
         assert hasattr(ts, "HTTP")
         assert hasattr(ts, "HTTPSource")
+        assert hasattr(ts, "HTTPServer")
+        assert hasattr(ts, "HTTPServerSource")
         assert hasattr(ts, "HTTPSink")
+        assert hasattr(ts, "HTTPServerSink")
         assert hasattr(ts, "Kafka")
         assert hasattr(ts, "KafkaSource")
         assert hasattr(ts, "KafkaSink")
@@ -182,8 +185,10 @@ class TestAPI:
         assert hasattr(ts, "SocketIOSink")
         assert hasattr(ts, "SubprocessSource")
         assert hasattr(ts, "WebSocket")
+        assert hasattr(ts, "WebSocketServer")
         assert hasattr(ts, "WebSocketSource")
         assert hasattr(ts, "WebSocketSink")
+        assert hasattr(ts, "WebSocketServerSink")
 
     def test_api_other_inputs(self):
         # Other inputs

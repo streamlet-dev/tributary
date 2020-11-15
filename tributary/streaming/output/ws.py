@@ -67,3 +67,27 @@ def WebSocket(
     )
     node >> ret
     return ret
+
+
+def WebSocketServer(node, json=False, wrap=False, field=None):
+    """Host a websocket server and send data to clients
+
+    Args:
+        node (Node): input tributary
+        json (bool): dump data as json
+        wrap (bool): wrap result in a list
+    """
+
+    async def _send(
+        data,
+        json=json,
+        wrap=wrap,
+        field=field,
+    ):
+        raise NotImplementedError()
+
+    ret = Node(
+        foo=_send, name="WebSocketServer", inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE
+    )
+    node >> ret
+    return ret

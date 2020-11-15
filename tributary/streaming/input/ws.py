@@ -33,3 +33,19 @@ class WebSocket(Foo):
 
         super().__init__(foo=_listen)
         self._name = "WebSocket"
+
+
+class WebSocketServer(Foo):
+    """Host a websocket server and yield data as sent
+
+    Args:
+        json (bool): load websocket data as json
+        wrap (bool): wrap result in a list
+    """
+
+    def __init__(self, json=False, wrap=False):
+        async def _listen(json=json, wrap=wrap):
+            raise NotImplementedError()
+
+        super().__init__(foo=_listen)
+        self._name = "WebSocketServer"
