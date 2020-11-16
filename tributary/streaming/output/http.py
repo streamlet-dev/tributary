@@ -78,7 +78,7 @@ class HTTP(Foo):
                     return msg
 
         super().__init__(foo=_send, inputs=1)
-        self._name = "Http"
+        self._name = "HTTP"
         node >> self
 
 
@@ -125,7 +125,12 @@ class HTTPServer(Foo):
         queue = asyncio.Queue()
 
         # http server handler
-        async def _handler(request, queue=queue, response_handler=response_handler):
+        async def _handler(
+            request,
+            queue=queue,
+            request_handler=request_handler,
+            response_handler=response_handler,
+        ):
             if queue.empty():
                 return web.Response()
 
@@ -156,7 +161,6 @@ class HTTPServer(Foo):
             wrap=wrap,
             field=field,
             queue=queue,
-            request_handler=request_handler,
         ):
             if json:
                 data = JSON.dumps(data)
@@ -174,7 +178,7 @@ class HTTPServer(Foo):
             return data
 
         super().__init__(foo=_req, inputs=1)
-        self._name = "HttpServer"
+        self._name = "HTTPServer"
         node >> self
 
         # set server attribute so it can be accessed
@@ -195,17 +199,14 @@ class HTTPServer(Foo):
         if run:
             # setup runners so that we start the application
             async def _start(self=self, server=server, host=host, port=port):
-                print("here")
-                if self.app is None:
-                    # https://docs.aiohttp.org/en/v3.0.1/web_reference.html#running-applications
-                    runner = web.AppRunner(server)
-                    self.app = runner
-                    await runner.setup()
+                # https://docs.aiohttp.org/en/v3.0.1/web_reference.html#running-applications
+                runner = web.AppRunner(server)
+                self.app = runner
+                await runner.setup()
 
-                    site = web.TCPSite(runner, host=host, port=port)
-                    self.site = site
-                    await site.start()
-                return
+                site = web.TCPSite(runner, host=host, port=port)
+                self.site = site
+                await site.start()
 
             async def _shutdown(self=self, server=server, host=host, port=port):
                 await self.site.stop()

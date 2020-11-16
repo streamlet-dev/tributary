@@ -77,7 +77,7 @@ class HTTP(Foo):
                             count += 1
 
         super().__init__(foo=_req)
-        self._name = "Http"
+        self._name = "HTTP"
 
 
 class HTTPServer(Foo):
@@ -169,7 +169,7 @@ class HTTPServer(Foo):
             return data
 
         super().__init__(foo=_req)
-        self._name = "HttpServer"
+        self._name = "HTTPServer"
 
         # set server attribute so it can be accessed
         self.set("server", server)
@@ -197,12 +197,10 @@ class HTTPServer(Foo):
                 site = web.TCPSite(runner, host=host, port=port)
                 self.site = site
                 await site.start()
-                return
 
             async def _shutdown(self=self, server=server, host=host, port=port):
                 await self.site.stop()
                 await self.runner.cleanup()
-                return
 
             self._onstarts = (_start,)
             self._onstops = (_shutdown,)

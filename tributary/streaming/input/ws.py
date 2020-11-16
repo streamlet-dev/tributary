@@ -11,9 +11,10 @@ class WebSocket(Foo):
         url (str): websocket url to connect to
         json (bool): load websocket data as json
         wrap (bool): wrap result in a list
+        field (str): field to index result by
     """
 
-    def __init__(self, url, json=False, wrap=False):
+    def __init__(self, url, json=False, wrap=False, field=None):
         async def _listen(url=url, json=json, wrap=wrap):
             session = aiohttp.ClientSession()
             async with session.ws_connect(url) as ws:
@@ -23,6 +24,8 @@ class WebSocket(Foo):
                         x = msg.data
                         if json:
                             x = JSON.loads(x)
+                        if field:
+                            x = x[field]
                         if wrap:
                             x = [x]
                         yield x
