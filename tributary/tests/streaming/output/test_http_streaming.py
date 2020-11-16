@@ -23,15 +23,15 @@ class TestHttp:
 
     def test_http_server(self):
         inp = ts.Random(interval=1, count=2)
-        ss = ts.HTTPServerSink(inp, json=True, port=12345)
+        ss = ts.HTTPServerSink(inp, json=True, port=12346)
         w = ts.Window(ss)
         l = ts.run(w, blocking=False)
 
         time.sleep(1)
-        resp = requests.get("http://127.0.0.1:12345/")
+        resp = requests.get("http://127.0.0.1:12346/")
         print(resp.json())
         time.sleep(1)
-        resp = requests.get("http://127.0.0.1:12345/")
+        resp = requests.get("http://127.0.0.1:12346/")
         print(resp.json())
         time.sleep(2)
         print(w._accum)
