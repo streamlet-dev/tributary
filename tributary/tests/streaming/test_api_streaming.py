@@ -112,6 +112,10 @@ class TestAPI:
 
     def test_api_outputs(self):
         # Output
+        assert hasattr(ts.StreamingNode, "foo")
+        assert hasattr(ts, "FooOutput")
+        assert hasattr(ts.StreamingNode, "collect")
+        assert hasattr(ts, "Collect")
         assert hasattr(ts.StreamingNode, "graph")
         assert hasattr(ts, "Graph")
         assert hasattr(ts.StreamingNode, "pprint")

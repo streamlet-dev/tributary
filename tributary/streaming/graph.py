@@ -52,10 +52,10 @@ class StreamingGraph(object):
     async def _run(self):
         value, last, self._stop = None, None, False
 
-        while True:
-            # run onstarts
-            await asyncio.gather(*(asyncio.create_task(s()) for s in self._onstarts))
+        # run onstarts
+        await asyncio.gather(*(asyncio.create_task(s()) for s in self._onstarts))
 
+        while True:
             for level in self._nodes:
                 if self._stop:
                     break
@@ -83,9 +83,12 @@ class StreamingGraph(object):
             # Set to proactor event loop on window
             # (default in python 3.8+)
             loop = asyncio.ProactorEventLoop()
+
         else:
+
             if newloop:
                 loop = asyncio.new_event_loop()
+
             else:
                 loop = asyncio.get_event_loop()
 

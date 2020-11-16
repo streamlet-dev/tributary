@@ -112,6 +112,10 @@ class TestAPI:
 
     def test_api_outputs(self):
         # Output
+        # assert hasattr(tl.LazyNode, "foo")
+        # assert hasattr(tl, "FooOutput")
+        # assert hasattr(tl.LazyNode, "Collect")
+        # assert hasattr(tl, "collect")
         assert hasattr(tl.LazyNode, "graph")
         assert hasattr(tl, "Graph")
         # assert hasattr(tl.LazyNode, 'pprint')

@@ -18,6 +18,7 @@ class HTTP(Foo):
         field (str): field to index result by
         proxies (list): list of URL proxies to pass to requests.get
         cookies (list): list of cookies to pass to requests.get
+        response_handler (Optional[callable]): custom handler to manage the response from the server
     """
 
     def __init__(
@@ -30,6 +31,7 @@ class HTTP(Foo):
         field=None,
         proxies=None,
         cookies=None,
+        response_handler=None,
     ):
         async def _req(
             url=url,
@@ -47,21 +49,26 @@ class HTTP(Foo):
                     async with session.get(
                         url, cookies=cookies, proxy=proxies
                     ) as response:
-                        msg = await response.text()
 
-                        if msg is None or response.status != 200:
-                            break
+                        if response_handler and callable(response_handler):
+                            yield response_handler(response)
 
-                        if json:
-                            msg = JSON.loads(msg)
+                        else:
+                            msg = await response.text()
 
-                        if field:
-                            msg = msg[field]
+                            if msg is None or response.status != 200:
+                                break
 
-                        if wrap:
-                            msg = [msg]
+                            if json:
+                                msg = JSON.loads(msg)
 
-                        yield msg
+                            if field:
+                                msg = msg[field]
+
+                            if wrap:
+                                msg = [msg]
+
+                            yield msg
 
                         if interval:
                             await asyncio.sleep(interval)
@@ -149,8 +156,6 @@ class HTTPServer(Foo):
                 else:
                     # read body as json
                     data = await request.json()
-
-            print(data)
 
             # if specifying a field
             if field:
