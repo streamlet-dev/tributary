@@ -65,19 +65,33 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 # Sources and Sinks
 ## Sources
 - Python Function/Generator/Async Function/Async Generator
+- Curve - yield through an iterable
+- Const - yield a constant
+- Timer - yield on an interval
 - Random - generates a random dictionary of values
 - File - streams data from a file, optionally loading each line as a json
-- Kafka - streams data from kafka
+- HTTP - polls a url with GET requests, streams data out
+- HTTPServer - runs an http server and streams data sent by clients
 - Websocket - strams data from a websocket
-- Http - polls a url with GET requests, streams data out
+- WebsocketServer - runs a websocket server and streams data sent by clients
 - SocketIO - streams data from a socketIO connection
+- SocketIOServer - streams data from a socketIO connection
+- SSE - streams data from an SSE connection
+- Kafka - streams data from kafka
+- Postgres - streams data from postgres
 
 ## Sinks
+- Foo - data to a python function
 - File - data to a file
-- Kafka - streams data to kafka
-- Http - POSTs data to an url
+- HTTP - POSTs data to an url
+- HTTPServer - runs an http server and streams data to connections
 - Websocket - streams data to a websocket
+- WebsocketServer - runs a websocket server and streams data to connections
 - SocketIO - streams data to a socketIO connection
+- SocketIOServer - runs a socketio server and streams data to connections
+- SSE - runs an SSE server and streams data to connections
+- Kafka - streams data to kafka
+- Postgres - streams data to postgres
 
 # Transforms
 ## Modulate
@@ -90,8 +104,12 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - ListMerge - Streaming wrapper to merge 2 input lists into a single output list
 - DictMerge - Streaming wrapper to merge 2 input dicts into a single output dict. Preference is given to the second input (e.g. if keys overlap)
 - Reduce - Streaming wrapper to merge any number of inputs
+- FixedMap - Map input stream to fixed number of outputs
+- Subprocess - Open a subprocess and yield results as they come. Can also stream data to subprocess (either instantaneous or long-running subprocess)
 
 ## Calculations
+Note that `tributary` can also be configured to operate on **dual numbers** for things like lazy or streaming autodifferentiation.
+
 ### Arithmetic Operators
 - Noop (unary) - Pass input to output
 - Negate (unary) - -1 * input
@@ -105,6 +123,9 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - Pow (binary) - first input^second input
 - Sum (n-ary) - sum all inputs
 - Average (n-ary) - average of all inputs
+- Round (unary)
+- Floor (unary)
+- Ceil (unary)
 
 ### Boolean Operators
 - Not (unary) - `Not` input
