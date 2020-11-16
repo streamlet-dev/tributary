@@ -12,8 +12,7 @@ sy.init_printing()
 
 class TestConfig:
     def setup(self):
-        pass
-        # setup() before each test method
+        time.sleep(0.5)
 
     def test_construct_lazy(self):
         # adapted from https://gist.github.com/raddy/bd0e977dc8437a4f8276

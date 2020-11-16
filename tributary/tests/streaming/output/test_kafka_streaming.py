@@ -1,8 +1,12 @@
 import tributary.streaming as ts
 import pytest
+import time
 
 
 class TestKafka:
+    def setup(self):
+        time.sleep(0.5)
+
     @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS', '1'))")
     def test_kafka(self):
         """Test streaming with Kafka"""

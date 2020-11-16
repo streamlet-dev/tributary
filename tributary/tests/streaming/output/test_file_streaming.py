@@ -1,9 +1,13 @@
 import os
+import time
 import tributary.streaming as ts
 import pytest
 
 
 class TestFile:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_file(self):
         file = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "test_file_data.json")

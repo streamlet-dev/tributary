@@ -1,11 +1,15 @@
 import os
 import os.path
 import requests
+import time
 import tributary.streaming as ts
 from aiohttp import web
 
 
 class TestHttp:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_http(self):
         out = ts.Print(ts.HTTPSource(url="https://google.com"))
         ret = ts.run(out)

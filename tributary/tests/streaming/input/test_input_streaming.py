@@ -1,7 +1,11 @@
+import time
 import tributary.streaming as ts
 
 
 class TestConst:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_const_1(self):
         t = ts.Const(value=1, count=1)
         assert ts.run(t) == [1]
@@ -12,6 +16,9 @@ class TestConst:
 
 
 class TestTimer:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_timer(self):
         val = 0
 
@@ -80,6 +87,9 @@ class TestTimer:
 
 
 class TestFoo:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_timer(self):
         val = 0
 

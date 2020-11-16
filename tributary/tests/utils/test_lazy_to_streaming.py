@@ -1,9 +1,13 @@
+import time
 import tributary.lazy as tl
 import tributary.streaming as ts
 import tributary as t
 
 
 class TestLazyToStreaming:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_function(self):
         def foo(*args):
             for _ in range(5):
