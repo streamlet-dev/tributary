@@ -1,7 +1,8 @@
-import tributary.streaming as ts
+import asyncio
+import pytest
 import requests
 import time
-import pytest
+import tributary.streaming as ts
 
 
 class TestHttp:
@@ -24,7 +25,7 @@ class TestHttp:
         inp = ts.Random(interval=1, count=2)
         ss = ts.HTTPServerSink(inp, json=True, port=12345)
         w = ts.Window(ss)
-        ts.run(w, blocking=False)
+        l = ts.run(w, blocking=False)
 
         time.sleep(1)
         resp = requests.get("http://127.0.0.1:12345/")
@@ -35,3 +36,9 @@ class TestHttp:
         time.sleep(2)
         print(w._accum)
         assert len(w._accum) == 2
+        asyncio.set_event_loop(asyncio.new_event_loop())
+
+        try:
+            l.stop()
+        finally:
+            pass

@@ -1,3 +1,4 @@
+import asyncio
 import os
 import os.path
 import requests
@@ -20,7 +21,12 @@ class TestHttp:
         ss = ts.HTTPServerSource(json=True, host="127.0.0.1", port=12345)
         w = ts.Window(ss)
         l = ts.run(w, blocking=False)
-
+        time.sleep(1)
         resp = requests.post("http://127.0.0.1:12345/", json={"test": 1, "test2": 2})
-        l.stop()
         assert w._accum == [{"test": 1, "test2": 2}]
+        asyncio.set_event_loop(asyncio.new_event_loop())
+
+        try:
+            l.stop()
+        finally:
+            pass
