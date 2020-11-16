@@ -19,7 +19,6 @@ class StreamingGraph(object):
         # Collect graph
         self.getNodes()
 
-
     def getNodes(self):
         self._nodes = self._starting_node._deep_bfs()
 
@@ -34,8 +33,12 @@ class StreamingGraph(object):
         # Check that all are async coroutines
         for call in self._onstarts + self._onstops:
             if not asyncio.iscoroutinefunction(call):
-                raise TributaryException('all onstarts and onstops must be async coroutines, got bad function: {}'.format(call))
-            
+                raise TributaryException(
+                    "all onstarts and onstops must be async coroutines, got bad function: {}".format(
+                        call
+                    )
+                )
+
         # return node levels
         return self._nodes
 
@@ -98,7 +101,6 @@ class StreamingGraph(object):
                 return loop.run_until_complete(self._run())
             except KeyboardInterrupt:
                 return
-            
 
         t = Thread(target=loop.run_until_complete, args=(self._run(),))
         t.daemon = True

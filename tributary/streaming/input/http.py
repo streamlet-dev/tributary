@@ -89,6 +89,7 @@ class HTTPServer(Foo):
         request_handler (Optional[callable]): custom handler to process the request from client
         response_handler (Optional[callable]): custom handler to manage the response sent to client
     """
+
     def __init__(
         self,
         path="/",
@@ -169,11 +170,11 @@ class HTTPServer(Foo):
         self.set("server", server)
 
         # install get handler
-        if meth.lower() in ('get', 'both'):
+        if meth.lower() in ("get", "both"):
             server.router.add_get(path, _handler)
 
         # install post handler
-        if meth.lower() in ('post', 'both'):
+        if meth.lower() in ("post", "both"):
             server.router.add_post(path, _handler)
 
         # Initialize application to None, might be managed outside
