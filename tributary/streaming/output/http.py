@@ -2,7 +2,8 @@ import asyncio
 import aiohttp
 import json as JSON
 from aiohttp import web
-from .output import Foo, _OUTPUT_GRAPHVIZSHAPE
+from .output import Foo
+from ..node import Node
 from ...base import StreamEnd, TributaryException
 
 
@@ -25,7 +26,7 @@ class HTTP(Foo):
     def __init__(
         self,
         node,
-        url="",
+        url,
         json=False,
         wrap=False,
         field=None,
@@ -213,3 +214,7 @@ class HTTPServer(Foo):
 
             self._onstarts = (_start,)
             self._onstops = (_shutdown,)
+
+
+Node.http = HTTP
+Node.httpServer = HTTPServer

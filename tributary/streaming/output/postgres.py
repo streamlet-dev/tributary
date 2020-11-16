@@ -1,8 +1,9 @@
 import asyncpg
+from .output import Foo
 from ..node import Node
 
 
-def Postgres(node, user, password, database, host, query_parser):
+class Postgres(Foo):
     """Connects to Postgres and executes queries
 
     Args:
@@ -14,28 +15,31 @@ def Postgres(node, user, password, database, host, query_parser):
         query_parser (func): parse input node data to query list
     """
 
-    async def _send(
-        data,
-        query_parser=query_parser,
-        user=user,
-        password=password,
-        database=database,
-        host=host,
-    ):
-        conn = await asyncpg.connect(
+    def __init__(self, node, user, password, database, host, query_parser):
+        async def _send(
+            data,
+            query_parser=query_parser,
             user=user,
             password=password,
             database=database,
-            host=host.split(":")[0],
-            port=host.split(":")[1],
-        )
-        queries = query_parser(data)
-        for q in queries:
-            await conn.execute(q)
+            host=host,
+        ):
+            conn = await asyncpg.connect(
+                user=user,
+                password=password,
+                database=database,
+                host=host.split(":")[0],
+                port=host.split(":")[1],
+            )
+            queries = query_parser(data)
+            for q in queries:
+                await conn.execute(q)
 
-        await conn.close()
-        return data
+            await conn.close()
+            return data
 
-    ret = Node(foo=_send, name="PostgresSink", inputs=1)
-    node >> ret
-    return ret
+        super().__init__(foo=_send, name="PostgresSink", inputs=1)
+        node >> self
+
+
+Node.postgres = Postgres
