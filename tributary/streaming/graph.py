@@ -1,7 +1,8 @@
 import asyncio
 import sys
 from threading import Thread
-from ..base import StreamEnd, StreamNone, StreamRepeat  # noqa: F401
+
+from ..base import StreamEnd, StreamNone, StreamRepeat, TributaryException  # noqa: F401
 
 
 class StreamingGraph(object):
@@ -10,10 +11,32 @@ class StreamingGraph(object):
     def __init__(self, node):
         self._stop = False
         self._starting_node = node  # noqa F405
+
+        # coroutines to run on start and stop
+        self._onstarts = []
+        self._onstops = []
+
+        # Collect graph
         self.getNodes()
+
 
     def getNodes(self):
         self._nodes = self._starting_node._deep_bfs()
+
+        # Run through nodes and extract onstarts and onstops
+        for ns in self._nodes:
+            for n in ns:
+                if n._onstarts:
+                    self._onstarts.extend(list(n._onstarts))
+                if n._onstops:
+                    self._onstops.extend(list(n._onstops))
+
+        # Check that all are async coroutines
+        for call in self._onstarts + self._onstops:
+            if not asyncio.iscoroutinefunction(call):
+                raise TributaryException('all onstarts and onstops must be async coroutines, got bad function: {}'.format(call))
+            
+        # return node levels
         return self._nodes
 
     def rebuild(self):
@@ -27,6 +50,9 @@ class StreamingGraph(object):
         value, last, self._stop = None, None, False
 
         while True:
+            # run onstarts
+            await asyncio.gather(*(asyncio.create_task(s()) for s in self._onstarts))
+
             for level in self._nodes:
                 if self._stop:
                     break
@@ -43,6 +69,10 @@ class StreamingGraph(object):
             if isinstance(value, StreamEnd):
                 break
 
+        # run `onstops`
+        await asyncio.gather(*(asyncio.create_task(s()) for s in self._onstops))
+
+        # return last val
         return last
 
     def run(self, blocking=True, newloop=False):
@@ -64,7 +94,11 @@ class StreamingGraph(object):
 
         if blocking:
             # block until done
-            return loop.run_until_complete(self._run())
+            try:
+                return loop.run_until_complete(self._run())
+            except KeyboardInterrupt:
+                return
+            
 
         t = Thread(target=loop.run_until_complete, args=(self._run(),))
         t.daemon = True
