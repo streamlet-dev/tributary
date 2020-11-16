@@ -19,7 +19,8 @@ class TestHttp:
     def test_http_server(self):
         ss = ts.HTTPServerSource(json=True, host="127.0.0.1", port=12345)
         w = ts.Window(ss)
-        ts.run(w, blocking=False)
+        l = ts.run(w, blocking=False)
 
         resp = requests.post("http://127.0.0.1:12345/", json={"test": 1, "test2": 2})
+        l.stop()
         assert w._accum == [{"test": 1, "test2": 2}]

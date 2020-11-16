@@ -96,7 +96,7 @@ class StreamingGraph(object):
 
         if loop.is_running():
             # return future
-            return asyncio.create_task(self._run())
+            return loop.create_task(self._run())
 
         if blocking:
             # block until done

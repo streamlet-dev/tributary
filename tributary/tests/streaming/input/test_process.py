@@ -15,6 +15,7 @@ vals = [
     "test_input_streaming.py",
     "test_postgres_streaming.py",
     "test_process.py",
+    "test_sse_streaming.py",
 ]
 
 
