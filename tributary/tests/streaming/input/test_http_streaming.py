@@ -17,7 +17,7 @@ class TestHttp:
         print(ret)
         assert len(ret) == 1
 
-    @pytest.mark.skipif(os.name == "nt")
+    @pytest.mark.skipif('os.name == "nt"')
     def test_http_server(self):
         ss = ts.HTTPServerSource(json=True, host="127.0.0.1", port=12345)
         w = ts.Window(ss)

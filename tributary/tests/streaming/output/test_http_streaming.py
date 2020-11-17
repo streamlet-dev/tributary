@@ -22,7 +22,7 @@ class TestHttp:
         out = ts.HTTPSink(ts.Foo(foo), url="http://localhost:8080")
         assert len(ts.run(out)) == 3
 
-    @pytest.mark.skipif(os.name == "nt")
+    @pytest.mark.skipif('os.name == "nt"')
     def test_http_server(self):
         inp = ts.Random(interval=1, count=2)
         ss = ts.HTTPServerSink(inp, json=True, port=12346)
