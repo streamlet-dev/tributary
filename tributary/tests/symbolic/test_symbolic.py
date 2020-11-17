@@ -2,9 +2,6 @@ import time
 import tributary.symbolic as ts
 import tributary.streaming as tss
 import sympy as sy
-import numpy as np
-import sympy as sy
-from IPython.display import display, HTML
 from sympy.stats import Normal as syNormal, cdf
 
 sy.init_printing()

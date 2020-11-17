@@ -1,4 +1,5 @@
 import asyncio
+import os
 import pytest
 import requests
 import time
@@ -21,11 +22,12 @@ class TestHttp:
         out = ts.HTTPSink(ts.Foo(foo), url="http://localhost:8080")
         assert len(ts.run(out)) == 3
 
+    @pytest.mark.skipif(os.name == "nt")
     def test_http_server(self):
         inp = ts.Random(interval=1, count=2)
         ss = ts.HTTPServerSink(inp, json=True, port=12346)
         w = ts.Window(ss)
-        l = ts.run(w, blocking=False)
+        out = ts.run(w, blocking=False)
 
         time.sleep(1)
         resp = requests.get("http://127.0.0.1:12346/")
@@ -39,6 +41,6 @@ class TestHttp:
         asyncio.set_event_loop(asyncio.new_event_loop())
 
         try:
-            l.stop()
+            out.stop()
         finally:
             pass

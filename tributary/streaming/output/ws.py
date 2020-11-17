@@ -92,12 +92,7 @@ class WebSocketServer(Foo):
         response=False,
         response_timeout=1,
     ):
-        async def _send(
-            data,
-            json=json,
-            wrap=wrap,
-            field=field,
-        ):
+        async def _send(data, json=json, wrap=wrap, field=field):
             raise NotImplementedError()
 
         super().__init__(foo=_send, name="WebSocketServer", inputs=1)

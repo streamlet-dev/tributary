@@ -81,11 +81,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     keywords="analytics tools plotting",
-    packages=find_packages(
-        exclude=[
-            "tests",
-        ]
-    ),
+    packages=find_packages(exclude=["tests"]),
     package_data={},
     include_package_data=True,
     zip_safe=False,

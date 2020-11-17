@@ -1,7 +1,6 @@
 import os
 import time
 import tributary.streaming as ts
-import pytest
 
 
 class TestFile:

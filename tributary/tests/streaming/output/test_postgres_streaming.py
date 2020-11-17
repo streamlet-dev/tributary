@@ -17,7 +17,6 @@ class TestPostgres:
         def parser(data):
             return ["INSERT INTO test(col1) VALUES ({});".format(data)]
 
-        query = ["SELECT * FROM test"]
         out = ts.PostgresSink(
             ts.Foo(foo),
             query_parser=parser,

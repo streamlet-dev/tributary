@@ -1,4 +1,3 @@
-import asyncio
 import json as JSON
 import os.path
 import pytest

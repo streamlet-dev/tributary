@@ -13,19 +13,8 @@ class SSE(Foo):
         field (str): field to index result by
     """
 
-    def __init__(
-        self,
-        url,
-        json=False,
-        wrap=False,
-        field=None,
-    ):
-        async def _req(
-            url=url,
-            json=json,
-            wrap=wrap,
-            field=field,
-        ):
+    def __init__(self, url, json=False, wrap=False, field=None):
+        async def _req(url=url, json=json, wrap=wrap, field=field):
             async with sse_client.EventSource(url) as event_source:
                 async for event in event_source:
                     data = event.data

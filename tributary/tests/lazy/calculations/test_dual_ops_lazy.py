@@ -53,7 +53,7 @@ class TestOps:
     def test_Not(self):
         t = tl.Node(value=(5, 1), use_dual=True)
         out = tl.Not(t)
-        assert out() == False
+        assert out() is False
 
     def test_And(self):
         t = tl.Node(value=(5, 1), use_dual=True)
@@ -88,7 +88,7 @@ class TestOps:
     def test_Gt(self):
         t = tl.Node(value=(5, 1), use_dual=True)
         out = tl.Gt(t, (5, 1))
-        assert out() == False
+        assert out() is False
 
     def test_Ge(self):
         t = tl.Node(value=(5, 1), use_dual=True)

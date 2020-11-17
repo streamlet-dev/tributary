@@ -155,13 +155,7 @@ class HTTPServer(Foo):
                 return web.Response(text=JSON.dumps(datas))
 
         # tributary node handler
-        async def _req(
-            data,
-            json=json,
-            wrap=wrap,
-            field=field,
-            queue=queue,
-        ):
+        async def _req(data, json=json, wrap=wrap, field=field, queue=queue):
             if json:
                 data = JSON.dumps(data)
 

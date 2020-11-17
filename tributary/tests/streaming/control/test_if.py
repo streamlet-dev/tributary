@@ -20,7 +20,6 @@ class TestConditional:
     def test_if(self):
         import tributary.streaming as ts
 
-        n = ts.Foo(conditionals)
         assert ts.run(
             ts.Print(
                 ts.If(ts.Foo(conditionals), ts.Foo(if_stream), ts.Foo(else_stream))
