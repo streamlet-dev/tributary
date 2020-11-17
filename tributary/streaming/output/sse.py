@@ -11,7 +11,7 @@ class SSE(Foo):
     """Host an sse server and send results on requests
 
     Args:
-        path (str): route on which to host http server
+        path (str): route on which to host sse server
         json (bool): load http content data as json
         wrap (bool): wrap result in a list
         field (str): field to index result by
