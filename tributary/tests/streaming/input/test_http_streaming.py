@@ -1,6 +1,4 @@
 import asyncio
-import os
-import os.path
 import pytest
 import requests
 import time
