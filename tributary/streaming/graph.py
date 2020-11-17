@@ -94,18 +94,16 @@ class StreamingGraph(object):
 
         asyncio.set_event_loop(loop)
 
-        if loop.is_running():
-            # return future
-            return asyncio.create_task(self._run())
+        task = loop.create_task(self._run())
 
         if blocking:
             # block until done
             try:
-                return loop.run_until_complete(self._run())
+                return loop.run_until_complete(task)
             except KeyboardInterrupt:
                 return
 
-        t = Thread(target=loop.run_until_complete, args=(self._run(),))
+        t = Thread(target=loop.run_until_complete, args=(task,))
         t.daemon = True
         t.start()
         return loop
