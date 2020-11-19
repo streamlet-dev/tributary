@@ -1,7 +1,11 @@
+import time
 import tributary.streaming as ts
 
 
 class TestOutput:
+    def setup(self):
+        time.sleep(0.5)
+
     def test_print(self):
         val = 0
 

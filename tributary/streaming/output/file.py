@@ -1,10 +1,10 @@
 import aiofiles
 import json as JSON
-from .output import _OUTPUT_GRAPHVIZSHAPE
+from .output import Foo
 from ..node import Node
 
 
-def File(node, filename="", json=False, csv=False):
+class File(Foo):
     """Open up a file and write lines to the file
 
     Args:
@@ -14,18 +14,21 @@ def File(node, filename="", json=False, csv=False):
         csv (bool): write file line as csv
     """
 
-    async def _file(data):
-        if csv:
-            async with aiofiles.open(filename, "w") as f:
-                await f.write(",".join(data))
-        else:
-            async with aiofiles.open(filename, mode="a") as f:
-                if json:
-                    await f.write(JSON.dumps(data))
-                else:
-                    await f.write(data)
-            return data
+    def __init__(self, node, filename="", json=False, csv=False):
+        async def _file(data):
+            if csv:
+                async with aiofiles.open(filename, "w") as f:
+                    await f.write(",".join(data))
+            else:
+                async with aiofiles.open(filename, mode="a") as f:
+                    if json:
+                        await f.write(JSON.dumps(data))
+                    else:
+                        await f.write(data)
+                return data
 
-    ret = Node(foo=_file, name="File", inputs=1, graphvizshape=_OUTPUT_GRAPHVIZSHAPE)
-    node >> ret
-    return ret
+        super().__init__(foo=_file, name="File", inputs=1)
+        node >> self
+
+
+Node.file = File

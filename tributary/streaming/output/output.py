@@ -9,6 +9,23 @@ from ...base import StreamEnd, StreamNone, StreamRepeat
 _OUTPUT_GRAPHVIZSHAPE = "box"
 
 
+class Foo(Node):
+    """Streaming wrapper to send data to function
+
+    Arguments:
+        foo (callable): callable to call
+        foo_kwargs (dict): kwargs for callable
+    """
+
+    def __init__(self, foo, foo_kwargs=None, **kwargs):
+        super().__init__(
+            foo=foo,
+            foo_kwargs=foo_kwargs,
+            graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
+            **kwargs
+        )
+
+
 def Print(node, text=""):
     async def foo(val):
         if getattr(Print, "_multiprocess", None):
@@ -185,6 +202,8 @@ def Perspective(node, text="", **psp_kwargs):
     return ret
 
 
+Node.foo = Foo
+Node.collect = Collect
 Node.graph = Graph
 Node.pprint = PPrint
 Node.graphviz = GraphViz

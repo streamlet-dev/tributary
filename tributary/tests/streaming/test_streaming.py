@@ -70,7 +70,7 @@ class TestStreaming:
         i = ts.Print(f)
 
         def _ids(lst):
-            return set([l._id for l in lst])
+            return set([elem._id for elem in lst])
 
         def _ids_ids(lst_of_list):
             ret = []

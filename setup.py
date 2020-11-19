@@ -26,6 +26,8 @@ requires = [
     "aioconsole>=0.2.1",
     "aiofiles>=0.4.0",
     "aiohttp>=3.5.4",
+    "aiohttp-sse>=2.0",
+    "aiohttp-sse-client>=0.2.0",
     "aiokafka>=0.6.0",
     "aiostream>=0.3.1",
     "asyncpg>=0.20.1",
@@ -79,11 +81,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     keywords="analytics tools plotting",
-    packages=find_packages(
-        exclude=[
-            "tests",
-        ]
-    ),
+    packages=find_packages(exclude=["tests"]),
     package_data={},
     include_package_data=True,
     zip_safe=False,

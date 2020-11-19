@@ -1,93 +1,17 @@
 import asyncio
-import aiohttp
-import json as JSON
 from collections import deque
+import json as JSON
 from aiohttp import web
+from aiohttp_sse import sse_response
 from .output import Foo
 from ..node import Node
-from ...base import StreamNone, StreamEnd
 
 
-class WebSocket(Foo):
-    """Connect to websocket and send data
-
-    Args:
-        node (Node): input tributary
-        url (str): websocket url to connect to
-        json (bool): dump data as json
-        wrap (bool): wrap result in a list
-        binary (bool): send_bytes instead of send_str
-    """
-
-    def __init__(
-        self,
-        node,
-        url,
-        json=False,
-        wrap=False,
-        field=None,
-        response=False,
-        response_timeout=1,
-        binary=False,
-    ):
-        async def _send(
-            data,
-            url=url,
-            json=json,
-            wrap=wrap,
-            field=field,
-            response=response,
-            response_timeout=response_timeout,
-            binary=binary,
-        ):
-            if isinstance(data, (StreamNone, StreamEnd)):
-                return data
-
-            if wrap:
-                data = [data]
-            if json:
-                data = JSON.dumps(data)
-
-            session = aiohttp.ClientSession()
-            async with session.ws_connect(url) as ws:
-                if binary:
-                    await ws.send_bytes(data)
-                else:
-                    await ws.send_str(data)
-
-                if response:
-                    msg = await ws.receive(response_timeout)
-                    if msg.type == aiohttp.WSMsgType.TEXT:
-                        x = msg.data
-                    elif msg.type == aiohttp.WSMsgType.CLOSED:
-                        x = "{}"
-                    elif msg.type == aiohttp.WSMsgType.ERROR:
-                        x = "{}"
-                else:
-                    x = "{}"
-
-            await session.close()
-
-            if json:
-                x = JSON.loads(x)
-
-            if field:
-                x = x[field]
-
-            if wrap:
-                x = [x]
-
-            return x
-
-        super().__init__(foo=_send, name="WebSocket", inputs=1)
-        node >> self
-
-
-class WebSocketServer(Foo):
-    """Host a websocket server and stream in the data
+class SSE(Foo):
+    """Host an sse server and send results on requests
 
     Args:
-        path (str): route on which to host ws server
+        path (str): route on which to host sse server
         json (bool): load http content data as json
         wrap (bool): wrap result in a list
         field (str): field to index result by
@@ -98,7 +22,6 @@ class WebSocketServer(Foo):
         port (Optional[int]): if running the web app, port to listen on
         request_handler (Optional[callable]): custom handler to process the request from client
         response_handler (Optional[callable]): custom handler to manage the response sent to client
-        binary (bool): send_bytes instead of send_str
     """
 
     def __init__(
@@ -115,7 +38,6 @@ class WebSocketServer(Foo):
         port=8080,
         request_handler=None,
         response_handler=None,
-        binary=False,
     ):
         # instantiate server if not existing
         server = server or web.Application()
@@ -133,28 +55,22 @@ class WebSocketServer(Foo):
             history=self._history,
             request_handler=request_handler,
             response_handler=response_handler,
-            binary=binary,
         ):
-            ws = web.WebSocketResponse()
-            await ws.prepare(request)
+            async with sse_response(request) as resp:
+                if resp not in queue_map:
+                    # create a queue for this client
+                    queue_map[resp] = asyncio.Queue()
 
-            if ws not in queue_map:
-                # create a queue for this client
-                queue_map[ws] = asyncio.Queue()
+                    # send history if snapshotting
+                    for data in history:
+                        if response_handler and callable(response_handler):
+                            data = await response_handler(request, data)
+                        await resp.send(data)
 
-                # send history if snapshotting
-                for data in history:
-                    if response_handler and callable(response_handler):
-                        data = await response_handler(request, data)
-                    if binary:
-                        await ws.send_bytes(data)
-                    else:
-                        await ws.send_str(data)
-
-                queue = queue_map[ws]
+                queue = queue_map[resp]
 
                 try:
-                    while not ws.closed:
+                    while not resp.task.done():
                         # put the request into the queue
                         data = await queue.get()
 
@@ -165,24 +81,16 @@ class WebSocketServer(Foo):
                         # if custom response handler is given, use that to determine response
                         if response_handler and callable(response_handler):
                             data = await response_handler(request, data)
-                            if binary:
-                                await ws.send_bytes(data)
-                            else:
-                                await ws.send_str(data)
+                            await resp.send(data)
 
-                        elif response_handler and isinstance(
-                            response_handler, (str, bytes)
-                        ):
-                            if binary:
-                                await ws.send_bytes(response_handler)
-                            else:
-                                await ws.send_str(response_handler)
+                        elif response_handler and isinstance(response_handler, str):
+                            await resp.send(response_handler)
                         else:
                             # just put an ok with data
-                            await ws.send_str(JSON.dumps(data))
+                            await resp.send(JSON.dumps(data))
                 finally:
                     # remove from queue
-                    queue_map.pop(ws)
+                    queue_map.pop(resp)
 
         # tributary node handler
         async def _req(
@@ -216,7 +124,7 @@ class WebSocketServer(Foo):
             return data
 
         super().__init__(foo=_req, inputs=1)
-        self._name = "WebSocketServer"
+        self._name = "SSE"
         node >> self
 
         # set server attribute so it can be accessed
@@ -249,5 +157,4 @@ class WebSocketServer(Foo):
             self._onstops = (_shutdown,)
 
 
-Node.websocket = WebSocket
-Node.websocketServer = WebSocketServer
+Node.sse = SSE

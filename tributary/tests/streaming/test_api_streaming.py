@@ -110,7 +110,7 @@ class TestAPI:
         assert hasattr(ts.StreamingNode, "meanBasket")
         assert hasattr(ts, "MeanBasket")
 
-    def test_api_outputs(self):
+    def test_api_common_outputs(self):
         # Output
         assert hasattr(ts.StreamingNode, "graph")
         assert hasattr(ts, "Graph")
@@ -124,8 +124,6 @@ class TestAPI:
         assert hasattr(ts, "Print")
         assert hasattr(ts.StreamingNode, "logging")
         assert hasattr(ts, "Logging")
-        assert hasattr(ts.StreamingNode, "perspective")
-        assert hasattr(ts, "Perspective")
 
     def test_api_control_flow(self):
         # Control flow
@@ -167,23 +165,49 @@ class TestAPI:
         assert hasattr(ts, "Console")
         assert hasattr(ts, "File")
         assert hasattr(ts, "FileSource")
-        assert hasattr(ts, "FileSink")
         assert hasattr(ts, "HTTP")
         assert hasattr(ts, "HTTPSource")
-        assert hasattr(ts, "HTTPSink")
+        assert hasattr(ts, "HTTPServer")
+        assert hasattr(ts, "HTTPServerSource")
         assert hasattr(ts, "Kafka")
         assert hasattr(ts, "KafkaSource")
-        assert hasattr(ts, "KafkaSink")
         assert hasattr(ts, "Postgres")
         assert hasattr(ts, "PostgresSource")
-        assert hasattr(ts, "PostgresSink")
         assert hasattr(ts, "SocketIO")
         assert hasattr(ts, "SocketIOSource")
-        assert hasattr(ts, "SocketIOSink")
+        assert hasattr(ts, "SSE")
+        assert hasattr(ts, "SSESource")
         assert hasattr(ts, "SubprocessSource")
         assert hasattr(ts, "WebSocket")
+        assert hasattr(ts, "WebSocketServer")
         assert hasattr(ts, "WebSocketSource")
+
+    def test_api_outputs(self):
+        # outputs
+        assert hasattr(ts.StreamingNode, "foo")
+        assert hasattr(ts, "FooOutput")
+        assert hasattr(ts.StreamingNode, "collect")
+        assert hasattr(ts, "Collect")
+        assert hasattr(ts.StreamingNode, "perspective")
+        assert hasattr(ts, "Perspective")
+        assert hasattr(ts.StreamingNode, "file")
+        assert hasattr(ts, "FileSink")
+        assert hasattr(ts.StreamingNode, "http")
+        assert hasattr(ts, "HTTPSink")
+        assert hasattr(ts.StreamingNode, "httpServer")
+        assert hasattr(ts, "HTTPServerSink")
+        assert hasattr(ts.StreamingNode, "kafka")
+        assert hasattr(ts, "KafkaSink")
+        assert hasattr(ts.StreamingNode, "postgres")
+        assert hasattr(ts, "PostgresSink")
+        assert hasattr(ts.StreamingNode, "socketio")
+        assert hasattr(ts, "SocketIOSink")
+        assert hasattr(ts.StreamingNode, "sse")
+        assert hasattr(ts, "SSESink")
+        assert hasattr(ts.StreamingNode, "websocket")
         assert hasattr(ts, "WebSocketSink")
+        assert hasattr(ts.StreamingNode, "websocketServer")
+        assert hasattr(ts, "WebSocketServerSink")
 
     def test_api_other_inputs(self):
         # Other inputs

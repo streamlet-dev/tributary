@@ -2,9 +2,6 @@ import time
 import tributary.symbolic as ts
 import tributary.streaming as tss
 import sympy as sy
-import numpy as np
-import sympy as sy
-from IPython.display import display, HTML
 from sympy.stats import Normal as syNormal, cdf
 
 sy.init_printing()
@@ -12,8 +9,7 @@ sy.init_printing()
 
 class TestConfig:
     def setup(self):
-        pass
-        # setup() before each test method
+        time.sleep(0.5)
 
     def test_construct_lazy(self):
         # adapted from https://gist.github.com/raddy/bd0e977dc8437a4f8276

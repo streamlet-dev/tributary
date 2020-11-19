@@ -110,7 +110,7 @@ class TestAPI:
         assert hasattr(tl.LazyNode, "meanBasket")
         assert hasattr(tl, "MeanBasket")
 
-    def test_api_outputs(self):
+    def test_api_common_outputs(self):
         # Output
         assert hasattr(tl.LazyNode, "graph")
         assert hasattr(tl, "Graph")
@@ -124,8 +124,6 @@ class TestAPI:
         assert hasattr(tl, "Print")
         # assert hasattr(tl.LazyNode, "logging")
         # assert hasattr(tl, "Logging")
-        # assert hasattr(ts.StreamingNode, 'perspective')
-        # assert hasattr(ts, 'Perspective')
 
     def test_api_control_flow(self):
         # Control flow

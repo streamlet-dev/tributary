@@ -156,6 +156,12 @@ class Node(NodeSerializeMixin, object):
         # repeat last if input is StreamNone
         self._repeat = repeat
 
+        # coroutines to run on graph start
+        self._onstarts = ()
+
+        # coroutines to run on graph stop
+        self._onstops = ()
+
         # for safety
         self._initial_attrs = dir(self) + ["_old_foo", "_initial_attrs"]
 
