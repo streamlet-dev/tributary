@@ -9,6 +9,6 @@ from .utils import *  # noqa: F401, F403
 from ..base import StreamEnd, StreamNone, StreamRepeat  # noqa: F401
 
 
-def run(node, blocking=True):
+def run(node, blocking=True, period=None):
     graph = node.constructGraph()
-    return graph.run(blocking)
+    return graph.run(blocking=blocking, period=period)

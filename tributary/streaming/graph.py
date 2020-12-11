@@ -49,23 +49,45 @@ class StreamingGraph(object):
     def stop(self):
         self._stop = True
 
-    async def _run(self):
+    async def _run(self, period=None):
+        """this is the main graph runner. it is pretty straightforward, we go through
+        all the layers of the graph and execute the layer as a batch of coroutines.
+
+        If we generate a stop event (e.g. graph is done), we stop.
+
+        If a period is set, a layer in the graph will run for at max `period` seconds
+        before pushing a None.
+
+        Args:
+            period (Optional[int]): max period to wait
+        """
         value, last, self._stop = None, None, False
 
         # run onstarts
         await asyncio.gather(*(asyncio.create_task(s()) for s in self._onstarts))
 
         while True:
-            for level in self._nodes:
+            if period is not None:
+                raise NotImplementedError()
+                # wrap each individual node in a task
+                # add tasks to set
+                # execute all and remove from set on callback
+                # how loop checking if tasks are done up until `period`
+                # force push None for remaining (`_output(None)`)
+                # next level
+                # on next loop around only re-wrap and re-call those that aren't still in the set
+                pass
+            else:
+                for level in self._nodes:
+                    if self._stop:
+                        break
+
+                    await asyncio.gather(*(asyncio.create_task(n()) for n in level))
+
+                self.rebuild()
+
                 if self._stop:
                     break
-
-                await asyncio.gather(*(asyncio.create_task(n()) for n in level))
-
-            self.rebuild()
-
-            if self._stop:
-                break
 
             value, last = self._starting_node.value(), value
 
@@ -78,7 +100,8 @@ class StreamingGraph(object):
         # return last val
         return last
 
-    def run(self, blocking=True, newloop=False):
+    def run(self, blocking=True, newloop=False, period=None):
+
         if sys.platform == "win32":
             # Set to proactor event loop on window
             # (default in python 3.8+)
@@ -94,7 +117,7 @@ class StreamingGraph(object):
 
         asyncio.set_event_loop(loop)
 
-        task = loop.create_task(self._run())
+        task = loop.create_task(self._run(period=period))
 
         if blocking:
             # block until done

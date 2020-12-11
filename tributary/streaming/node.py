@@ -247,6 +247,9 @@ class Node(NodeSerializeMixin, object):
                     if isinstance(val, StreamEnd):
                         return await self._finish()
 
+                    if isinstance(val, (StreamNone,)):
+                        ready = False
+
                     # set as active
                     self._active[i] = val
                 else:
@@ -264,6 +267,7 @@ class Node(NodeSerializeMixin, object):
     # Private interface
     # ***********************
     def __hash__(self):
+        """nodes are unique"""
         return self._id
 
     def __rshift__(self, other):
@@ -303,10 +307,12 @@ class Node(NodeSerializeMixin, object):
             # else call it
             elif isinstance(self._foo, types.FunctionType):
                 try:
-                    # could be a generator
+                    # could be a kicked generator, so wrap in try
                     try:
+                        # execute wrapped function
                         _last = self._foo(*self._active, **self._foo_kwargs)
                     except ZeroDivisionError:
+                        # catch divide by zero and force inf
                         _last = float("inf")
 
                 except ValueError:
@@ -315,6 +321,7 @@ class Node(NodeSerializeMixin, object):
                     continue
 
             else:
+                # can only wrap function types
                 raise TributaryException("Cannot use type:{}".format(type(self._foo)))
 
             # calculation was valid
@@ -324,7 +331,7 @@ class Node(NodeSerializeMixin, object):
             self._execution_count += 1
 
         if isinstance(_last, types.AsyncGeneratorType):
-
+            # Swap to async generator unroller
             async def _foo(g=_last):
                 return await _agen_to_foo(g)
 
@@ -338,6 +345,7 @@ class Node(NodeSerializeMixin, object):
             _last = self._foo()
 
         elif asyncio.iscoroutine(_last):
+            # await coroutine
             _last = await _last
 
         if self._repeat:
@@ -349,8 +357,10 @@ class Node(NodeSerializeMixin, object):
         else:
             self._last = _last
 
+        # push result downstream
         await self._output(self._last)
 
+        # allow new inputs
         for i in range(len(self._active)):
             self._active[i] = StreamNone()
 

@@ -1,39 +1,22 @@
-import time
 import asyncio
+import time
 import tributary.streaming as ts
-from datetime import datetime, timedelta
+import requests
+
+def create(interval):
+    async def foo_():
+        for _ in range(5):
+            yield interval
+            await asyncio.sleep(interval)
+    return foo_
 
 
-async def fooFast():
-    await asyncio.sleep(1)
-    yield 1
-    await asyncio.sleep(1)
-    yield 1
-    await asyncio.sleep(1)
-    yield 1
-    await asyncio.sleep(1)
+fast = ts.Foo(create(1))
+med = ts.Foo(create(2))
+slow = ts.Foo(create(3))
 
-async def fooMed():
-    await asyncio.sleep(2)
-    yield 2
-    await asyncio.sleep(2)
-    yield 2
-    await asyncio.sleep(2)
-    yield 2
-    await asyncio.sleep(2)
+def reducer(fast, med, slow):
+    return {"fast": fast, "med": med, "slow": slow}
 
-async def fooSlow():
-    await asyncio.sleep(4)
-    yield 4
-    await asyncio.sleep(4)
-    yield 4
-    await asyncio.sleep(4)
-    yield 4
-    await asyncio.sleep(4)
-
-
-def reducer(one, two, three):
-    return {"1": one, "2": two, "3": three}
-
-n = ts.Reduce(ts.Foo(fooFast), ts.Foo(fooMed), ts.Foo(fooSlow), reducer=reducer).print()
-ts.run(n)
+node = ts.Reduce(fast, med, slow, reducer=reducer).print()
+ts.run(node, period=1)
