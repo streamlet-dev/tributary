@@ -236,16 +236,46 @@ def FixedMap(node, count, mapper=None):
     return rets
 
 
-def Reduce(*nodes, reducer=None):
+def Reduce(*nodes, reducer=None, inject_node=False):
     """Streaming wrapper to merge any number of inputs
 
     Arguments:
         nodes (tuple): input streams
         reducer (function): how to map the outputs into one stream
+        node_arg (bool): pass the reducer node as an argument to the
+                         reducer function as a means of saving state
+
+    Here is an example reducer that maps node values to names, ignoring
+    updates if they are `None`.
+
+    def reduce(node1_value, node2_value, node3_value, reducer_node):
+
+        if not hasattr(reducer_node, 'state'):
+            # on first call, make sure node tracks state
+            reducer_node.set('state', {"n1": None, "n2": None, "n3": None})
+
+        if node1_value is not None:
+            reducer_node.state["n1"] = node1_value
+
+        if node2_value is not None:
+            reducer_node.state["n2"] = node2_value
+
+        if node3_value is not None:
+            reducer_node.state["n3"] = node3_value
+
+        return reducer_node.state
+
+    For a full example, see tributary.tests.streaming.test_utils_streaming.TestUtils
     """
 
     def foo(*values, reducer=reducer):
-        return values if reducer is None else reducer(*values)
+        return (
+            values
+            if reducer is None
+            else reducer(*values, ret)
+            if inject_node
+            else reducer(*values)
+        )
 
     ret = Node(foo=foo, name="Reduce", inputs=len(nodes))
     for i, n in enumerate(nodes):

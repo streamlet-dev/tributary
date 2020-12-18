@@ -84,6 +84,53 @@ class TestUtils:
         out = ts.Reduce(ts.Foo(foo1), ts.Foo(foo2), ts.Foo(foo3))
         assert ts.run(out) == [(1, 2, 3), (4, 5, 6)]
 
+    def test_reduce_stateful(self):
+        def foo1():
+            yield 0
+            yield 2
+            yield 4
+
+        def foo2():
+            yield 1
+            yield 3
+            yield 5
+
+        def foo3():
+            yield 2
+            yield 4
+            yield 6
+
+        def reduce(node1_value, node2_value, node3_value, reducer_node):
+
+            if not hasattr(reducer_node, "state"):
+                # on first call, make sure node tracks state
+                reducer_node.set("state", {"n1": None, "n2": None, "n3": None})
+
+            if node1_value is not None:
+                reducer_node.state["n1"] = node1_value
+
+            if node2_value is not None:
+                reducer_node.state["n2"] = node2_value
+
+            if node3_value is not None:
+                reducer_node.state["n3"] = node3_value
+
+            return reducer_node.state
+
+        n1 = ts.Foo(foo1)
+        n2 = ts.Foo(foo2)
+        n3 = ts.Foo(foo3)
+
+        r = ts.Reduce(n1, n2, n3, reducer=reduce, inject_node=True)
+        out = ts.run(r)
+
+        print(out)
+        assert out == [
+            {"n1": 0, "n2": 1, "n3": 2},
+            {"n1": 2, "n2": 3, "n3": 4},
+            {"n1": 4, "n2": 5, "n3": 6},
+        ]
+
     @pytest.mark.skipif(
         (sys.version_info.major, sys.version_info.minor) == (3, 7) and os.name == "nt",
         reason="bug on windows py3.7 where pytest hangs",
