@@ -1,6 +1,7 @@
 import asyncio
 import json as JSON
 import os
+from datetime import datetime
 from .node import Node
 from ..base import StreamNone, StreamRepeat, StreamEnd, TributaryException
 
@@ -20,24 +21,6 @@ def Delay(node, delay=1):
     ret = Node(foo=foo, name="Delay", inputs=1)
     node >> ret
     return ret
-
-
-# class State(Node):
-#     '''Streaming wrapper to delay a stream
-
-#     Arguments:
-#         node (node): input stream
-#         state (dict): state dictionary of values to hold
-#     '''
-
-#     def __init__(self, node, delay=1):
-#         async def foo(val):
-#             await asyncio.sleep(delay)
-#             return val
-
-#         super().__init__(foo=foo, foo_kwargs=None, name='Delay', inputs=1)
-#         node.downstream().append((self, 0))
-#         self.upstream().append(node)
 
 
 def Apply(node, foo, foo_kwargs=None):
@@ -360,6 +343,57 @@ def Subprocess(
     return ret
 
 
+def Debounce(node):
+    """Streaming wrapper to only return values if different from previous
+
+    Arguments:
+        node (Node): input stream
+    """
+
+    def _foo(val):
+        if val == ret._last_element:
+            return StreamNone()
+        ret._last_element = val
+        return ret._last_element
+
+    ret = Node(foo=_foo, name="Debounce", inputs=1)
+    ret.set("_last_element", None)
+    node >> ret
+    return ret
+
+
+def Throttle(node, interval=1, now=None):
+    """Streaming wrapper to collect return values in an interval
+
+    Arguments:
+        node (Node): input stream
+        interval (float): interval in which to aggregate (in seconds)
+        now (Callable): function to call to get current time, defaults to datetime.now
+    """
+    now = now or datetime.now
+
+    def _foo(val):
+        ret._last_ticks.append(val)
+
+        if ret._last_tick_time:
+            duration = now() - ret._last_tick_time
+            duration = duration.seconds + duration.microseconds / 1000000
+            print(duration, interval)
+            if duration < interval:
+                return StreamNone()
+
+        vals = ret._last_ticks[:]
+        ret._last_ticks = []
+        ret._last_tick_time = now()
+        return vals
+
+    ret = Node(foo=_foo, name="Throttle", inputs=1)
+    ret.set("_last_tick_time", None)
+    ret.set("_last_ticks", [])
+    node >> ret
+    return ret
+
+
 Node.delay = Delay
 # Node.state = State
 Node.apply = Apply
@@ -372,3 +406,5 @@ Node.dictMerge = DictMerge
 Node.map = FixedMap
 Node.reduce = Reduce
 Node.proc = Subprocess
+Node.debounce = Debounce
+Node.throttle = Throttle

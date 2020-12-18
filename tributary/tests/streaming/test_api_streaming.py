@@ -222,6 +222,8 @@ class TestAPI:
         # Timing and stream mapping
         assert hasattr(ts.StreamingNode, "delay")
         assert hasattr(ts, "Delay")
+        assert hasattr(ts.StreamingNode, "debounce")
+        assert hasattr(ts, "Debounce")
         assert hasattr(ts.StreamingNode, "apply")
         assert hasattr(ts, "Apply")
         assert hasattr(ts.StreamingNode, "window")
