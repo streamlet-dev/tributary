@@ -1,9 +1,11 @@
+import asyncio
 import json as JSON
 import os.path
 import pytest
 import sys
 import time
 import tributary.streaming as ts
+from asyncio import sleep
 
 
 def foo():
@@ -161,3 +163,67 @@ class TestUtils:
             {"a": 3, "b": 6},
             {"a": 4, "b": 8},
         ]
+
+    def test_interval(self):
+        def reducer(short, long, node):
+            if not node.has("state"):
+                node.set("state", {"long": 0, "short": 0})
+            if long:
+                node.state["long"] += long
+            if short:
+                node.state["short"] += short
+            return node.state.copy()
+
+        async def short():
+            await sleep(1)
+            return 1
+
+        async def long():
+            await sleep(2)
+            return 2
+
+        def interval(foo, time=1):
+            task = None
+
+            async def _ret():
+                nonlocal task
+                if task is None:
+                    task = asyncio.ensure_future(foo())
+
+                if not task.done():
+                    await sleep(time)
+                    return None
+
+                result = task.result()
+                task = None
+
+                return result
+
+            return _ret
+
+        short_node = ts.Foo(interval(short, 1), count=5)
+        long_node = ts.Foo(interval(long, 1), count=5)
+        out = ts.Reduce(
+            short_node, long_node, reducer=reducer, inject_node=True
+        ).print()
+        ts.run(out)
+
+    def test_debounce(self):
+        async def clic():
+            for _ in range(10):
+                await sleep(0.1)
+                yield 1
+
+        n = ts.Node(clic).debounce()
+        out = ts.run(n)
+        assert out == [1]
+
+    def test_throttle(self):
+        async def clic():
+            for _ in range(10):
+                await sleep(1)
+                yield 1
+
+        n = ts.Node(clic).throttle(2)
+        out = ts.run(n)
+        assert out == [[1], [1, 1], [1, 1], [1, 1], [1, 1]]
