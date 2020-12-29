@@ -92,10 +92,14 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - SSE - runs an SSE server and streams data to connections
 - Kafka - streams data to kafka
 - Postgres - streams data to postgres
+- Email - streams data and sends it in emails
+- TextMessage - streams data and sends it via text message
 
 # Transforms
 ## Modulate
 - Delay - Streaming wrapper to delay a stream
+- Throttle - Streaming wrapper to only tick at most every interval
+- Debounce - Streaming wrapper to only tick on new values
 - Apply - Streaming wrapper to apply a function to an input stream
 - Window - Streaming wrapper to collect a window of values
 - Unroll - Streaming wrapper to unroll an iterable stream
@@ -106,6 +110,7 @@ Here green indicates executing, and red indicates that the node is dirty. Note t
 - Reduce - Streaming wrapper to merge any number of inputs
 - FixedMap - Map input stream to fixed number of outputs
 - Subprocess - Open a subprocess and yield results as they come. Can also stream data to subprocess (either instantaneous or long-running subprocess)
+
 
 ## Calculations
 Note that `tributary` can also be configured to operate on **dual numbers** for things like lazy or streaming autodifferentiation.
