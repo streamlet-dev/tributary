@@ -40,11 +40,13 @@ docs:  ## make documentation
 	make -C ./docs html
 	open ./docs/_build/html/index.html
 
-dist:  ## dist to pypi
+dist:  ## create dists
 	rm -rf dist build
-	python setup.py sdist
-	python setup.py bdist_wheel
-	python -m twine check dist/* && twine upload dist/*
+	python setup.py sdist bdist_wheel
+	python -m twine check dist/*
+	
+publish: dist  ## dist to pypi
+	python -m twine upload dist/* --skip-existing
 
 # Thanks to Francoise at marmelab.com for this
 .DEFAULT_GOAL := help
