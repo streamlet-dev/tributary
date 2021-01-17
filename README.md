@@ -1,9 +1,8 @@
 # <a href="https://tributary.readthedocs.io"><img src="https://raw.githubusercontent.com/timkpaine/tributary/main/docs/img/icon.png" width="300"></a>
 Python Data Streams
 
-[![Build Status](https://dev.azure.com/tpaine154/tributary/_apis/build/status/timkpaine.tributary?branchName=main)](https://dev.azure.com/tpaine154/tributary/_build/latest?definitionId=2&branchName=main)
-[![GitHub issues](https://img.shields.io/github/issues/timkpaine/tributary.svg)](https://github.com/timkpaine/tributary/issues)
-[![Coverage](https://img.shields.io/azure-devops/coverage/tpaine154/tributary/2/main)](https://dev.azure.com/tpaine154/tributary/_build?definitionId=2&_a=summary)
+[![Build Status](https://github.com/timkpaine/tributary/workflows/Build%20Status/badge.svg?branch=main)](https://github.com/timkpaine/tributary/actions?query=workflow%3A%22Build+Status%22)
+[![Coverage](https://codecov.io/gh/timkpaine/tributary/branch/main/graph/badge.svg)](https://codecov.io/gh/timkpaine/tributary)
 [![PyPI](https://img.shields.io/pypi/l/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)

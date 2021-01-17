@@ -20,7 +20,7 @@ def get_version(file, name="__version__"):
 version = get_version(pjoin(here, name, "_version.py"))
 
 with open(pjoin(here, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
+    long_description = f.read().replace("\r\n", "\n")
 
 
 requires = [
