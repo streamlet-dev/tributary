@@ -68,6 +68,15 @@ class StreamingGraph(object):
 
         while True:
             if period is not None:
+                sets = {}
+                for i, level in enumerate(self._nodes):
+                    sets[i] = set()
+                    for n in level:
+                        sets[i].add(asyncio.create_task(n()))
+                        
+                        await asyncio.gather(*(asyncio.create_task(n()) for n in level))
+
+
                 raise NotImplementedError()
                 # wrap each individual node in a task
                 # add tasks to set
