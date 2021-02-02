@@ -208,6 +208,10 @@ class TestAPI:
         assert hasattr(ts, "WebSocketSink")
         assert hasattr(ts.StreamingNode, "websocketServer")
         assert hasattr(ts, "WebSocketServerSink")
+        assert hasattr(ts.StreamingNode, "email")
+        assert hasattr(ts, "EmailSink")
+        assert hasattr(ts.StreamingNode, "textMessage")
+        assert hasattr(ts, "TextMessageSink")
 
     def test_api_other_inputs(self):
         # Other inputs
@@ -222,6 +226,8 @@ class TestAPI:
         # Timing and stream mapping
         assert hasattr(ts.StreamingNode, "delay")
         assert hasattr(ts, "Delay")
+        assert hasattr(ts.StreamingNode, "debounce")
+        assert hasattr(ts, "Debounce")
         assert hasattr(ts.StreamingNode, "apply")
         assert hasattr(ts, "Apply")
         assert hasattr(ts.StreamingNode, "window")

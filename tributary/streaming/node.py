@@ -171,6 +171,10 @@ class Node(NodeSerializeMixin, object):
     def __repr__(self):
         return "{}".format(self._name)
 
+    def has(self, key):
+        """Use this method to check attributes (convenience for hasattr)"""
+        return hasattr(self, key)
+
     def set(self, key, value):
         """Use this method to set attributes
 
