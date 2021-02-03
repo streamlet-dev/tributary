@@ -73,7 +73,7 @@ class StreamingGraph(object):
                     sets[i] = set()
                     for n in level:
                         sets[i].add(asyncio.create_task(n()))
-                        
+
                         await asyncio.gather(*(asyncio.create_task(n()) for n in level))
                 # TODO
                 # wrap each individual node in a task
