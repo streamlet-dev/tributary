@@ -75,9 +75,7 @@ class StreamingGraph(object):
                         sets[i].add(asyncio.create_task(n()))
                         
                         await asyncio.gather(*(asyncio.create_task(n()) for n in level))
-
-
-                raise NotImplementedError()
+                # TODO
                 # wrap each individual node in a task
                 # add tasks to set
                 # execute all and remove from set on callback
@@ -85,7 +83,7 @@ class StreamingGraph(object):
                 # force push None for remaining (`_output(None)`)
                 # next level
                 # on next loop around only re-wrap and re-call those that aren't still in the set
-                pass
+                raise NotImplementedError()
             else:
                 for level in self._nodes:
                     if self._stop:
