@@ -78,7 +78,7 @@ class StreamingGraph(object):
         # return last val
         return last
 
-    def run(self, blocking=True, newloop=False):
+    def run(self, blocking=True, newloop=False, start=True):
         if sys.platform == "win32":
             # Set to proactor event loop on window
             # (default in python 3.8+)
@@ -103,10 +103,13 @@ class StreamingGraph(object):
             except KeyboardInterrupt:
                 return
 
-        t = Thread(target=loop.run_until_complete, args=(task,))
-        t.daemon = True
-        t.start()
-        return loop
+        if start:
+            t = Thread(target=loop.run_until_complete, args=(task,))
+            t.daemon = True
+            t.start()
+            return loop
+
+        return loop, task
 
     def graph(self):
         return self._starting_node.graph()

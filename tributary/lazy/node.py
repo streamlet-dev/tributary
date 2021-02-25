@@ -1,6 +1,6 @@
 import six
 import inspect
-from boltons.funcutils import wraps
+# from boltons.funcutils import wraps
 from ..utils import _either_type
 from ..base import TributaryException
 
@@ -473,7 +473,6 @@ def node(meth, memoize=True, **default_attrs):
             "Missing args (call or preprocessing error has occurred)"
         )
 
-    @wraps(meth)
     def meth_wrapper(self, *args, **kwargs):
         if is_method:
             # val = meth(self, *(arg.value() if isinstance(arg, Node) else getattr(self, arg).value() for arg in args if arg not in default_attrs), **
@@ -522,4 +521,5 @@ def node(meth, memoize=True, **default_attrs):
         )
 
     ret._node_wrapper = new_node
+    # ret = wraps(meth)(ret)
     return ret
