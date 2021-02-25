@@ -1,5 +1,6 @@
 import six
 import inspect
+
 # from boltons.funcutils import wraps
 from ..utils import _either_type
 from ..base import TributaryException
