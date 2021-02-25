@@ -5,6 +5,7 @@ from .http import HTTPServer as HTTPServerSink
 from .kafka import Kafka as KafkaSink
 from .output import Collect, Dagre
 from .output import Foo as FooOutput
+from .output import Queue as QueueSink
 from .output import Graph, GraphViz, Logging, Perspective, PPrint, Print
 from .postgres import Postgres as PostgresSink
 from .socketio import SocketIO as SocketIOSink

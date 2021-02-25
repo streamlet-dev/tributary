@@ -212,6 +212,8 @@ class TestAPI:
         assert hasattr(ts, "EmailSink")
         assert hasattr(ts.StreamingNode, "textMessage")
         assert hasattr(ts, "TextMessageSink")
+        assert hasattr(ts.StreamingNode, "queue")
+        assert hasattr(ts, "QueueSink")
 
     def test_api_other_inputs(self):
         # Other inputs
@@ -219,6 +221,7 @@ class TestAPI:
         assert hasattr(ts, "Const")
         assert hasattr(ts, "Curve")
         assert hasattr(ts, "Foo")
+        assert hasattr(ts, "Queue")
         assert hasattr(ts, "Random")
 
     def test_api_streaming_specific(self):

@@ -9,6 +9,7 @@ from .scheduler import Scheduler
 from .utils import *
 
 
-def run(node, blocking=True):
+def run(node, blocking=True, **kwargs):
     graph = node.constructGraph()
-    return graph.run(blocking)
+    kwargs["blocking"] = blocking
+    return graph.run(**kwargs)
