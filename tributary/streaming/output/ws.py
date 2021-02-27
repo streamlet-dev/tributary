@@ -209,7 +209,7 @@ class WebSocketServer(Foo):
 
             # put data into queue
             await asyncio.gather(
-                *(asyncio.create_task(queue.put(data) for queue in queue_map.values()))
+                *(asyncio.create_task(queue.put(data)) for queue in queue_map.values())
             )
 
             # TODO expect response from clients?

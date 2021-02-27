@@ -1,7 +1,8 @@
-from setuptools import setup, find_packages
-from codecs import open
-import os.path
 import io
+import os.path
+from codecs import open
+
+from setuptools import find_packages, setup
 
 pjoin = os.path.join
 here = os.path.abspath(os.path.dirname(__file__))
@@ -19,7 +20,7 @@ def get_version(file, name="__version__"):
 version = get_version(pjoin(here, name, "_version.py"))
 
 with open(pjoin(here, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
+    long_description = f.read().replace("\r\n", "\n")
 
 
 requires = [
@@ -31,7 +32,9 @@ requires = [
     "aiokafka>=0.6.0",
     "aiostream>=0.3.1",
     "asyncpg>=0.20.1",
+    "beautifulsoup4>=4.9.1",
     "boltons>=20.1.0",
+    "emails>=0.5.15",
     "future>=0.17.1",
     "gevent>=1.3.7",
     "graphviz>=0.10.1",
@@ -45,6 +48,7 @@ requires = [
     "sympy>=1.5.1",
     "temporal-cache>=0.0.6",
     "tornado>=5.1.1",
+    "twilio>=6.50.1",
 ]
 
 requires_dev = [

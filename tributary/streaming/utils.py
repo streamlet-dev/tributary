@@ -1,6 +1,7 @@
 import asyncio
 import json as JSON
 import os
+from datetime import datetime
 from .node import Node
 from ..base import StreamNone, StreamRepeat, StreamEnd, TributaryException
 
@@ -20,24 +21,6 @@ def Delay(node, delay=1):
     ret = Node(foo=foo, name="Delay", inputs=1)
     node >> ret
     return ret
-
-
-# class State(Node):
-#     '''Streaming wrapper to delay a stream
-
-#     Arguments:
-#         node (node): input stream
-#         state (dict): state dictionary of values to hold
-#     '''
-
-#     def __init__(self, node, delay=1):
-#         async def foo(val):
-#             await asyncio.sleep(delay)
-#             return val
-
-#         super().__init__(foo=foo, foo_kwargs=None, name='Delay', inputs=1)
-#         node.downstream().append((self, 0))
-#         self.upstream().append(node)
 
 
 def Apply(node, foo, foo_kwargs=None):
@@ -236,16 +219,46 @@ def FixedMap(node, count, mapper=None):
     return rets
 
 
-def Reduce(*nodes, reducer=None):
+def Reduce(*nodes, reducer=None, inject_node=False):
     """Streaming wrapper to merge any number of inputs
 
     Arguments:
         nodes (tuple): input streams
         reducer (function): how to map the outputs into one stream
+        node_arg (bool): pass the reducer node as an argument to the
+                         reducer function as a means of saving state
+
+    Here is an example reducer that maps node values to names, ignoring
+    updates if they are `None`.
+
+    def reduce(node1_value, node2_value, node3_value, reducer_node):
+
+        if not hasattr(reducer_node, 'state'):
+            # on first call, make sure node tracks state
+            reducer_node.set('state', {"n1": None, "n2": None, "n3": None})
+
+        if node1_value is not None:
+            reducer_node.state["n1"] = node1_value
+
+        if node2_value is not None:
+            reducer_node.state["n2"] = node2_value
+
+        if node3_value is not None:
+            reducer_node.state["n3"] = node3_value
+
+        return reducer_node.state
+
+    For a full example, see tributary.tests.streaming.test_utils_streaming.TestUtils
     """
 
     def foo(*values, reducer=reducer):
-        return values if reducer is None else reducer(*values)
+        return (
+            values
+            if reducer is None
+            else reducer(*values, ret)
+            if inject_node
+            else reducer(*values)
+        )
 
     ret = Node(foo=foo, name="Reduce", inputs=len(nodes))
     for i, n in enumerate(nodes):
@@ -330,6 +343,57 @@ def Subprocess(
     return ret
 
 
+def Debounce(node):
+    """Streaming wrapper to only return values if different from previous
+
+    Arguments:
+        node (Node): input stream
+    """
+
+    def _foo(val):
+        if val == ret._last_element:
+            return StreamNone()
+        ret._last_element = val
+        return ret._last_element
+
+    ret = Node(foo=_foo, name="Debounce", inputs=1)
+    ret.set("_last_element", None)
+    node >> ret
+    return ret
+
+
+def Throttle(node, interval=1, now=None):
+    """Streaming wrapper to collect return values in an interval
+
+    Arguments:
+        node (Node): input stream
+        interval (float): interval in which to aggregate (in seconds)
+        now (Callable): function to call to get current time, defaults to datetime.now
+    """
+    now = now or datetime.now
+
+    def _foo(val):
+        ret._last_ticks.append(val)
+
+        if ret._last_tick_time:
+            duration = now() - ret._last_tick_time
+            duration = duration.seconds + duration.microseconds / 1000000
+            print(duration, interval)
+            if duration < interval:
+                return StreamNone()
+
+        vals = ret._last_ticks[:]
+        ret._last_ticks = []
+        ret._last_tick_time = now()
+        return vals
+
+    ret = Node(foo=_foo, name="Throttle", inputs=1)
+    ret.set("_last_tick_time", None)
+    ret.set("_last_ticks", [])
+    node >> ret
+    return ret
+
+
 Node.delay = Delay
 # Node.state = State
 Node.apply = Apply
@@ -342,3 +406,5 @@ Node.dictMerge = DictMerge
 Node.map = FixedMap
 Node.reduce = Reduce
 Node.proc = Subprocess
+Node.debounce = Debounce
+Node.throttle = Throttle

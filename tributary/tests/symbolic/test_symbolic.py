@@ -61,7 +61,7 @@ class TestConfig:
     def test_parse(self):
         from sympy.parsing.sympy_parser import parse_expr
 
-        assert parse_expr("x^2") == ts.parse_expression("x^2")
+        assert parse_expr("x**2") == ts.parse_expression("x**2")
 
     def test_construct_streaming(self):
         # adapted from https://gist.github.com/raddy/bd0e977dc8437a4f8276

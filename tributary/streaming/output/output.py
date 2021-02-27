@@ -202,6 +202,23 @@ def Perspective(node, text="", **psp_kwargs):
     return ret
 
 
+def Queue(node, queue):
+    async def foo(val):
+        await queue.put(val)
+        return val
+
+    node = _gen_node(node)
+    ret = Node(
+        foo=foo,
+        foo_kwargs=None,
+        name="Queue",
+        inputs=1,
+        graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
+    )
+    node >> ret
+    return ret
+
+
 Node.foo = Foo
 Node.collect = Collect
 Node.graph = Graph
@@ -211,3 +228,4 @@ Node.dagre = Dagre
 Node.print = Print
 Node.logging = Logging
 Node.perspective = Perspective
+Node.queue = Queue

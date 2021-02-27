@@ -142,3 +142,21 @@ class Console(Foo):
 
         super().__init__(foo=_input, message=message, json=json, **kwargs)
         self._name = "Console"
+
+
+class Queue(Foo):
+    """Streaming wrapper to emit as values are received from an asynchronous queue
+
+    Arguments:
+        queue (Queue): asyncio Queue
+    """
+
+    def __init__(self, queue, **kwargs):
+        async def foo(queue=queue):
+            return await queue.get()
+
+        super().__init__(foo=foo, count=0, **kwargs)
+        self._name = "Queue"
+
+
+QueueSource = Queue
