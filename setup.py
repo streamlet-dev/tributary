@@ -66,12 +66,12 @@ requires_dev = [
 setup(
     name=name,
     version=version,
-    description="Analytics library",
+    description="Streaming reactive and dataflow graphs in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/timkpaine/{name}".format(name=name),
     author="Tim Paine",
-    author_email="timothy.k.paine@gmail.com",
+    author_email="t.paine154@gmail.com",
     license="Apache 2.0",
     install_requires=requires,
     extras_require={
@@ -84,7 +84,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    keywords="analytics tools plotting",
+    keywords="streaming lazy graph dag dataflow reactive",
     packages=find_packages(exclude=["tests"]),
     package_data={},
     include_package_data=True,
