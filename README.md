@@ -67,8 +67,10 @@ See the [CATALOG](CATALOG.md) for a full list of functions, transforms, sources,
 ## Support / Contributors
 Thanks to the following organizations for providing code or financial support.
 
-<a href="https://nemoulous.com"><img src="https://raw.githubusercontent.com/timkpaine/tributary/main/docs/img/nem.png" width="150"></a>
 
+<a href="https://nemoulous.com"><img src="https://raw.githubusercontent.com/timkpaine/tributary/main/docs/img/nem.png" width="50"></a>
+
+<a href="https://nemoulous.com">Nemoulous</a>
 
 ## License
 This software is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file for details.
