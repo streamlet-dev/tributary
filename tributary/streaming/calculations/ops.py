@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 from .utils import _CALCULATIONS_GRAPHVIZSHAPE, _raise
 from ..node import Node
-from ...utils import  _gen_node
+from ...utils import _gen_node
 
 
 def unary(foos, name):

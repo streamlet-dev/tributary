@@ -62,7 +62,7 @@ class Node(_DagreD3Mixin):
         self._dd3g = None
 
         # starting value
-        self._value = value
+        self._values = [value]
 
         # use dual number operators
         self._use_dual = kwargs.get("use_dual", False)
@@ -71,7 +71,7 @@ class Node(_DagreD3Mixin):
         self._readonly = readonly
 
         # threshold for calculating difference
-        self._tolerance = _compare
+        self._compare = _compare
 
         # callable and args
         self._callable_args = callable_args or []
@@ -98,7 +98,7 @@ class Node(_DagreD3Mixin):
                 except StopIteration:
                     self._dynamic = False
                     self._dirty = False
-                    return self._value
+                    return self.value()
 
             self._callable = _callable
 
@@ -113,9 +113,6 @@ class Node(_DagreD3Mixin):
 
         # cache node operations that have already been done
         self._node_op_cache = {}
-
-        # setup dependency dirty map
-        self._dirty_dependency = {}
 
         # dependencies can be nodes
         if self._callable:
@@ -142,10 +139,7 @@ class Node(_DagreD3Mixin):
         return self._is_dirty
 
     def _set_dirty(self, val):
-        if val:
-            self._reddd3g()
-        else:
-            self._whited3g()
+        self._reddd3g() if val else self._whited3g()
         self._is_dirty = val
 
     _dirty = property(_get_dirty, _set_dirty)
@@ -172,22 +166,12 @@ class Node(_DagreD3Mixin):
         for k, v in kwargs.items():
             self._callable_kwargs[k].setValue(v)
 
-    def _with_self(self, other_self, *args, **kwargs):
-        self._self_reference = other_self
+    def _bind(self, other_self=None, *args, **kwargs):
+        if other_self is not None:
+            self._self_reference = other_self
         self._install_args(*args)
         self._install_kwargs(**kwargs)
         return self
-
-    def _without_self(self, *args, **kwargs):
-        self._install_args(*args)
-        self._install_kwargs(**kwargs)
-        return self
-
-    def dependencyIsDirty(self, dep):
-        """In a callable, use this method to determine if a dependency WAS dirty.
-        Since the dependency will be reevaluated before the callable is executed,
-        you would otherwise lose the information"""
-        return self._dirty_dependency.get(dep, False)
 
     def _compute_from_dependencies(self):
         if self._dependencies:
@@ -195,15 +179,15 @@ class Node(_DagreD3Mixin):
             for deps in six.itervalues(self._dependencies):
                 # recompute args
                 for arg in deps[0]:
-                    self._dirty_dependency[arg] = arg._recompute()
+                    arg._recompute()
 
-                    # Set yourself as parent
+                    # Set yourself as parent if not set
                     if self not in arg._parents:
                         arg._parents.append(self)
 
                 # recompute kwargs
                 for kwarg in six.itervalues(deps[1]):
-                    self._dirty_dependency[kwarg] = kwarg._recompute()
+                    kwarg._recompute()
 
                     # Set yourself as parent
                     if self not in kwarg._parents:
@@ -227,13 +211,10 @@ class Node(_DagreD3Mixin):
             if isinstance(new_value, Node):
                 raise TributaryException("Value should not itself be a node!")
 
-            self._value = new_value
-
-        # reset to empty
-        self._dirty_dependency = {}
+            self._setValue(new_value)
 
         self._whited3g()
-        return self._value
+        return self.value()
 
     def _subtree_dirty(self):
         for call, deps in six.iteritems(self._dependencies):
@@ -272,7 +253,7 @@ class Node(_DagreD3Mixin):
         if self._dirty:
             _value = self._compute_from_dependencies()
 
-            if self._tolerance(_value, self._value):
+            if self._compare(_value, self.value()):
                 ret = True
 
                 if self._parents:
@@ -280,7 +261,8 @@ class Node(_DagreD3Mixin):
                         # let your parents know you were dirty!
                         parent._dirty = True
 
-            self._value = _value
+            self._setValue(_value)
+
         self._dirty = False
         return ret
 
@@ -306,10 +288,15 @@ class Node(_DagreD3Mixin):
         return self._node_op_cache[str(other)]
 
     def setValue(self, value):
-        if self._tolerance(value, self._value):
-            self._value = value  # leave for dagre
+        """set the node's value, marking it as dirty as appropriate"""
+        if self._compare(value, self.value()):
+            self._setValue(value)  # leave for dagre
             self._dirty = True
-        self._value = value
+        self._setValue(value)
+
+    def _setValue(self, value):
+        """internal method to set value"""
+        self._values.append(value)
 
     def append(self, value):
         # TODO is this better or worse than
@@ -317,8 +304,8 @@ class Node(_DagreD3Mixin):
         # n = Node(value=lst)
         # lst.append(x)
         # n._dirty = True
-        iter(self._value)
-        self._value.append(value)
+        iter(self.value())
+        self.value().append(value)
         self._dirty = True
 
     def set(self, *args, **kwargs):
@@ -344,8 +331,11 @@ class Node(_DagreD3Mixin):
                         _set = True
                         break
 
+    def getValue(self):
+        return self.value()
+
     def value(self):
-        return self._value
+        return self._values[-1]
 
     def __call__(self, *args, **kwargs):
         self._install_args(*args)
@@ -483,12 +473,12 @@ def node(meth, memoize=True, **default_attrs):
     )
 
     if is_method:
-        ret = lambda self, *args, **kwargs: new_node._with_self(  # noqa: E731
+        ret = lambda self, *args, **kwargs: new_node._bind(  # noqa: E731
             self, *args, **kwargs
         )
     else:
-        ret = lambda *args, **kwargs: new_node._without_self(  # noqa: E731
-            *args, **kwargs
+        ret = lambda *args, **kwargs: new_node._bind(  # noqa: E731
+            None, *args, **kwargs
         )
 
     ret._node_wrapper = new_node

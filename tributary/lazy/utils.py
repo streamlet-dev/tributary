@@ -89,10 +89,9 @@ def Window(node, size=-1, full_only=False):
             return node.value()
 
         if ret._accum is None:
-            ret._accum = [node.value()]
+            ret._accum = []
 
-        elif ret.dependencyIsDirty(node):
-            ret._accum.append(node.value())
+        ret._accum.append(node.value())
 
         if size > 0:
             ret._accum = ret._accum[-size:]

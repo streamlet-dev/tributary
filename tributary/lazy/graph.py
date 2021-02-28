@@ -1,6 +1,7 @@
 import types
 from .node import Node  # noqa: F401
 from ..base import TributaryException
+from ..utils import _compare
 
 
 class LazyGraph(object):
@@ -86,9 +87,7 @@ class LazyGraph(object):
             elif isinstance(value, Node):
                 raise TributaryException("Cannot set to node")
             else:
-                node._dirty = (node._value != value) or (
-                    node._value is not None and abs(node._value - value) > 10 ** -5
-                )
-                node._value = value
+                node._dirty = _compare(node.value(), value)
+                node._setValue(value)
         else:
             super(LazyGraph, self).__setattr__(name, value)
