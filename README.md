@@ -62,7 +62,7 @@ Here green indicates executing, yellow indicates stalled for backpressure, and r
 Here green indicates executing, and red indicates that the node is dirty. Note the the determination if a node is dirty is also done lazily (we can check with `isDirty` whcih will update the node's graph state.
 
 ## Catalog
-See the [CATALOG](CATALOG) for a full list of functions, transforms, sources, and sinks.
+See the [CATALOG](CATALOG.md) for a full list of functions, transforms, sources, and sinks.
 
 ## Support / Contributors
 Thanks to the following organizations for providing code or financial support.
