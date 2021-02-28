@@ -2,12 +2,14 @@ import inspect
 
 import six
 
+from .dd3 import _DagreD3Mixin
 from ..base import TributaryException
+
 # from boltons.funcutils import wraps
 from ..utils import _compare, _either_type, _ismethod
 
 
-class Node(object):
+class Node(_DagreD3Mixin):
     """Class to represent an operation that is lazy"""
 
     _id_ref = 0
@@ -51,9 +53,8 @@ class Node(object):
             raise TributaryException("Cannot set value to be itself a node")
 
         # Graphviz shape
-        self._graphvizshape = kwargs.get(
-            "graphvizshape", "box"
-        )  # default is box instead of ellipse
+        self._graphvizshape = kwargs.get("graphvizshape", "box")
+        # default is box instead of ellipse
         # because all lazy nodes are i/o nodes
         # by default
 
@@ -181,30 +182,6 @@ class Node(object):
         self._install_args(*args)
         self._install_kwargs(**kwargs)
         return self
-
-    def _greendd3g(self):
-        if self._dd3g:
-            self._dd3g.setNode(
-                self._name, tooltip=str(self.value()), style="fill: #0f0"
-            )
-
-    def _yellowdd3g(self):
-        if self._dd3g:
-            self._dd3g.setNode(
-                self._name, tooltip=str(self.value()), style="fill: #ff0"
-            )
-
-    def _reddd3g(self):
-        if self._dd3g:
-            self._dd3g.setNode(
-                self._name, tooltip=str(self.value()), style="fill: #f00"
-            )
-
-    def _whited3g(self):
-        if self._dd3g:
-            self._dd3g.setNode(
-                self._name, tooltip=str(self.value()), style="fill: #fff"
-            )
 
     def dependencyIsDirty(self, dep):
         """In a callable, use this method to determine if a dependency WAS dirty.
@@ -448,14 +425,10 @@ def node(meth, memoize=True, **default_attrs):
                 )
             )
         elif default:
-            node_kwargs[arg] = Node(
-                name=arg, derived=True, readonly=False, value=value
-            )
+            node_kwargs[arg] = Node(name=arg, derived=True, readonly=False, value=value)
 
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
-        node_kwargs[k] = Node(
-            name=k, derived=True, readonly=False, value=v
-        )
+        node_kwargs[k] = Node(name=k, derived=True, readonly=False, value=v)
 
     # add all attribute args to the argspec
     # see the docstring for more details

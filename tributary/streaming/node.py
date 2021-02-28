@@ -1,49 +1,15 @@
 import asyncio
 import types
 from collections import deque
+from .dd3 import _DagreD3Mixin
 from .graph import StreamingGraph
 from .serialize import NodeSerializeMixin
 from ..base import StreamEnd, StreamNone, StreamRepeat
-from ..lazy.node import Node as LazyNode
-from ..utils import LazyToStreaming
 from ..base import TributaryException
+from ..utils import _agen_to_foo, _gen_to_foo
 
 
-_DD3_TRANSITION_DELAY = 0.1  # used so you can visually see the
-# transition e.g. not too fast
-
-
-def anext(obj):
-    return obj.__anext__()
-
-
-def _gen_to_foo(generator):
-    try:
-        return next(generator)
-    except StopIteration:
-        return StreamEnd()
-
-
-async def _agen_to_foo(generator):
-    try:
-        return await anext(generator)
-    except StopAsyncIteration:
-        return StreamEnd()
-
-
-def _gen_node(n):
-    from .input import Const, Foo
-
-    if isinstance(n, Node):
-        return n
-    elif isinstance(n, LazyNode):
-        return LazyToStreaming(n)
-    elif callable(n):
-        return Foo(n, name="Callable")
-    return Const(n)
-
-
-class Node(NodeSerializeMixin, object):
+class Node(NodeSerializeMixin, _DagreD3Mixin, object):
     _id_ref = 0
 
     def __init__(
@@ -408,36 +374,6 @@ class Node(NodeSerializeMixin, object):
                 else:
                     await down._push(ret, i)
         return ret
-
-    # ***********************
-
-    # ***********************
-    # Dagre D3 integration
-    # ***********************
-
-    async def _startdd3g(self):
-        """represent start of calculation with a dd3 node"""
-        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #0f0")
-            await asyncio.sleep(_DD3_TRANSITION_DELAY)
-
-    async def _waitdd3g(self):
-        """represent a node waiting for its input to tick"""
-        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #ff0")
-            await asyncio.sleep(_DD3_TRANSITION_DELAY)
-
-    async def _finishdd3g(self):
-        """represent a node that has finished its calculation"""
-        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #f00")
-            await asyncio.sleep(_DD3_TRANSITION_DELAY)
-
-    async def _enddd3g(self):
-        """represent a node that has finished all calculations"""
-        if self._dd3g:  # disable if not installed/enabled as it incurs a delay
-            self._dd3g.setNode(self._name, tooltip=str(self._last), style="fill: #fff")
-            await asyncio.sleep(_DD3_TRANSITION_DELAY)
 
     # ***********************
 
