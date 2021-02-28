@@ -1,9 +1,10 @@
-import six
 import inspect
 
-# from boltons.funcutils import wraps
-from ..utils import _either_type
+import six
+
 from ..base import TributaryException
+# from boltons.funcutils import wraps
+from ..utils import _compare, _either_type, _ismethod
 
 
 class Node(object):
@@ -17,13 +18,10 @@ class Node(object):
         name="?",
         derived=False,
         readonly=False,
-        nullable=False,
         callable=None,
         callable_args=None,
         callable_kwargs=None,
-        callable_is_method=False,
-        always_dirty=False,
-        override_callable_dirty=False,
+        dynamic=False,
         **kwargs
     ):
         """Construct a new lazy node, wrapping a callable or a value
@@ -34,15 +32,11 @@ class Node(object):
                             e.g. via n + 10 where n is a preexisting node.
                             These default to dirty state
             readonly (bool): whether a node is settable
-            nullable (bool): whether a node can have value None
             value (any): initial value of the node
             callable (callable): function or other callable that the node is wrapping
             callable_args (tuple): args for the wrapped callable
             callable_kwargs (dict): kwargs for the wrapped callable
-            callable_is_method (bool): is the callable a method of an object
-            always_dirty (bool): node should not be lazy - always access underlying value
-            override_callable_dirty (bool): treat callable as dirty-able. This is an override of the default
-                                                behavior where a callable will be re-evaluated
+            dynamic (bool): node should not be lazy - always access underlying value
         """
         # Instances get an id but one id tracker for all nodes so we can
         # uniquely identify them
@@ -75,10 +69,13 @@ class Node(object):
         # can be set
         self._readonly = readonly
 
+        # threshold for calculating difference
+        self._tolerance = _compare
+
         # callable and args
         self._callable_args = callable_args or []
         self._callable_kwargs = callable_kwargs or {}
-        self._callable_is_method = callable_is_method
+        self._callable_is_method = _ismethod(callable)
 
         # map positional to kw
         if callable is not None and not inspect.isgeneratorfunction(callable):
@@ -98,16 +95,14 @@ class Node(object):
                     ret = next(gen)
                     return ret
                 except StopIteration:
-                    self._always_dirty = False
+                    self._dynamic = False
                     self._dirty = False
                     return self._value
 
             self._callable = _callable
 
         # if always dirty, always reevaluate
-        self._always_dirty = always_dirty or (
-            not override_callable_dirty and self._callable is not None
-        )
+        self._dynamic = dynamic or self._callable is not None
 
         # parent nodes in graph
         self._parents = []
@@ -291,19 +286,24 @@ class Node(object):
         return False
 
     def isDirty(self):
-        self._dirty = self._dirty or self._subtree_dirty() or self._always_dirty
+        self._dirty = self._dirty or self._subtree_dirty() or self._dynamic
         return self._dirty
 
     def _recompute(self):
         ret = False
         self.isDirty()
         if self._dirty:
-            ret = True
-            if self._parents:
-                for parent in self._parents:
-                    # let your parents know you were dirty!
-                    parent._dirty = True
-            self._value = self._compute_from_dependencies()
+            _value = self._compute_from_dependencies()
+
+            if self._tolerance(_value, self._value):
+                ret = True
+
+                if self._parents:
+                    for parent in self._parents:
+                        # let your parents know you were dirty!
+                        parent._dirty = True
+
+            self._value = _value
         self._dirty = False
         return ret
 
@@ -329,7 +329,7 @@ class Node(object):
         return self._node_op_cache[str(other)]
 
     def setValue(self, value):
-        if value != self._value:
+        if self._tolerance(value, self._value):
             self._value = value  # leave for dagre
             self._dirty = True
         self._value = value
@@ -434,11 +434,9 @@ def node(meth, memoize=True, **default_attrs):
             value = (
                 argspec.defaults[i] if not is_method else argspec.defaults[i - 1]
             )  # account for self
-            nullable = True
         else:
             default = False
             value = None
-            nullable = False
 
         if arg not in default_attrs and not default:
             node_args.append(
@@ -446,18 +444,17 @@ def node(meth, memoize=True, **default_attrs):
                     name=arg,
                     derived=True,
                     readonly=False,
-                    nullable=nullable,
                     value=value,
                 )
             )
         elif default:
             node_kwargs[arg] = Node(
-                name=arg, derived=True, readonly=False, nullable=nullable, value=value
+                name=arg, derived=True, readonly=False, value=value
             )
 
     for k, v in six.iteritems(argspec.kwonlydefaults or {}):
         node_kwargs[k] = Node(
-            name=k, derived=True, readonly=False, nullable=True, value=v
+            name=k, derived=True, readonly=False, value=v
         )
 
     # add all attribute args to the argspec
