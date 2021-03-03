@@ -39,22 +39,6 @@ class Foo4(t.LazyGraph):
         return random.random()
 
 
-class Foo5(t.LazyGraph):
-    @t.node()
-    def z(self):
-        return self.x | self.y()
-
-    @t.node()
-    def y(self):
-        return 10
-
-    def reset(self):
-        self.x = None
-
-    def __init__(self):
-        self.x = self.node(name="x", value=None)
-
-
 class TestLazy:
     def test_misc(self):
         f4 = Foo4()
@@ -63,40 +47,3 @@ class TestLazy:
         assert z.graph()
         assert z.graphviz()
 
-
-class TestDirtyPropogation:
-    def test_or_dirtypropogation(self):
-        f = Foo5()
-        assert f.z()() == 10
-        assert f.x() is None
-
-        f.x = 5
-
-        assert f.x() == 5
-        assert f.z()() == 5
-
-        f.reset()
-
-        assert f.x() is None
-        assert f.z()() == 10
-
-
-class TestDeclarative:
-    def test_simple_declarative(self):
-        n = t.Node(value=1)
-        z = n + 5
-        assert z() == 6
-        n.setValue(2)
-        assert z() == 7
-
-
-class TestTolerance:
-    def test_tolerance(self):
-        n = t.Node(value=1.0)
-        assert n() == 1.0
-
-        n.setValue(1.0000000000000001)
-        assert n.isDirty() == False
-
-        n.setValue(1.0001)
-        assert n.isDirty() == True

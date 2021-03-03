@@ -62,7 +62,7 @@ class Node(_DagreD3Mixin):
         self._dd3g = None
 
         # starting value
-        self._values = [value]
+        self._values = []
 
         # use dual number operators
         self._use_dual = kwargs.get("use_dual", False)
@@ -122,7 +122,13 @@ class Node(_DagreD3Mixin):
             }
         else:
             self._dependencies = {}
-            self._inputs = {}
+
+            # insert initial value
+            self._setValue(value)
+
+        # use this variable when manually overriding
+        # a callable to have a fixed value
+        self._dependencies_stashed = {}
 
         # if derived node, default to dirty to start
         if derived:
@@ -244,8 +250,18 @@ class Node(_DagreD3Mixin):
         return False
 
     def isDirty(self):
+        '''Node needs to be re-evaluated, either because its value has changed
+        or because its value *could* change
+        
+        Note that in evaluating if a node is dirty, you will have a side effect
+        of updating that node's status to be dirty or not.
+        '''
         self._dirty = self._dirty or self._subtree_dirty() or self._dynamic
         return self._dirty
+
+    def isDynamic(self):
+        '''Node isnt necessarily dirty, but needs to be reevaluated'''
+        return self._dynamic
 
     def _recompute(self):
         ret = False
@@ -290,9 +306,35 @@ class Node(_DagreD3Mixin):
     def setValue(self, value):
         """set the node's value, marking it as dirty as appropriate"""
         if self._compare(value, self.value()):
+            # if callable, stash and force a fixed value
+            if self._dependencies:
+                # stash dependency tree for later
+                self._dependencies_stashed = self._dependencies
+
+                # reset to empty
+                self._dependencies = {}
+
+                # mark as not dynamic anymore
+                self._dynamic = False
+
+            # set the value
             self._setValue(value)  # leave for dagre
+
+            # mark as dirty
             self._dirty = True
-        self._setValue(value)
+
+    def unlock(self):
+        '''if node has been set to a fixed value, reset to callable'''
+        # no-op if not previously stashed
+        if self._dependencies_stashed:
+            # restore dependency tree
+            self._dependencies = self._dependencies_stashed
+
+            # clear out stashed
+            self._dependencies_stashed = {}
+
+            # mark as dynamic again
+            self._dynamic = True
 
     def _setValue(self, value):
         """internal method to set value"""
@@ -335,7 +377,7 @@ class Node(_DagreD3Mixin):
         return self.value()
 
     def value(self):
-        return self._values[-1]
+        return self._values[-1] if self._values else None
 
     def __call__(self, *args, **kwargs):
         self._install_args(*args)
@@ -343,6 +385,12 @@ class Node(_DagreD3Mixin):
 
         self._recompute()
         return self.value()
+
+    def evaluate(self, *args, **kwargs):
+        return self(*args, **kwargs)
+
+    def eval(self, *args, **kwargs):
+        return self(*args, **kwargs)
 
     def __repr__(self):
         return self._name

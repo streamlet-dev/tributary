@@ -48,7 +48,10 @@ def GraphViz(node):
     def rec(nodes, parent):
         for d in nodes:
             if not isinstance(d, dict):
-                if d.isDirty():
+                if d.isDynamic():
+                    dot.node(d._name, color="teal", shape=d._graphvizshape)
+                    dot.edge(d._name, parent._name, color="magenta")
+                elif d.isDirty():
                     dot.node(d._name, color="red", shape=d._graphvizshape)
                     dot.edge(d._name, parent._name, color="red")
                 else:
@@ -56,7 +59,11 @@ def GraphViz(node):
                     dot.edge(d._name, parent._name)
             else:
                 for k in d:
-                    if k.isDirty():
+                    if k.isDynamic():
+                        dot.node(k._name, color="teal", shape=k._graphvizshape)
+                        rec(d[k], k)
+                        dot.edge(k._name, parent._name, color="magenta")
+                    elif k.isDirty():
                         dot.node(k._name, color="red", shape=k._graphvizshape)
                         rec(d[k], k)
                         dot.edge(k._name, parent._name, color="red")
@@ -66,7 +73,9 @@ def GraphViz(node):
                         dot.edge(k._name, parent._name)
 
     for k in d:
-        if k.isDirty():
+        if k.isDynamic():
+            dot.node(k._name, color="teal", shape=k._graphvizshape)
+        elif k.isDirty():
             dot.node(k._name, color="red", shape=k._graphvizshape)
         else:
             dot.node(k._name, shape=k._graphvizshape)
@@ -84,7 +93,13 @@ def Dagre(node):
         for d in nodes:
             if not isinstance(d, dict):
                 d._dd3g = G
-                if d.isDirty():
+                if d.isDynamic():
+                    G.setNode(
+                        d._name,
+                        style="fill: #0ff",
+                        shape="rect" if d._graphvizshape == "box" else d._graphvizshape,
+                    )
+                elif d.isDirty():
                     G.setNode(
                         d._name,
                         style="fill: #f00",
@@ -102,7 +117,15 @@ def Dagre(node):
             else:
                 for k in d:
                     k._dd3g = G
-                    if k.isDirty():
+                    if k.isDynamic():
+                        G.setNode(
+                            k._name,
+                            style="fill: #0ff",
+                            shape="rect"
+                            if k._graphvizshape == "box"
+                            else k._graphvizshape,
+                        )
+                    elif k.isDirty():
                         G.setNode(
                             k._name,
                             style="fill: #f00",
@@ -110,8 +133,6 @@ def Dagre(node):
                             if k._graphvizshape == "box"
                             else k._graphvizshape,
                         )
-                        rec(d[k], k)
-                        # G.setEdge(k._name, parent._name, style='stroke: #f00')
                     else:
                         G.setNode(
                             k._name,
@@ -120,13 +141,19 @@ def Dagre(node):
                             if k._graphvizshape == "box"
                             else k._graphvizshape,
                         )
-                        rec(d[k], k)
+                    rec(d[k], k)
 
                     G.setEdge(k._name, parent._name, style="stroke: #000")
 
     for k in d:
         k._dd3g = G
-        if k.isDirty():
+        if k.isDynamic():
+            G.setNode(
+                k._name,
+                style="fill: #0ff",
+                shape="rect" if k._graphvizshape == "box" else k._graphvizshape,
+            )
+        elif k.isDirty():
             G.setNode(
                 k._name,
                 style="fill: #f00",
