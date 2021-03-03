@@ -7,7 +7,7 @@ class TestTolerance:
         assert n() == 1.0
 
         n.setValue(1.0000000000000001)
-        assert n.isDirty() == False
+        assert n.isDirty() is False
 
         n.setValue(1.0001)
-        assert n.isDirty() == True
+        assert n.isDirty() is True

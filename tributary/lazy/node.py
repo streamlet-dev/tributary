@@ -250,17 +250,17 @@ class Node(_DagreD3Mixin):
         return False
 
     def isDirty(self):
-        '''Node needs to be re-evaluated, either because its value has changed
+        """Node needs to be re-evaluated, either because its value has changed
         or because its value *could* change
-        
+
         Note that in evaluating if a node is dirty, you will have a side effect
         of updating that node's status to be dirty or not.
-        '''
+        """
         self._dirty = self._dirty or self._subtree_dirty() or self._dynamic
         return self._dirty
 
     def isDynamic(self):
-        '''Node isnt necessarily dirty, but needs to be reevaluated'''
+        """Node isnt necessarily dirty, but needs to be reevaluated"""
         return self._dynamic
 
     def _recompute(self):
@@ -324,7 +324,7 @@ class Node(_DagreD3Mixin):
             self._dirty = True
 
     def unlock(self):
-        '''if node has been set to a fixed value, reset to callable'''
+        """if node has been set to a fixed value, reset to callable"""
         # no-op if not previously stashed
         if self._dependencies_stashed:
             # restore dependency tree

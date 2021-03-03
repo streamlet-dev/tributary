@@ -17,7 +17,6 @@ class Foo5(t.LazyGraph):
         self.x = self.node(name="x", value=None)
 
 
-
 class TestDirtyPropogation:
     def test_or_dirtypropogation(self):
         f = Foo5()

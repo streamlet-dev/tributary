@@ -46,4 +46,3 @@ class TestLazy:
         assert z.print()
         assert z.graph()
         assert z.graphviz()
-
