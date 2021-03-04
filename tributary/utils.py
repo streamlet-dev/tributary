@@ -58,13 +58,16 @@ def _compare(new_value, old_value):
 
 
 def _ismethod(callable):
-    return callable and (
-        inspect.ismethod(callable)
-        or (
-            inspect.getargspec(callable).args
-            and inspect.getargspec(callable).args[0] == "self"
+    try:
+        return callable and (
+            inspect.ismethod(callable)
+            or (
+                inspect.getargspec(callable).args
+                and inspect.getargspec(callable).args[0] == "self"
+            )
         )
-    )
+    except TypeError:
+        return False
 
 
 def anext(obj):
