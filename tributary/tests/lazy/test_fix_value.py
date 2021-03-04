@@ -1,10 +1,11 @@
-import tributary.lazy as t
 import random
+
+import tributary.lazy as t
 
 
 class TestCallableLock:
     def test_callable_lock(self):
-        n = t.Node(callable=lambda: random.random())
+        n = t.Node(callable=random.random, dynamic=True)
 
         x = n()
         assert n() != x

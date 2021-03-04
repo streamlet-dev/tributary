@@ -2,11 +2,11 @@ import inspect
 
 import six
 
-from .dd3 import _DagreD3Mixin
 from ..base import TributaryException
 
 # from boltons.funcutils import wraps
 from ..utils import _compare, _either_type, _ismethod
+from .dd3 import _DagreD3Mixin
 
 
 class Node(_DagreD3Mixin):
@@ -78,18 +78,30 @@ class Node(_DagreD3Mixin):
         self._callable_kwargs = callable_kwargs or {}
         self._callable_is_method = _ismethod(callable)
 
+        self._callable = callable
+
         # map positional to kw
         if callable is not None and not inspect.isgeneratorfunction(callable):
             args = inspect.getfullargspec(callable).args
             if "self" in args:
                 args.remove("self")
             self._callable_args_mapping = {i: arg for i, arg in enumerate(args)}
-        else:
+
+            try:
+                self._callable._node_wrapper = None  # not known until program start
+            except AttributeError:
+                # can't set attributes on certain functions, so wrap with lambda
+                if self._callable_is_method:
+                    self._callable = lambda self, *args, **kwargs: callable(
+                        *args, **kwargs
+                    )
+                else:
+                    self._callable = lambda *args, **kwargs: callable(*args, **kwargs)
+                self._callable._node_wrapper = None  # not known until program start
+
+        elif callable is not None:
             self._callable_args_mapping = {}
 
-        if not inspect.isgeneratorfunction(callable):
-            self._callable = callable
-        else:
             # FIXME this wont work for attribute inputs
             def _callable(gen=callable(*self._callable_args, **self._callable_kwargs)):
                 try:
@@ -101,9 +113,16 @@ class Node(_DagreD3Mixin):
                     return self.value()
 
             self._callable = _callable
+        else:
+            self._callable_args_mapping = {}
 
         # if always dirty, always reevaluate
-        self._dynamic = dynamic or self._callable is not None
+        # self._dynamic = dynamic  # or self._callable is not None
+        self._dynamic = (
+            dynamic
+            or (self._callable and inspect.isgeneratorfunction(callable))
+            or False
+        )
 
         # parent nodes in graph
         self._parents = []
@@ -116,7 +135,6 @@ class Node(_DagreD3Mixin):
 
         # dependencies can be nodes
         if self._callable:
-            self._callable._node_wrapper = None  # not known until program start
             self._dependencies = {
                 self._callable: (self._callable_args, self._callable_kwargs)
             }
@@ -131,7 +149,7 @@ class Node(_DagreD3Mixin):
         self._dependencies_stashed = {}
 
         # if derived node, default to dirty to start
-        if derived:
+        if derived or self._callable is not None:
             self._dirty = True
         else:
             self._dirty = False
@@ -397,7 +415,7 @@ class Node(_DagreD3Mixin):
 
 
 @_either_type
-def node(meth, memoize=True, **default_attrs):
+def node(meth, dynamic=True, **default_attrs):
     """Convert a method into a lazy node
 
     Since `self` is not defined at the point of method creation, you can pass in
@@ -516,8 +534,7 @@ def node(meth, memoize=True, **default_attrs):
         callable=meth_wrapper,
         callable_args=node_args,
         callable_kwargs=node_kwargs,
-        callable_is_method=is_method,
-        always_dirty=not memoize,
+        dynamic=dynamic,
     )
 
     if is_method:
