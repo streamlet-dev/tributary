@@ -85,6 +85,7 @@ class Node(_DagreD3Mixin):
             args = inspect.getfullargspec(callable).args
             if "self" in args:
                 args.remove("self")
+
             self._callable_args_mapping = {i: arg for i, arg in enumerate(args)}
 
             try:
