@@ -94,7 +94,7 @@ class Node(_DagreD3Mixin):
 
             except ValueError:
                 # https://bugs.python.org/issue20189
-                signature = namedtuple("Signature", ["parameters"])([])
+                signature = namedtuple("Signature", ["parameters"])({})
 
             parameters = [
                 p
