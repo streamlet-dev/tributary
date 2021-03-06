@@ -90,19 +90,30 @@ class Node(_DagreD3Mixin):
         # map positional to kw
         if callable is not None and not inspect.isgeneratorfunction(callable):
             # wrap args and kwargs of function to node
-            argspec = inspect.getfullargspec(callable)
-
-            defaults = argspec.defaults or []
+            signature = inspect.signature(callable)
+            parameters = [
+                p
+                for p in signature.parameters.values()
+                if p.kind
+                not in (
+                    inspect._ParameterKind.VAR_POSITIONAL,
+                    inspect._ParameterKind.VAR_KEYWORD,
+                )
+            ]
 
             # map argument index to name of argument, for later use
-            self._callable_args_mapping = {i: arg for i, arg in enumerate(argspec.args)}
+            self._callable_args_mapping = {
+                i: arg.name for i, arg in enumerate(parameters)
+            }
+
+            # import ipdb; ipdb.set_trace()
 
             # first, iterate through callable_args and callable_kwargs and convert to nodes
             for i, arg in enumerate(self._callable_args):
                 if not isinstance(arg, Node):
                     # see if arg in argspec
-                    if i < len(argspec.args):
-                        name = argspec.args[i]
+                    if i < len(parameters):
+                        name = parameters[i].name
                     else:
                         name = "vararg"
 
@@ -115,47 +126,34 @@ class Node(_DagreD3Mixin):
 
             # now iterate through callable's args and ensure
             # everything is matched up
-            for i, arg in enumerate(argspec.args):
-                if arg == "self":
-                    # don't do anything for self
+            for i, arg in enumerate(parameters):
+                if arg.name == "self":
+                    # skip
                     continue
 
                 # passed in as arg
-                if i < len(self._callable_args) or arg in self._callable_kwargs:
+                if i < len(self._callable_args) or arg.name in self._callable_kwargs:
                     # arg is passed in args/kwargs, continue
                     continue
 
-                if (self._callable_is_method and len(defaults) >= i) or (
-                    not self._callable_is_method and len(defaults) > i
-                ):
-                    # arg not accounted for, see if it has a default in the callable
-                    value = (
-                        argspec.defaults[i]
-                        if not self._callable_is_method
-                        else argspec.defaults[i - 1]
-                    )
-                else:
-                    # no default and not accounted for, set to null
-                    value = None
-
+                # arg not accounted for, see if it has a default in the callable
                 # convert to node
-                node = Node(name=arg, derived=True, value=value)
+                node = Node(name=arg.name, derived=True, value=arg.default)
 
                 # set in kwargs
-                self._callable_kwargs[arg] = node
+                self._callable_kwargs[arg.name] = node
 
-            if argspec.varargs:
+            # compare filtered parameters to original
+            if len(parameters) != len(signature.parameters):
                 # if varargs, can have more callable_args + callable_kwargs than listed arguments
-                failif = (
-                    len([arg for arg in argspec.args if arg != "self"])
-                    + len(argspec.kwonlydefaults or {})
-                ) > (len(self._callable_args) + len(self._callable_kwargs))
+                failif = len([arg for arg in parameters if arg.name != "self"]) > (
+                    len(self._callable_args) + len(self._callable_kwargs)
+                )
             else:
                 # should be exactly equal
-                failif = (
-                    len([arg for arg in argspec.args if arg != "self"])
-                    + len(argspec.kwonlydefaults or {})
-                ) != (len(self._callable_args) + len(self._callable_kwargs))
+                failif = len([arg for arg in parameters if arg.name != "self"]) != (
+                    len(self._callable_args) + len(self._callable_kwargs)
+                )
 
             if failif:
                 # something bad happened trying to align
@@ -484,9 +482,9 @@ class Node(_DagreD3Mixin):
                 # try to set kwargs
                 for kwarg in six.itervalues(deps[1]):
                     if kwarg._name_no_id() == k:
-                        kwarg._dirty = kwarg._value != v
-                        kwarg._value = v
-                        _set = True
+                        kwarg._dirty = kwarg.value() != v
+                        kwarg._setValue(v)
+                        # _set = True
                         break
 
     def getValue(self):
@@ -530,18 +528,19 @@ def node(meth, dynamic=True, **default_attrs):
     e.g. as if self._attribute_name was passed as an argument to my_method, and converted to a node in the usual manner
     """
 
-    argspec = inspect.getfullargspec(meth)
-    # args = argspec.args
-    # varargs = argspec.varargs
-    # varkw = argspec.varkw
-    # defaults = argspec.defaults
-    # kwonlyargs = argspec.kwonlyargs
-    # kwonlydefaults = args.kwonlydefaults
+    signature = inspect.signature(meth)
+    parameters = [
+        p
+        for p in signature.parameters.values()
+        if p.kind
+        not in (
+            inspect._ParameterKind.VAR_POSITIONAL,
+            inspect._ParameterKind.VAR_KEYWORD,
+        )
+    ]
 
-    if argspec.varargs:
-        raise TributaryException("varargs not supported yet!")
-
-    if argspec.varkw:
+    # don't handle varargs yet
+    if len(parameters) != len(signature.parameters):
         raise TributaryException("varargs not supported yet!")
 
     if inspect.isgeneratorfunction(meth) and default_attrs:
@@ -549,40 +548,16 @@ def node(meth, dynamic=True, **default_attrs):
 
     node_args = []
     node_kwargs = {}
-    is_method = False
+    is_method = _ismethod(meth)
 
     # iterate through method's args and convert them to nodes
-    for i, arg in enumerate(argspec.args):
-        if arg == "self":
-            # TODO
-            is_method = True
+    for i, arg in enumerate(parameters):
+        if arg.name == "self":
             continue
 
-        if (is_method and len(argspec.defaults or []) >= i) or (
-            not is_method and len(argspec.defaults or []) > i
-        ):
-            default = True
-            value = (
-                argspec.defaults[i] if not is_method else argspec.defaults[i - 1]
-            )  # account for self
-        else:
-            default = False
-            value = None
-
-        if arg not in default_attrs and not default:
-            node_args.append(
-                Node(
-                    name=arg,
-                    derived=True,
-                    readonly=False,
-                    value=value,
-                )
-            )
-        elif default:
-            node_kwargs[arg] = Node(name=arg, derived=True, readonly=False, value=value)
-
-    for k, v in six.iteritems(argspec.kwonlydefaults or {}):
-        node_kwargs[k] = Node(name=k, derived=True, readonly=False, value=v)
+        node_kwargs[arg.name] = Node(
+            name=arg.name, derived=True, readonly=False, value=arg.default
+        )
 
     # add all attribute args to the argspec
     # see the docstring for more details
@@ -590,10 +565,9 @@ def node(meth, dynamic=True, **default_attrs):
     # argspec.args.extend(list(default_attrs.keys()))
     node_kwargs.update(default_attrs)
 
-    if (
-        len([arg for arg in argspec.args if arg != "self"])
-        + len(argspec.kwonlydefaults or {})
-    ) != (len(node_args) + len(node_kwargs)):
+    if (len(parameters) - 1 if is_method else len(parameters)) != (
+        len(node_args) + len(node_kwargs)
+    ):
         raise TributaryException(
             "Missing args (call or preprocessing error has occurred)"
         )

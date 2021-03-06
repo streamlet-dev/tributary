@@ -46,3 +46,18 @@ class TestLazy:
         assert z.print()
         assert z.graph()
         assert z.graphviz()
+
+    def test_lazy_default_foo_arg(self):
+        def foo(val, prev_val=0):
+            print("val:\t{}\t{}".format(val, val.value()))
+            print("prev_val:\t{}\t{}".format(prev_val, prev_val.value()))
+            return val.value() + prev_val.value()
+
+        n = t.Node(callable=foo)
+        n.set(val=5)
+
+        assert n() == 5
+
+        n.set(prev_val=100)
+
+        assert n() == 105
