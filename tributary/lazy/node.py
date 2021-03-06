@@ -1,7 +1,5 @@
 import inspect
 
-import six
-
 from ..base import TributaryException
 
 # from boltons.funcutils import wraps
@@ -285,7 +283,7 @@ class Node(_DagreD3Mixin):
             self._greendd3g()
 
             # iterate through upstream deps
-            for deps in six.itervalues(self._dependencies):
+            for deps in self._dependencies.values():
                 # recompute args
                 for arg in deps[0]:
                     arg._recompute()
@@ -295,7 +293,7 @@ class Node(_DagreD3Mixin):
                         arg._parents.append(self)
 
                 # recompute kwargs
-                for kwarg in six.itervalues(deps[1]):
+                for kwarg in deps[1].values():
                     kwarg._recompute()
 
                     # Set yourself as parent if not set
@@ -337,7 +335,7 @@ class Node(_DagreD3Mixin):
         return self.value()
 
     def _subtree_dirty(self):
-        for call, deps in six.iteritems(self._dependencies):
+        for call, deps in self._dependencies.items():
             # callable node
             if hasattr(call, "_node_wrapper") and call._node_wrapper is not None:
                 if call._node_wrapper.isDirty():
@@ -355,7 +353,7 @@ class Node(_DagreD3Mixin):
                     return True
 
             # check kwargs
-            for kwarg in six.itervalues(deps[1]):
+            for kwarg in deps[1].values():
                 if kwarg.isDirty():
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
@@ -464,28 +462,36 @@ class Node(_DagreD3Mixin):
         self.value().append(value)
         self._dirty = True
 
-    def set(self, *args, **kwargs):
-        for k, v in six.iteritems(kwargs):
+    def set(self, **kwargs):
+        for k, v in kwargs.items():
             _set = False
-            for deps in six.itervalues(self._dependencies):
+            for deps in self._dependencies.values():
                 # try to set args
-                for arg in deps[0]:
+                for i, arg in enumerate(deps[0]):
                     if arg._name_no_id() == k:
-                        arg._dirty = arg._value != v
-                        arg._value = v
-                        _set = True
-                        break
+                        if isinstance(v, Node):
+                            # overwrite node
+                            deps[0][i] = v
+                        else:
+                            arg._dirty = arg.value() != v
+                            arg.setValue(v)
+                            _set = True
+                            break
 
                 if _set:
                     continue
 
                 # try to set kwargs
-                for kwarg in six.itervalues(deps[1]):
+                for key, kwarg in deps[1].items():
                     if kwarg._name_no_id() == k:
-                        kwarg._dirty = kwarg.value() != v
-                        kwarg._setValue(v)
-                        # _set = True
-                        break
+                        if isinstance(v, Node):
+                            # overwrite node
+                            deps[1][key] = v
+                        else:
+                            kwarg._dirty = kwarg.value() != v
+                            kwarg._setValue(v)
+                            # _set = True
+                            break
 
     def getValue(self):
         return self.value()
