@@ -20,7 +20,7 @@ def foo2():
 
 class TestUtils:
     def setup(self):
-        time.sleep(0.1)
+        time.sleep(0.2)
 
     def test_delay(self):
         out = ts.Delay(ts.Foo(foo), delay=5)
