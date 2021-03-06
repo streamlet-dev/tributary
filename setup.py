@@ -83,6 +83,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     keywords="streaming lazy graph dag dataflow reactive",
     packages=find_packages(exclude=["tests"]),
