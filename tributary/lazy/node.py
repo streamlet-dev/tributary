@@ -1,4 +1,5 @@
 import inspect
+from collections import namedtuple
 
 from ..base import TributaryException
 
@@ -88,7 +89,13 @@ class Node(_DagreD3Mixin):
         # map positional to kw
         if callable is not None and not inspect.isgeneratorfunction(callable):
             # wrap args and kwargs of function to node
-            signature = inspect.signature(callable)
+            try:
+                signature = inspect.signature(callable)
+
+            except ValueError:
+                # https://bugs.python.org/issue20189
+                signature = namedtuple("Signature", ["parameters"])([])
+
             parameters = [
                 p
                 for p in signature.parameters.values()
