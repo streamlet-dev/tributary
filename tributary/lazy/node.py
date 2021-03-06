@@ -47,7 +47,12 @@ class Node(_DagreD3Mixin):
         Node._id_ref += 1
 
         # Every node gets a name so it can be uniquely identified in the graph
-        self._name = "{}#{}".format(name or self.__class__.__name__, self._id)
+        self._name = "{}#{}".format(
+            name
+            or (callable.__name__ if callable else None)
+            or self.__class__.__name__,
+            self._id,
+        )
 
         if isinstance(value, Node):
             raise TributaryException("Cannot set value to be itself a node")
@@ -74,19 +79,92 @@ class Node(_DagreD3Mixin):
         self._compare = _compare
 
         # callable and args
+        self._callable_is_method = _ismethod(callable)
+        self._callable = callable
+
+        # map arguments of callable to nodes
         self._callable_args = callable_args or []
         self._callable_kwargs = callable_kwargs or {}
-        self._callable_is_method = _ismethod(callable)
-
-        self._callable = callable
+        self._callable_args_mapping = {}
 
         # map positional to kw
         if callable is not None and not inspect.isgeneratorfunction(callable):
-            args = inspect.getfullargspec(callable).args
-            if "self" in args:
-                args.remove("self")
+            # wrap args and kwargs of function to node
+            argspec = inspect.getfullargspec(callable)
 
-            self._callable_args_mapping = {i: arg for i, arg in enumerate(args)}
+            defaults = argspec.defaults or []
+
+            # map argument index to name of argument, for later use
+            self._callable_args_mapping = {i: arg for i, arg in enumerate(argspec.args)}
+
+            # first, iterate through callable_args and callable_kwargs and convert to nodes
+            for i, arg in enumerate(self._callable_args):
+                if not isinstance(arg, Node):
+                    # see if arg in argspec
+                    if i < len(argspec.args):
+                        name = argspec.args[i]
+                    else:
+                        name = "vararg"
+
+                    self._calalble_args[i] = Node(name=name, value=arg)
+
+            # first, iterate through callable_args and callable_kwargs and convert to nodes
+            for name, kwarg in self._callable_kwargs.items():
+                if not isinstance(kwarg, Node):
+                    self._callable_kwargs[name] = Node(name=name, value=kwarg)
+
+            # now iterate through callable's args and ensure
+            # everything is matched up
+            for i, arg in enumerate(argspec.args):
+                if arg == "self":
+                    # don't do anything for self
+                    continue
+
+                # passed in as arg
+                if i < len(self._callable_args) or arg in self._callable_kwargs:
+                    # arg is passed in args/kwargs, continue
+                    continue
+
+                if (self._callable_is_method and len(defaults) >= i) or (
+                    not self._callable_is_method and len(defaults) > i
+                ):
+                    # arg not accounted for, see if it has a default in the callable
+                    value = (
+                        argspec.defaults[i]
+                        if not self._callable_is_method
+                        else argspec.defaults[i - 1]
+                    )
+                else:
+                    # no default and not accounted for, set to null
+                    value = None
+
+                # convert to node
+                node = Node(name=arg, derived=True, value=value)
+
+                # set in kwargs
+                self._callable_kwargs[arg] = node
+
+            if argspec.varargs:
+                # if varargs, can have more callable_args + callable_kwargs than listed arguments
+                failif = (
+                    len([arg for arg in argspec.args if arg != "self"])
+                    + len(argspec.kwonlydefaults or {})
+                ) > (len(self._callable_args) + len(self._callable_kwargs))
+            else:
+                # should be exactly equal
+                failif = (
+                    len([arg for arg in argspec.args if arg != "self"])
+                    + len(argspec.kwonlydefaults or {})
+                ) != (len(self._callable_args) + len(self._callable_kwargs))
+
+            if failif:
+                # something bad happened trying to align
+                # callable's args/kwargs with the provided
+                # callable_args and callable_kwargs, and we're
+                # now in an unrecoverable state.
+                raise TributaryException(
+                    "Missing args (call or preprocessing error has occurred)"
+                )
 
             try:
                 self._callable._node_wrapper = None  # not known until program start
@@ -101,7 +179,8 @@ class Node(_DagreD3Mixin):
                 self._callable._node_wrapper = None  # not known until program start
 
         elif callable is not None:
-            self._callable_args_mapping = {}
+            self._callable_args = callable_args or []
+            self._callable_kwargs = callable_kwargs or {}
 
             # FIXME this wont work for attribute inputs
             def _callable(gen=callable(*self._callable_args, **self._callable_kwargs)):
@@ -114,8 +193,11 @@ class Node(_DagreD3Mixin):
                     return self.value()
 
             self._callable = _callable
-        else:
-            self._callable_args_mapping = {}
+
+        # list out all upstream nodes
+        self._upstream = list(self._callable_args) + list(
+            self._callable_kwargs.values()
+        )
 
         # if always dirty, always reevaluate
         # self._dynamic = dynamic  # or self._callable is not None
@@ -157,7 +239,7 @@ class Node(_DagreD3Mixin):
 
     def inputs(self, name=""):
         """get node inputs, optionally by name"""
-        dat = {n._name_no_id(): n for n in self._callable_args}
+        dat = {n._name_no_id(): n for n in self._upstream}
         return dat if not name else dat.get(name)
 
     def _get_dirty(self):
@@ -199,8 +281,12 @@ class Node(_DagreD3Mixin):
         return self
 
     def _compute_from_dependencies(self):
+        # if i have upstream dependencies
         if self._dependencies:
+            # mark graph as calculating
             self._greendd3g()
+
+            # iterate through upstream deps
             for deps in six.itervalues(self._dependencies):
                 # recompute args
                 for arg in deps[0]:
@@ -214,31 +300,42 @@ class Node(_DagreD3Mixin):
                 for kwarg in six.itervalues(deps[1]):
                     kwarg._recompute()
 
-                    # Set yourself as parent
+                    # Set yourself as parent if not set
                     if self not in kwarg._parents:
                         kwarg._parents.append(self)
 
-            k = list(self._dependencies.keys())[0]
+            # fetch the callable
+            kallable = list(self._dependencies.keys())[0]
 
             if self._callable_is_method:
-                new_value = k(
+                # if the callable is a method,
+                # pass this node as self
+                new_value = kallable(
                     self._self_reference,
-                    *self._dependencies[k][0],
-                    **self._dependencies[k][1]
+                    *self._dependencies[kallable][0],
+                    **self._dependencies[kallable][1]
                 )
             else:
-                new_value = k(*self._dependencies[k][0], **self._dependencies[k][1])
+                # else just call on deps
+                new_value = kallable(
+                    *self._dependencies[kallable][0], **self._dependencies[kallable][1]
+                )
 
             if isinstance(new_value, Node):
-                k._node_wrapper = new_value
+                # extract numerical value from node, if it is a node
+                kallable._node_wrapper = new_value
                 new_value = new_value()  # get value
 
             if isinstance(new_value, Node):
                 raise TributaryException("Value should not itself be a node!")
 
+            # set my value as new value
             self._setValue(new_value)
 
+        # mark calculation complete
         self._whited3g()
+
+        # return my value
         return self.value()
 
     def _subtree_dirty(self):

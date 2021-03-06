@@ -85,7 +85,7 @@ def Window(node, size=-1, full_only=False):
     """
 
     def foo(node=node, size=size, full_only=full_only):
-        if size == 0:
+        if size.value() == 0:
             return node.value()
 
         if ret._accum is None:
@@ -93,12 +93,12 @@ def Window(node, size=-1, full_only=False):
 
         ret._accum.append(node.value())
 
-        if size > 0:
-            ret._accum = ret._accum[-size:]
+        if size.value() > 0:
+            ret._accum = ret._accum[-size.value() :]
 
-        if full_only and len(ret._accum) == size:
+        if full_only.value() and len(ret._accum) == size.value():
             return ret._accum
-        elif full_only:
+        elif full_only.value():
             return None
         return ret._accum
 
