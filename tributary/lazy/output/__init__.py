@@ -5,6 +5,10 @@ def _print(node, cache=None):
     if cache is None:
         cache = {}
 
+    if id(node) in cache:
+        # loop, return None
+        return None
+
     cache[id(node)] = node
 
     ret = {node: []}
@@ -13,18 +17,15 @@ def _print(node, cache=None):
         for call, deps in node._dependencies.items():
             # callable node
             if hasattr(call, "_node_wrapper") and call._node_wrapper is not None:
-                val = call._node_wrapper._print(cache)
-                ret[node].append(val)
+                ret[node].append(call._node_wrapper._print(cache) or node)
 
             # args
             for arg in deps[0]:
-                val = arg._print(cache)
-                ret[node].append(val)
+                ret[node].append(arg._print(cache) or node)
 
             # kwargs
             for kwarg in deps[1].values():
-                val = kwarg._print(cache)
-                ret[node].append(val)
+                ret[node].append(kwarg._print(cache) or node)
 
     return ret
 
