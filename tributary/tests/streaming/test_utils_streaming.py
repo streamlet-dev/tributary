@@ -221,9 +221,9 @@ class TestUtils:
     def test_throttle(self):
         async def clic():
             for _ in range(10):
-                await sleep(0.1)
+                await sleep(0.5)
                 yield 1
 
-        n = ts.Node(clic).throttle(0.2)
+        n = ts.Node(clic).throttle(1)
         out = ts.run(n)
         assert out == [[1], [1, 1], [1, 1], [1, 1], [1, 1]]
