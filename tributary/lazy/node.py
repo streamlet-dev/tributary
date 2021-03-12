@@ -22,7 +22,7 @@ class Node(_DagreD3Mixin):
         callable_args=None,
         callable_kwargs=None,
         dynamic=False,
-        **kwargs
+        **kwargs,
     ):
         """Construct a new lazy node, wrapping a callable or a value
 
@@ -236,6 +236,9 @@ class Node(_DagreD3Mixin):
         # cache node operations that have already been done
         self._node_op_cache = {}
 
+        # tweaks
+        self._tweaks = None
+
         # dependencies can be nodes
         if self._callable:
             self._dependencies = {
@@ -295,6 +298,12 @@ class Node(_DagreD3Mixin):
         for k, v in kwargs.items():
             self._callable_kwargs[k].setValue(v)
 
+    def _get_arg(self, i):
+        return self._callable_args[i]
+
+    def _get_kwarg(self, keyword):
+        return self._callable_kwargs[keyword]
+
     def _bind(self, other_self=None, *args, **kwargs):
         if other_self is not None:
             self._self_reference = other_self
@@ -302,8 +311,20 @@ class Node(_DagreD3Mixin):
         self._install_kwargs(**kwargs)
         return self
 
-    def _compute_from_dependencies(self, **tweaks):
+    def _tweak(self, node_tweaks):
+        # TODO context manager
+        self._tweaks = node_tweaks
+
+    def _untweak(self):
+        # TODO context manager
+        self._tweaks = None
+
+    def _compute_from_dependencies(self, node_tweaks):
         """recompute node's value from its dependencies, applying any temporary tweaks as necessary"""
+
+        # if i'm the one being tweaked, just return tweaked value
+        if self in node_tweaks:
+            return node_tweaks[self]
 
         # if i have upstream dependencies
         if self._dependencies:
@@ -314,19 +335,29 @@ class Node(_DagreD3Mixin):
             for deps in self._dependencies.values():
                 # recompute args
                 for arg in deps[0]:
-                    arg._recompute(**tweaks)
+                    # recompute
+                    arg._recompute(node_tweaks)
 
                     # Set yourself as parent if not set
                     if self not in arg._parents:
                         arg._parents.append(self)
 
+                    # mark as tweaking
+                    if node_tweaks:
+                        arg._tweak(node_tweaks)
+
                 # recompute kwargs
                 for kwarg in deps[1].values():
-                    kwarg._recompute(**tweaks)
+                    # recompute
+                    kwarg._recompute(node_tweaks)
 
                     # Set yourself as parent if not set
                     if self not in kwarg._parents:
                         kwarg._parents.append(self)
+
+                    # mark as tweaking
+                    if node_tweaks:
+                        kwarg._tweak(node_tweaks)
 
             # fetch the callable
             kallable = list(self._dependencies.keys())[0]
@@ -337,7 +368,7 @@ class Node(_DagreD3Mixin):
                 new_value = kallable(
                     self._self_reference,
                     *self._dependencies[kallable][0],
-                    **self._dependencies[kallable][1]
+                    **self._dependencies[kallable][1],
                 )
             else:
                 # else just call on deps
@@ -353,22 +384,33 @@ class Node(_DagreD3Mixin):
             if isinstance(new_value, Node):
                 raise TributaryException("Value should not itself be a node!")
 
-            # TODO tweaks
-            # set my value as new value
-            self._setValue(new_value)
+            # set my value as new value if not tweaking
+            if not node_tweaks:
+                self._setValue(new_value)
+            else:
+                # iterate through upstream deps and unset tweak
+                for deps in self._dependencies.values():
+                    for arg in deps[0]:
+                        arg._untweak()
+                    for kwarg in deps[1].values():
+                        kwarg._untweak()
+        else:
+            # if i don't have upstream dependencies, my value is fixed
+            new_value = self.value()
 
         # mark calculation complete
         self._whited3g()
 
         # return my value
-        # TODO tweaks
+        if node_tweaks:
+            return new_value
         return self.value()
 
-    def _subtree_dirty(self, *positional_tweaks, **keyword_tweaks):
+    def _subtree_dirty(self, node_tweaks):
         for call, deps in self._dependencies.items():
             # callable node
             if hasattr(call, "_node_wrapper") and call._node_wrapper is not None:
-                if call._node_wrapper.isDirty():
+                if call._node_wrapper.isDirty(node_tweaks):
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
@@ -376,7 +418,7 @@ class Node(_DagreD3Mixin):
 
             # check args
             for arg in deps[0]:
-                if arg.isDirty(*positional_tweaks, **keyword_tweaks):
+                if arg.isDirty(node_tweaks):
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
@@ -384,64 +426,63 @@ class Node(_DagreD3Mixin):
 
             # check kwargs
             for kwarg in deps[1].values():
-                if kwarg.isDirty(*positional_tweaks, **keyword_tweaks):
+                if kwarg.isDirty(node_tweaks):
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
                     return True
         return False
 
-    def isDirty(self, *positional_tweaks, **keyword_tweaks):
+    def isDirty(self, node_tweaks=None):
         """Node needs to be re-evaluated, either because its value has changed
         or because its value *could* change
 
         Note that in evaluating if a node is dirty, you will have a side effect
         of updating that node's status to be dirty or not.
         """
-        self._dirty = (
-            self._dirty
-            or self._subtree_dirty(*positional_tweaks, **keyword_tweaks)
-            or self._dynamic
-        )
+        node_tweaks = node_tweaks or {}
+
+        if self in node_tweaks:
+            # return dirty but don't set
+            return _compare(node_tweaks[self], self.value())
+
+        self._dirty = self._dirty or self._subtree_dirty(node_tweaks) or self._dynamic
         return self._dirty
 
     def isDynamic(self):
         """Node isnt necessarily dirty, but needs to be reevaluated"""
         return self._dynamic
 
-    def _recompute(self, *positional_tweaks, **keyword_tweaks):
-        """returns if we need recomputed"""
-        # default to not recompute (lazy)
-        ret = False
-
+    def _recompute(self, node_tweaks):
+        """returns result of computation"""
         # check if self or upstream dirty
-        self.isDirty(*positional_tweaks, **keyword_tweaks)
+        self.isDirty(node_tweaks)
 
         # if i'm dirty, recompute my value
         if self._dirty:
             # compute upstream and then apply to self
-            _value = self._compute_from_dependencies()
+            new_value = self._compute_from_dependencies(node_tweaks)
 
             # if my new value is not equal to my old value,
             # make sure to indicate that i was really dirty
-            if self._compare(_value, self.value()):
-                # return true to indicate recalc is needed
-                ret = True
-
+            if self._compare(new_value, self.value()):
                 # mark my parents as dirty
                 if self._parents:
                     for parent in self._parents:
                         # let your parents know you were dirty!
                         parent._dirty = True
 
-                # set my value
-                self._setValue(_value)
+                # set my value if not tweaking
+                if not node_tweaks:
+                    self._setValue(new_value)
+        else:
+            new_value = self.value()
 
         # mark myself as no longer dirty
         self._dirty = False
 
-        # return whether i was properly dirty or not
-        return ret
+        # return result of computation
+        return new_value
 
     def _gennode(self, name, foo, foo_args, **kwargs):
         if name not in self._node_op_cache:
@@ -451,7 +492,7 @@ class Node(_DagreD3Mixin):
                 callable=foo,
                 callable_args=foo_args,
                 override_callable_dirty=True,
-                **kwargs
+                **kwargs,
             )
         return self._node_op_cache[name]
 
@@ -562,21 +603,63 @@ class Node(_DagreD3Mixin):
         return self.value()
 
     def value(self):
+        # if tweaking, return my tweaked value
+        if self._tweaks and self in self._tweaks:
+            return self._tweaks[self]
+
+        # otherwise return my latest value
         return self._values[-1] if self._values else None
 
-    def __call__(self, *args, **kwargs):
-        # don't install
-        self._install_args(*args)
-        self._install_kwargs(**kwargs)
+    def __call__(self, node_tweaks=None, *positional_tweaks, **keyword_tweaks):
+        """Lazily re-evaluate the node
 
-        self._recompute(*args, **kwargs)
+        Args:
+            node_tweaks (dict): A dict mapping node to tweaked value
+            positional_tweaks (VAR_POSITIONAL): A tuple of positional tweaks to apply
+            keyword_tweaks (VAR_KEYWORD): A dict of keyword tweaks to apply
+                How it works: The "original caller" is the node being evaluted w/ tweaks.
+                It will consume the positional_tweaks` and `keyword_tweaks`, which look like:
+                    (1, 2,)  ,  {"a": 5, "b": 10}
+                and join them with `node_tweaks` in a dict mapping node->tweaked value, e.g.
+                    {Node1: 1, Node2: 2, NodeA: 5, NodeB: 10}
+                and pass this dict up the call tree in `node_tweaks`.
+
+                This dict is carried through all node operations through the entire call tree.
+                If a node is being evaluated and is in `node_tweaks`, it ignores recalculation
+                and returns the tweaked value.
+        Returns:
+            Any: the value, either via re-evaluation (if self or upstream dirty),
+                 or the previously computed value
+        """
+        node_tweaks = node_tweaks or {}
+        if not isinstance(node_tweaks, dict):
+            # treat node_tweak argument as positional tweak
+            positional_tweaks = list(positional_tweaks) + [node_tweaks]
+            node_tweaks = {}
+
+        for i, positional_tweak in enumerate(positional_tweaks):
+            print(f"{i} {positional_tweak} {self._get_arg(i)}")
+            node_tweaks[self._get_arg(i)] = positional_tweak
+
+        for k, keyword_tweak in keyword_tweaks.items():
+            node_tweaks[self._get_kwarg(k)] = keyword_tweak
+
+        # calculate new value
+        computed = self._recompute(node_tweaks)
+
+        # return the calculation result, not my current value
+        if node_tweaks:
+            return computed
+
+        # otherwise return my permanent value, should equal computed
+        # assert self.value() == computed
         return self.value()
 
-    def evaluate(self, *args, **kwargs):
-        return self(*args, **kwargs)
+    def evaluate(self, node_tweaks=None, *positional_tweaks, **keyword_tweaks):
+        return self(node_tweaks, *positional_tweaks, **keyword_tweaks)
 
-    def eval(self, *args, **kwargs):
-        return self(*args, **kwargs)
+    def eval(self, node_tweaks=None, *positional_tweaks, **keyword_tweaks):
+        return self(node_tweaks, *positional_tweaks, **keyword_tweaks)
 
     def __repr__(self):
         return self._name
@@ -655,7 +738,7 @@ def node(meth, dynamic=True, **default_attrs):
                 **{
                     k: v.value() if isinstance(v, Node) else getattr(self, v).value()
                     for k, v in kwargs.items()
-                }
+                },
             )
         else:
             val = meth(
@@ -666,7 +749,7 @@ def node(meth, dynamic=True, **default_attrs):
                 **{
                     k: v.value() if isinstance(v, Node) else getattr(self, v).value()
                     for k, v in kwargs.items()
-                }
+                },
             )
         return val
 
