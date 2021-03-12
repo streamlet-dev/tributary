@@ -18,7 +18,6 @@ class Node(_DagreD3Mixin):
         value=None,
         name="?",
         derived=False,
-        readonly=False,
         callable=None,
         callable_args=None,
         callable_kwargs=None,
@@ -32,7 +31,6 @@ class Node(_DagreD3Mixin):
             derived (bool): node is note instantiated directly,
                             e.g. via n + 10 where n is a preexisting node.
                             These default to dirty state
-            readonly (bool): whether a node is settable
             value (any): initial value of the node
             callable (callable): function or other callable that the node is wrapping
             callable_args (tuple): args for the wrapped callable
@@ -71,9 +69,6 @@ class Node(_DagreD3Mixin):
         # use dual number operators
         self._use_dual = kwargs.get("use_dual", False)
 
-        # can be set
-        self._readonly = readonly
-
         # threshold for calculating difference
         self._compare = _compare
 
@@ -110,8 +105,6 @@ class Node(_DagreD3Mixin):
             self._callable_args_mapping = {
                 i: arg.name for i, arg in enumerate(parameters)
             }
-
-            # import ipdb; ipdb.set_trace()
 
             # first, iterate through callable_args and callable_kwargs and convert to nodes
             for i, arg in enumerate(self._callable_args):
@@ -457,7 +450,8 @@ class Node(_DagreD3Mixin):
 
     def _setValue(self, value):
         """internal method to set value"""
-        self._values.append(value)
+        if value != self.value():
+            self._values.append(value)
 
     def append(self, value):
         # TODO is this better or worse than
@@ -468,6 +462,19 @@ class Node(_DagreD3Mixin):
         iter(self.value())
         self.value().append(value)
         self._dirty = True
+
+    def get(self, **kwargs):
+        for k, v in kwargs.items():
+            for deps in self._dependencies.values():
+                # try to set args
+                for i, arg in enumerate(deps[0]):
+                    if arg._name_no_id() == k:
+                        return arg
+
+                # try to set kwargs
+                for key, kwarg in deps[1].items():
+                    if kwarg._name_no_id() == k:
+                        return kwarg
 
     def set(self, **kwargs):
         for k, v in kwargs.items():
@@ -568,9 +575,7 @@ def node(meth, dynamic=True, **default_attrs):
         if arg.name == "self":
             continue
 
-        node_kwargs[arg.name] = Node(
-            name=arg.name, derived=True, readonly=False, value=arg.default
-        )
+        node_kwargs[arg.name] = Node(name=arg.name, derived=True, value=arg.default)
 
     # add all attribute args to the argspec
     # see the docstring for more details

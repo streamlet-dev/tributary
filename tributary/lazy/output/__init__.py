@@ -7,7 +7,7 @@ def _print(node, cache=None):
 
     if id(node) in cache:
         # loop, return None
-        return None
+        return node
 
     cache[id(node)] = node
 
@@ -17,15 +17,15 @@ def _print(node, cache=None):
         for call, deps in node._dependencies.items():
             # callable node
             if hasattr(call, "_node_wrapper") and call._node_wrapper is not None:
-                ret[node].append(call._node_wrapper._print(cache) or node)
+                ret[node].append(call._node_wrapper._print(cache))
 
             # args
             for arg in deps[0]:
-                ret[node].append(arg._print(cache) or node)
+                ret[node].append(arg._print(cache))
 
             # kwargs
             for kwarg in deps[1].values():
-                ret[node].append(kwarg._print(cache) or node)
+                ret[node].append(kwarg._print(cache))
 
     return ret
 
@@ -35,15 +35,29 @@ def Print(node):
 
 
 def Graph(node):
-    return node.print()
+    if isinstance(node, Node):
+        return node.print()
+
+    ret = {}
+    for n in node:
+        ret.update(n.print())
+    return ret
 
 
 def GraphViz(node):
-    d = node.graph()
+    # allow for lists of nodes
+    if isinstance(node, Node):
+        d = node.graph()
+        name = node._name
+    else:
+        d = {}
+        for n in node:
+            d.update(n.graph())
+        name = ",".join(n._name for n in node)
 
     from graphviz import Digraph
 
-    dot = Digraph(node._name, strict=True)
+    dot = Digraph(name, strict=True)
     dot.format = "png"
 
     def rec(nodes, parent):
