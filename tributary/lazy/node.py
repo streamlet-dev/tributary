@@ -134,6 +134,9 @@ class Node(_DagreD3Mixin):
                     self._callable_args[i] = Node(name=name, value=arg)
 
                 # ensure arg can be passed by either node name, or arg name
+                if i not in self._callable_args_mapping:
+                    # varargs, disallow by arg
+                    self._callable_args_mapping[i] = {}
                 self._callable_args_mapping[i]["node"] = self._callable_args[
                     i
                 ]._name_no_id()
@@ -301,6 +304,7 @@ class Node(_DagreD3Mixin):
 
     def _compute_from_dependencies(self, **tweaks):
         """recompute node's value from its dependencies, applying any temporary tweaks as necessary"""
+
         # if i have upstream dependencies
         if self._dependencies:
             # mark graph as calculating
@@ -360,7 +364,7 @@ class Node(_DagreD3Mixin):
         # TODO tweaks
         return self.value()
 
-    def _subtree_dirty(self):
+    def _subtree_dirty(self, *positional_tweaks, **keyword_tweaks):
         for call, deps in self._dependencies.items():
             # callable node
             if hasattr(call, "_node_wrapper") and call._node_wrapper is not None:
@@ -372,7 +376,7 @@ class Node(_DagreD3Mixin):
 
             # check args
             for arg in deps[0]:
-                if arg.isDirty():
+                if arg.isDirty(*positional_tweaks, **keyword_tweaks):
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
@@ -380,44 +384,63 @@ class Node(_DagreD3Mixin):
 
             # check kwargs
             for kwarg in deps[1].values():
-                if kwarg.isDirty():
+                if kwarg.isDirty(*positional_tweaks, **keyword_tweaks):
                     # CRITICAL
                     # always set self to be dirty if subtree is dirty
                     self._dirty = True
                     return True
         return False
 
-    def isDirty(self):
+    def isDirty(self, *positional_tweaks, **keyword_tweaks):
         """Node needs to be re-evaluated, either because its value has changed
         or because its value *could* change
 
         Note that in evaluating if a node is dirty, you will have a side effect
         of updating that node's status to be dirty or not.
         """
-        self._dirty = self._dirty or self._subtree_dirty() or self._dynamic
+        self._dirty = (
+            self._dirty
+            or self._subtree_dirty(*positional_tweaks, **keyword_tweaks)
+            or self._dynamic
+        )
         return self._dirty
 
     def isDynamic(self):
         """Node isnt necessarily dirty, but needs to be reevaluated"""
         return self._dynamic
 
-    def _recompute(self):
+    def _recompute(self, *positional_tweaks, **keyword_tweaks):
+        """returns if we need recomputed"""
+        # default to not recompute (lazy)
         ret = False
-        self.isDirty()
+
+        # check if self or upstream dirty
+        self.isDirty(*positional_tweaks, **keyword_tweaks)
+
+        # if i'm dirty, recompute my value
         if self._dirty:
+            # compute upstream and then apply to self
             _value = self._compute_from_dependencies()
 
+            # if my new value is not equal to my old value,
+            # make sure to indicate that i was really dirty
             if self._compare(_value, self.value()):
+                # return true to indicate recalc is needed
                 ret = True
 
+                # mark my parents as dirty
                 if self._parents:
                     for parent in self._parents:
                         # let your parents know you were dirty!
                         parent._dirty = True
 
-            self._setValue(_value)
+                # set my value
+                self._setValue(_value)
 
+        # mark myself as no longer dirty
         self._dirty = False
+
+        # return whether i was properly dirty or not
         return ret
 
     def _gennode(self, name, foo, foo_args, **kwargs):
@@ -477,8 +500,8 @@ class Node(_DagreD3Mixin):
 
     def _setValue(self, value):
         """internal method to set value. this is a permanent operation"""
-        if value != self.value():
-            self._values.append(value)
+        # if value != self.value():
+        self._values.append(value)
 
     def append(self, value):
         # TODO is this better or worse than
@@ -542,10 +565,11 @@ class Node(_DagreD3Mixin):
         return self._values[-1] if self._values else None
 
     def __call__(self, *args, **kwargs):
+        # don't install
         self._install_args(*args)
         self._install_kwargs(**kwargs)
 
-        self._recompute()
+        self._recompute(*args, **kwargs)
         return self.value()
 
     def evaluate(self, *args, **kwargs):
