@@ -79,6 +79,21 @@ class Node(_DagreD3Mixin):
         # map arguments of callable to nodes
         self._callable_args = callable_args or []
         self._callable_kwargs = callable_kwargs or {}
+
+        # callable_args_mapping maps the wrapped functions'
+        # arguments to nodes. It does so in 2 ways, either
+        # via the argument node's name, or the wrapped
+        # function's argument name
+        #
+        # e.g. if i have lambda x, y: x + y
+        # where x is set to a Node(name="One")
+        # and y is set to a Node(name="Two"),
+        # callable_args_mapping looks like:
+        # {0: {"node": "One", "arg": "x"},
+        #  1: {"node": "Two", "arg": "y"}}
+        #
+        # this way i can pass (x=5) or (One=5)
+        # to modify the node's value
         self._callable_args_mapping = {}
 
         # map positional to kw
@@ -103,11 +118,12 @@ class Node(_DagreD3Mixin):
 
             # map argument index to name of argument, for later use
             self._callable_args_mapping = {
-                i: arg.name for i, arg in enumerate(parameters)
+                i: {"arg": arg.name} for i, arg in enumerate(parameters)
             }
 
             # first, iterate through callable_args and callable_kwargs and convert to nodes
             for i, arg in enumerate(self._callable_args):
+                # promote all args to nodes
                 if not isinstance(arg, Node):
                     # see if arg in argspec
                     if i < len(parameters):
@@ -115,7 +131,12 @@ class Node(_DagreD3Mixin):
                     else:
                         name = "vararg"
 
-                    self._calalble_args[i] = Node(name=name, value=arg)
+                    self._callable_args[i] = Node(name=name, value=arg)
+
+                # ensure arg can be passed by either node name, or arg name
+                self._callable_args_mapping[i]["node"] = self._callable_args[
+                    i
+                ]._name_no_id()
 
             # first, iterate through callable_args and callable_kwargs and convert to nodes
             for name, kwarg in self._callable_kwargs.items():
@@ -251,21 +272,23 @@ class Node(_DagreD3Mixin):
         return self._name.rsplit("#", 1)[0]
 
     def _install_args(self, *args):
+        """set arguments' values to those given. this is a permanent operation"""
         kwargs = []
         for i, arg in enumerate(args):
             if (
                 i < len(self._callable_args)
                 and self._callable_args[i]._name_no_id()
-                == self._callable_args_mapping[i]
+                in self._callable_args_mapping[i].values()
             ):
                 self._callable_args[i].setValue(arg)
             else:
-                kwargs.append((self._callable_args_mapping[i], arg))
+                kwargs.append((self._callable_args_mapping[i]["node"], arg))
 
         for k, v in kwargs:
             self._callable_kwargs[k].setValue(v)
 
     def _install_kwargs(self, **kwargs):
+        """set arguments' values to those given. this is a permanent operation"""
         for k, v in kwargs.items():
             self._callable_kwargs[k].setValue(v)
 
@@ -276,7 +299,8 @@ class Node(_DagreD3Mixin):
         self._install_kwargs(**kwargs)
         return self
 
-    def _compute_from_dependencies(self):
+    def _compute_from_dependencies(self, **tweaks):
+        """recompute node's value from its dependencies, applying any temporary tweaks as necessary"""
         # if i have upstream dependencies
         if self._dependencies:
             # mark graph as calculating
@@ -286,7 +310,7 @@ class Node(_DagreD3Mixin):
             for deps in self._dependencies.values():
                 # recompute args
                 for arg in deps[0]:
-                    arg._recompute()
+                    arg._recompute(**tweaks)
 
                     # Set yourself as parent if not set
                     if self not in arg._parents:
@@ -294,7 +318,7 @@ class Node(_DagreD3Mixin):
 
                 # recompute kwargs
                 for kwarg in deps[1].values():
-                    kwarg._recompute()
+                    kwarg._recompute(**tweaks)
 
                     # Set yourself as parent if not set
                     if self not in kwarg._parents:
@@ -325,6 +349,7 @@ class Node(_DagreD3Mixin):
             if isinstance(new_value, Node):
                 raise TributaryException("Value should not itself be a node!")
 
+            # TODO tweaks
             # set my value as new value
             self._setValue(new_value)
 
@@ -332,6 +357,7 @@ class Node(_DagreD3Mixin):
         self._whited3g()
 
         # return my value
+        # TODO tweaks
         return self.value()
 
     def _subtree_dirty(self):
@@ -416,7 +442,8 @@ class Node(_DagreD3Mixin):
         return self._node_op_cache[str(other)]
 
     def setValue(self, value):
-        """set the node's value, marking it as dirty as appropriate"""
+        """set the node's value, marking it as dirty as appropriate.
+        this operation is permanent"""
         if self._compare(value, self.value()):
             # if callable, stash and force a fixed value
             if self._dependencies:
@@ -449,7 +476,7 @@ class Node(_DagreD3Mixin):
             self._dynamic = True
 
     def _setValue(self, value):
-        """internal method to set value"""
+        """internal method to set value. this is a permanent operation"""
         if value != self.value():
             self._values.append(value)
 
@@ -477,6 +504,7 @@ class Node(_DagreD3Mixin):
                         return kwarg
 
     def set(self, **kwargs):
+        """this method sets upstream dependencys' values to those given"""
         for k, v in kwargs.items():
             _set = False
             for deps in self._dependencies.values():

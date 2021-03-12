@@ -61,3 +61,14 @@ class TestLazy:
         n.set(prev_val=100)
 
         assert n() == 105
+
+    def test_lazy_args_by_name_and_arg(self):
+        # see the extended note in lazy.node about callable_args_mapping
+        n = t.Node(name="Test", value=5)
+        n2 = n + 1
+
+        print(n2._callable_args_mapping)
+        print(n2._callable_args_mapping[0]["node"])
+        print(n2._callable_args_mapping[0]["arg"])
+        assert n2._callable_args_mapping[0]["node"] == "Test"
+        assert n2._callable_args_mapping[0]["arg"] == "x"
