@@ -638,7 +638,6 @@ class Node(_DagreD3Mixin):
             node_tweaks = {}
 
         for i, positional_tweak in enumerate(positional_tweaks):
-            print(f"{i} {positional_tweak} {self._get_arg(i)}")
             node_tweaks[self._get_arg(i)] = positional_tweak
 
         for k, keyword_tweak in keyword_tweaks.items():
