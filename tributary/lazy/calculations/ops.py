@@ -7,9 +7,9 @@ from ..node import Node
 
 def unary(node, name, lam):
     return node._gennode(
-        name,
-        lam,
-        [node],
+        name=name,
+        foo=lam,
+        foo_args=[node],
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
         use_dual=node._use_dual,
     )
@@ -18,34 +18,34 @@ def unary(node, name, lam):
 def binary(node1, other, name, lam):
     if isinstance(node1._self_reference, Node):
         return node1._gennode(
-            name,
-            lam,
-            [node1._self_reference, other],
+            name=name,
+            foo=lam,
+            foo_args=[node1._self_reference, other],
             graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
             use_dual=node1._use_dual,
         )
     return node1._gennode(
-        name,
-        lam,
-        [node1, other],
+        name=name,
+        foo=lam,
+        foo_args=[node1, other],
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
         use_dual=node1._use_dual,
     )
 
 
-def n_nary(node, others, name, lam):
+def n_ary(node, others, name, lam):
     if isinstance(node._self_reference, Node):
         return node._gennode(
-            name,
-            lam,
-            [node._self_reference] + others,
+            name=name,
+            foo=lam,
+            foo_args=[node._self_reference] + others,
             graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
             use_dual=node._use_dual,
         )
     return node._gennode(
-        name,
-        lam,
-        [node] + others,
+        name=name,
+        foo=lam,
+        foo_args=[node] + others,
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
         use_dual=node._use_dual,
     )
@@ -216,7 +216,7 @@ def Sum(self, *others):
         x._use_dual = self._use_dual
         others_nodes.append(x)
 
-    return n_nary(
+    return n_ary(
         self,
         others_nodes,
         "Sum({},{})".format(
@@ -241,7 +241,7 @@ def Average(self, *others):
         x._use_dual = self._use_dual
         others_nodes.append(x)
 
-    return n_nary(
+    return n_ary(
         self,
         others_nodes,
         "Average({},{})".format(

@@ -23,6 +23,7 @@ class ExamplePoint(tl.LazyGraph):
 class TestMethod:
     def test_args_kwargs(self):
         pt = ExamplePoint()
+        # TODO change when the tweaks are done
         assert (
             pt.asof(date=None)()
             == pt.asof()(date=None)

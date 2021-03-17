@@ -2,8 +2,9 @@ import copy
 import logging
 from aioconsole import aprint
 from IPython.display import display
-from ..node import Node, _gen_node
+from ..node import Node
 from ...base import StreamEnd, StreamNone, StreamRepeat
+from ...utils import _gen_node
 
 
 _OUTPUT_GRAPHVIZSHAPE = "box"

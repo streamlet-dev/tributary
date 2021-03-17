@@ -39,22 +39,6 @@ class Foo4(t.LazyGraph):
         return random.random()
 
 
-class Foo5(t.LazyGraph):
-    @t.node()
-    def z(self):
-        return self.x | self.y()
-
-    @t.node()
-    def y(self):
-        return 10
-
-    def reset(self):
-        self.x = None
-
-    def __init__(self):
-        self.x = self.node(name="x", value=None)
-
-
 class TestLazy:
     def test_misc(self):
         f4 = Foo4()
@@ -63,28 +47,28 @@ class TestLazy:
         assert z.graph()
         assert z.graphviz()
 
+    def test_lazy_default_foo_arg(self):
+        def foo(val, prev_val=0):
+            print("val:\t{}\t{}".format(val, val.value()))
+            print("prev_val:\t{}\t{}".format(prev_val, prev_val.value()))
+            return val.value() + prev_val.value()
 
-class TestDirtyPropogation:
-    def test_or_dirtypropogation(self):
-        f = Foo5()
-        assert f.z()() == 10
-        assert f.x() is None
+        n = t.Node(callable=foo)
+        n.set(val=5)
 
-        f.x = 5
+        assert n() == 5
 
-        assert f.x() == 5
-        assert f.z()() == 5
+        n.set(prev_val=100)
 
-        f.reset()
+        assert n() == 105
 
-        assert f.x() is None
-        assert f.z()() == 10
+    def test_lazy_args_by_name_and_arg(self):
+        # see the extended note in lazy.node about callable_args_mapping
+        n = t.Node(name="Test", value=5)
+        n2 = n + 1
 
-
-class TestDeclarative:
-    def test_simple_declarative(self):
-        n = t.Node(value=1)
-        z = n + 5
-        assert z() == 6
-        n.setValue(2)
-        assert z() == 7
+        print(n2._callable_args_mapping)
+        print(n2._callable_args_mapping[0]["node"])
+        print(n2._callable_args_mapping[0]["arg"])
+        assert n2._callable_args_mapping[0]["node"] == "Test"
+        assert n2._callable_args_mapping[0]["arg"] == "x"
