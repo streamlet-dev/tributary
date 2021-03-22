@@ -302,6 +302,7 @@ class Node(_DagreD3Mixin):
         return self._callable_args[i]
 
     def _get_kwarg(self, keyword):
+        print(self._callable_args)
         return self._callable_kwargs[keyword]
 
     def _bind(self, other_self=None, *args, **kwargs):
@@ -318,6 +319,10 @@ class Node(_DagreD3Mixin):
     def _untweak(self):
         # TODO context manager
         self._tweaks = None
+
+        # mark myself as dirt for tweak side-effects
+        # TODO another way of doing this?
+        self._dirty = True
 
     def _compute_from_dependencies(self, node_tweaks):
         """recompute node's value from its dependencies, applying any temporary tweaks as necessary"""
@@ -388,6 +393,9 @@ class Node(_DagreD3Mixin):
             if not node_tweaks:
                 self._setValue(new_value)
             else:
+                # set value in tweak dict
+                node_tweaks[self] = new_value
+
                 # iterate through upstream deps and unset tweak
                 for deps in self._dependencies.values():
                     for arg in deps[0]:
@@ -402,8 +410,6 @@ class Node(_DagreD3Mixin):
         self._whited3g()
 
         # return my value
-        if node_tweaks:
-            return new_value
         return self.value()
 
     def _subtree_dirty(self, node_tweaks):
@@ -632,22 +638,36 @@ class Node(_DagreD3Mixin):
                  or the previously computed value
         """
         node_tweaks = node_tweaks or {}
+
         if not isinstance(node_tweaks, dict):
             # treat node_tweak argument as positional tweak
             positional_tweaks = list(positional_tweaks) + [node_tweaks]
             node_tweaks = {}
 
+        # instantiate tweaks
+        tweaks = {}
+
+        # update with provided
+        tweaks.update(node_tweaks)
+
         for i, positional_tweak in enumerate(positional_tweaks):
-            node_tweaks[self._get_arg(i)] = positional_tweak
+            tweaks[self._get_arg(i)] = positional_tweak
 
         for k, keyword_tweak in keyword_tweaks.items():
-            node_tweaks[self._get_kwarg(k)] = keyword_tweak
+            tweaks[self._get_kwarg(k)] = keyword_tweak
+
+        # tweak self
+        if tweaks:
+            self._tweak(tweaks)
 
         # calculate new value
-        computed = self._recompute(node_tweaks)
+        computed = self._recompute(tweaks)
 
-        # return the calculation result, not my current value
-        if node_tweaks:
+        if tweaks:
+            # untweak self
+            self._untweak()
+
+            # return the calculation result, not my current value
             return computed
 
         # otherwise return my permanent value, should equal computed
