@@ -18,3 +18,24 @@ class TestLazyTweaks:
 
         # not permanently set
         assert n2() == 6
+
+    def test_tweaks_dirtiness_and_parent(self):
+        n1 = tl.Node(value=1, name="n1")
+        n2 = n1 + 2
+        n3 = n2 + 4
+
+        assert n3({n1: -1}) == 5
+        assert n3() == 7
+        assert n3({n2: 2}) == 6
+        assert n3(2) == 6
+        assert n3(2, 2) == 4
+        assert n3({n1: -1}) == 5
+        assert n3({n1: -1}) == 5
+        assert n3() == 7
+        assert n3({n2: 2}) == 6
+        assert n3(2) == 6
+        assert n3(2, 2) == 4
+        assert n3({n1: -1}) == 5
+        assert n3() == 7
+        assert n3() == 7
+        assert n3() == 7
