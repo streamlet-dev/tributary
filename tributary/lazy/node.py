@@ -2,7 +2,6 @@ import inspect
 from collections import namedtuple
 
 from ..base import TributaryException
-
 # from boltons.funcutils import wraps
 from ..utils import _compare, _either_type, _ismethod
 from .dd3 import _DagreD3Mixin
@@ -137,15 +136,22 @@ class Node(_DagreD3Mixin):
                 if i not in self._callable_args_mapping:
                     # varargs, disallow by arg
                     self._callable_args_mapping[i] = {}
+
+                # short name
                 self._callable_args_mapping[i]["node"] = self._callable_args[
                     i
                 ]._name_no_id()
+
+                # full name
+                self._callable_args_mapping[i]["node_full"] = self._callable_args[
+                    i
+                ].name()
 
             # first, iterate through callable_args and callable_kwargs and convert to nodes
             for name, kwarg in self._callable_kwargs.items():
                 if not isinstance(kwarg, Node):
                     self._callable_kwargs[name] = Node(name=name, value=kwarg)
-
+                
             # now iterate through callable's args and ensure
             # everything is matched up
             for i, arg in enumerate(parameters):
@@ -277,14 +283,17 @@ class Node(_DagreD3Mixin):
     def _name_no_id(self):
         return self._name.rsplit("#", 1)[0]
 
+    def name(self):
+        return self._name
+
     def _install_args(self, *args):
         """set arguments' values to those given. this is a permanent operation"""
         kwargs = []
         for i, arg in enumerate(args):
             if (
                 i < len(self._callable_args)
-                and self._callable_args[i]._name_no_id()
-                in self._callable_args_mapping[i].values()
+                and (self._callable_args[i]._name_no_id()
+                in self._callable_args_mapping[i].values() or self._callable_args[i].name() in self._callable_args_mapping[i].values())
             ):
                 self._callable_args[i].setValue(arg)
             else:
@@ -302,8 +311,7 @@ class Node(_DagreD3Mixin):
         return self._callable_args[i]
 
     def _get_kwarg(self, keyword):
-        print(self._callable_args)
-        return self._callable_kwargs[keyword]
+        return self._callable_kwargs.get(keyword, None)
 
     def _bind(self, other_self=None, *args, **kwargs):
         if other_self is not None:
@@ -330,6 +338,9 @@ class Node(_DagreD3Mixin):
         # if i'm the one being tweaked, just return tweaked value
         if self in node_tweaks:
             return node_tweaks[self]
+
+        if self.name() in node_tweaks:
+            return node_tweaks[self.name()]
 
         # if i have upstream dependencies
         if self._dependencies:
@@ -451,6 +462,11 @@ class Node(_DagreD3Mixin):
         if self in node_tweaks:
             # return dirty but don't set
             return _compare(node_tweaks[self], self.value())
+        
+        if self.name() in node_tweaks:
+            # return dirty but don't set
+            import pdb; pdb.set_trace()
+            return _compare(node_tweaks[self.name()], self.value())
 
         self._dirty = self._dirty or self._subtree_dirty(node_tweaks) or self._dynamic
         return self._dirty
@@ -565,12 +581,12 @@ class Node(_DagreD3Mixin):
             for deps in self._dependencies.values():
                 # try to set args
                 for i, arg in enumerate(deps[0]):
-                    if arg._name_no_id() == k:
+                    if arg._name_no_id() == k or arg.name() == k:
                         return arg
 
                 # try to set kwargs
                 for key, kwarg in deps[1].items():
-                    if kwarg._name_no_id() == k:
+                    if kwarg._name_no_id() == k or kwargs.name() == k:
                         return kwarg
 
     def set(self, **kwargs):
@@ -580,7 +596,7 @@ class Node(_DagreD3Mixin):
             for deps in self._dependencies.values():
                 # try to set args
                 for i, arg in enumerate(deps[0]):
-                    if arg._name_no_id() == k:
+                    if arg._name_no_id() == k or arg.name() == k:
                         if isinstance(v, Node):
                             # overwrite node
                             deps[0][i] = v
@@ -595,7 +611,7 @@ class Node(_DagreD3Mixin):
 
                 # try to set kwargs
                 for key, kwarg in deps[1].items():
-                    if kwarg._name_no_id() == k:
+                    if kwarg._name_no_id() == k or kwargs.name() == k:
                         if isinstance(v, Node):
                             # overwrite node
                             deps[1][key] = v
@@ -654,7 +670,13 @@ class Node(_DagreD3Mixin):
             tweaks[self._get_arg(i)] = positional_tweak
 
         for k, keyword_tweak in keyword_tweaks.items():
-            tweaks[self._get_kwarg(k)] = keyword_tweak
+            # try to get node by kwarg
+            kwarg_name = self._get_kwarg(k)
+            if kwarg_name:
+                tweaks[kwarg_name] = keyword_tweak
+            else:
+                # pass by unique id 
+                tweaks[k] = keyword_tweak
 
         # tweak self
         if tweaks:
@@ -681,7 +703,7 @@ class Node(_DagreD3Mixin):
         return self(node_tweaks, *positional_tweaks, **keyword_tweaks)
 
     def __repr__(self):
-        return self._name
+        return self.name()
 
 
 @_either_type
