@@ -1,2 +1,3 @@
-from .graph import LazyGraph  # noqa: F401
-from .node import Node, node  # noqa: F401
+from .graph import LazyGraph
+from .node import Node, node
+from .node2 import Node2
