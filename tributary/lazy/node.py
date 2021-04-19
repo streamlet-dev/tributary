@@ -138,22 +138,9 @@ class Node(_DagreD3Mixin):
         # map positional to kw
         if callable is not None and not inspect.isgeneratorfunction(callable):
             # wrap args and kwargs of function to node
-            try:
-                signature = inspect.signature(callable)
+            parameters = extractParameters(callable)
 
-            except ValueError:
-                # https://bugs.python.org/issue20189
-                signature = namedtuple("Signature", ["parameters"])({})
-
-            parameters = [
-                p
-                for p in signature.parameters.values()
-                if p.kind
-                not in (
-                    inspect._ParameterKind.VAR_POSITIONAL,
-                    inspect._ParameterKind.VAR_KEYWORD,
-                )
-            ]
+            # TODO replace with calling context
 
             # map argument index to name of argument, for later use
             self._callable_args_mapping = {
@@ -178,7 +165,7 @@ class Node(_DagreD3Mixin):
                     self._callable_args_mapping[i] = {}
                 self._callable_args_mapping[i]["node"] = self._callable_args[
                     i
-                ]._name_no_id()
+                ].name(nameonly=True)
 
             # first, iterate through callable_args and callable_kwargs and convert to nodes
             for name, kwarg in self._callable_kwargs.items():
@@ -203,27 +190,6 @@ class Node(_DagreD3Mixin):
 
                 # set in kwargs
                 self._callable_kwargs[arg.name] = node
-
-            # compare filtered parameters to original
-            if len(parameters) != len(signature.parameters):
-                # if varargs, can have more callable_args + callable_kwargs than listed arguments
-                failif = len([arg for arg in parameters if arg.name != "self"]) > (
-                    len(self._callable_args) + len(self._callable_kwargs)
-                )
-            else:
-                # should be exactly equal
-                failif = len([arg for arg in parameters if arg.name != "self"]) != (
-                    len(self._callable_args) + len(self._callable_kwargs)
-                )
-
-            if failif:
-                # something bad happened trying to align
-                # callable's args/kwargs with the provided
-                # callable_args and callable_kwargs, and we're
-                # now in an unrecoverable state.
-                raise TributaryException(
-                    "Missing args (call or preprocessing error has occurred)"
-                )
 
             try:
                 self._callable._node_wrapper = None  # not known until program start
