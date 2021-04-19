@@ -104,6 +104,10 @@ class CallingCtx(object):
         ...
         return True
 
+    # def set(self, *args, **kwargs):
+    #     for i, arg in enumerate(args):
+    #         self.args[i].set() = arg
+
     def __repr__(self):
         return "{} {}".format(self.callable.__name__, self.kwargs)
 

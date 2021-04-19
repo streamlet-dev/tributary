@@ -1,4 +1,5 @@
 import inspect
+import uuid
 from collections import namedtuple
 
 from ..base import TributaryException
@@ -8,10 +9,52 @@ from ..utils import _compare, _either_type, _ismethod
 from .dd3 import _DagreD3Mixin
 
 
+class Parameter(object):
+    def __init__(self, name, position, default, kind):
+        self.name = name
+        self.position = position
+        self.kind = kind
+
+        if kind == inspect._ParameterKind.VAR_POSITIONAL:
+            # default is empty tuple
+            self.default = tuple()
+
+        elif kind == inspect._ParameterKind.VAR_KEYWORD:
+            # default is empty dict
+            self.default = {}
+        else:
+            # default can be inspect._empty
+            self.default = default
+
+
+def extractParameters(callable):
+    """Given a function, extract the arguments and defaults
+
+    Args:
+        value [callable]: a callable
+    """
+
+    # TODO handle generators as lambda g=g: next(g)
+    if inspect.isgeneratorfunction(callable):
+        raise NotImplementedError()
+
+    # wrap args and kwargs of function to node
+    try:
+        signature = inspect.signature(callable)
+
+    except ValueError:
+        # https://bugs.python.org/issue20189
+        signature = namedtuple("Signature", ["parameters"])({})
+
+    # extract all args. args/kwargs become tuple/dict input
+    return [
+        Parameter(p.name, i, p.default, p.kind)
+        for i, p in enumerate(signature.parameters.values())
+    ]
+
+
 class Node(_DagreD3Mixin):
     """Class to represent an operation that is lazy"""
-
-    _id_ref = 0
 
     def __init__(
         self,
@@ -37,18 +80,14 @@ class Node(_DagreD3Mixin):
             callable_kwargs (dict): kwargs for the wrapped callable
             dynamic (bool): node should not be lazy - always access underlying value
         """
-        # Instances get an id but one id tracker for all nodes so we can
-        # uniquely identify them
-        # TODO different scheme
-        self._id = Node._id_ref
-        Node._id_ref += 1
+        # ID is unique identifier of the node
+        self._id = str(uuid.uuid4())
 
-        # Every node gets a name so it can be uniquely identified in the graph
-        self._name = "{}#{}".format(
+        # Name is a string for display
+        self._name = "{}".format(
             name
             or (callable.__name__ if callable else None)
             or self.__class__.__name__,
-            self._id,
         )
 
         if isinstance(value, Node):
@@ -260,9 +299,19 @@ class Node(_DagreD3Mixin):
         else:
             self._dirty = False
 
+    def name(self, truncate=True, nameonly=False):
+        if nameonly:
+            return self._name
+        elif truncate:
+            return "{}#{}".format(self._name, self._id[:4])
+        return "{}#{}".format(self._name, self._id)
+
+    def __repr__(self):
+        return self.name(truncate=True)
+
     def inputs(self, name=""):
         """get node inputs, optionally by name"""
-        dat = {n._name_no_id(): n for n in self._upstream}
+        dat = {n.name(nameonly=True): n for n in self._upstream}
         return dat if not name else dat.get(name)
 
     def _get_dirty(self):
@@ -274,16 +323,13 @@ class Node(_DagreD3Mixin):
 
     _dirty = property(_get_dirty, _set_dirty)
 
-    def _name_no_id(self):
-        return self._name.rsplit("#", 1)[0]
-
     def _install_args(self, *args):
         """set arguments' values to those given. this is a permanent operation"""
         kwargs = []
         for i, arg in enumerate(args):
             if (
                 i < len(self._callable_args)
-                and self._callable_args[i]._name_no_id()
+                and self._callable_args[i].name(nameonly=True)
                 in self._callable_args_mapping[i].values()
             ):
                 self._callable_args[i].setValue(arg)
@@ -565,12 +611,12 @@ class Node(_DagreD3Mixin):
             for deps in self._dependencies.values():
                 # try to set args
                 for i, arg in enumerate(deps[0]):
-                    if arg._name_no_id() == k:
+                    if arg.name(nameonly=True) == k:
                         return arg
 
                 # try to set kwargs
                 for key, kwarg in deps[1].items():
-                    if kwarg._name_no_id() == k:
+                    if kwarg.name(nameonly=True) == k:
                         return kwarg
 
     def set(self, **kwargs):
@@ -580,7 +626,7 @@ class Node(_DagreD3Mixin):
             for deps in self._dependencies.values():
                 # try to set args
                 for i, arg in enumerate(deps[0]):
-                    if arg._name_no_id() == k:
+                    if arg.name(nameonly=True) == k:
                         if isinstance(v, Node):
                             # overwrite node
                             deps[0][i] = v
@@ -595,7 +641,7 @@ class Node(_DagreD3Mixin):
 
                 # try to set kwargs
                 for key, kwarg in deps[1].items():
-                    if kwarg._name_no_id() == k:
+                    if kwarg.name(nameonly=True) == k:
                         if isinstance(v, Node):
                             # overwrite node
                             deps[1][key] = v
@@ -679,9 +725,6 @@ class Node(_DagreD3Mixin):
 
     def eval(self, node_tweaks=None, *positional_tweaks, **keyword_tweaks):
         return self(node_tweaks, *positional_tweaks, **keyword_tweaks)
-
-    def __repr__(self):
-        return self._name
 
 
 @_either_type
