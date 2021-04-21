@@ -141,6 +141,8 @@ class Node(_DagreD3Mixin):
             parameters = extractParameters(callable)
 
             # TODO replace with calling context
+            # base params
+            self._callable_parameters = extractParameters(callable)
 
             # map argument index to name of argument, for later use
             self._callable_args_mapping = {
