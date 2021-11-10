@@ -74,3 +74,13 @@ Thanks to the following organizations for providing code or financial support.
 
 ## License
 This software is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file for details.
+
+## Alternatives
+Here is an incomplete list of libraries which implement similar/overlapping functionality
+
+- [man-group/mdf](https://github.com/man-group/mdf)
+- [cedricleroy/pyungo](https://github.com/cedricleroy/pyungo)
+- [python-streamz/streamz](https://github.com/python-streamz/streamz)
+- [EntilZha/pyfunctional](https://github.com/EntilZha/PyFunctional)
+- [stitchfix/hamilton](https://github.com/stitchfix/hamilton)
+
