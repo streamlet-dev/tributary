@@ -165,9 +165,9 @@ class Node(_DagreD3Mixin):
                 if i not in self._callable_args_mapping:
                     # varargs, disallow by arg
                     self._callable_args_mapping[i] = {}
-                self._callable_args_mapping[i]["node"] = self._callable_args[
-                    i
-                ].name(nameonly=True)
+                self._callable_args_mapping[i]["node"] = self._callable_args[i].name(
+                    nameonly=True
+                )
 
             # first, iterate through callable_args and callable_kwargs and convert to nodes
             for name, kwarg in self._callable_kwargs.items():
