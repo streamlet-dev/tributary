@@ -1,7 +1,7 @@
 ipydagred3==0.2.5
 ipyregulartable==0.1.2
 ipywidgets==7.5.1
-jupyterlab==2.2.8
+jupyterlab==2.2.10
 pyEX==0.2.5
 requests==2.24.0
 tributary==0.1.4
