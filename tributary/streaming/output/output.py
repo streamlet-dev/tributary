@@ -2,8 +2,9 @@ import copy
 import logging
 from aioconsole import aprint
 from IPython.display import display
-from ..node import Node, _gen_node
+from ..node import Node
 from ...base import StreamEnd, StreamNone, StreamRepeat
+from ...utils import _gen_node
 
 
 _OUTPUT_GRAPHVIZSHAPE = "box"
@@ -202,6 +203,23 @@ def Perspective(node, text="", **psp_kwargs):
     return ret
 
 
+def Queue(node, queue):
+    async def foo(val):
+        await queue.put(val)
+        return val
+
+    node = _gen_node(node)
+    ret = Node(
+        foo=foo,
+        foo_kwargs=None,
+        name="Queue",
+        inputs=1,
+        graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
+    )
+    node >> ret
+    return ret
+
+
 Node.foo = Foo
 Node.collect = Collect
 Node.graph = Graph
@@ -211,3 +229,4 @@ Node.dagre = Dagre
 Node.print = Print
 Node.logging = Logging
 Node.perspective = Perspective
+Node.queue = Queue

@@ -20,7 +20,7 @@ def foo2():
 
 class TestUtils:
     def setup(self):
-        time.sleep(0.1)
+        time.sleep(0.2)
 
     def test_delay(self):
         out = ts.Delay(ts.Foo(foo), delay=5)
@@ -221,9 +221,9 @@ class TestUtils:
     def test_throttle(self):
         async def clic():
             for _ in range(10):
-                await sleep(1)
+                await sleep(0.5)
                 yield 1
 
-        n = ts.Node(clic).throttle(2)
+        n = ts.Node(clic).throttle(1)
         out = ts.run(n)
         assert out == [[1], [1, 1], [1, 1], [1, 1], [1, 1]]

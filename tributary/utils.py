@@ -1,4 +1,10 @@
 import functools
+import inspect
+
+import numpy as np
+import pandas as pd
+
+from .base import StreamEnd
 
 
 def _either_type(f):
@@ -21,9 +27,9 @@ def _either_type(f):
 
 
 def LazyToStreaming(lazy_node):
-    from .streaming import StreamingNode, Foo
-    from .lazy import LazyNode
     from .base import TributaryException
+    from .lazy import LazyNode
+    from .streaming import Foo, StreamingNode
 
     if isinstance(lazy_node, StreamingNode):
         return lazy_node
@@ -31,3 +37,66 @@ def LazyToStreaming(lazy_node):
         raise TributaryException("Malformed input:{}".format(lazy_node))
 
     return Foo(foo=lambda node=lazy_node: node())
+
+
+def _compare(new_value, old_value):
+    """return true if value is new, otherwise false"""
+    if isinstance(new_value, (int, float)) and type(new_value) == type(old_value):
+        # if numeric, compare within a threshold
+        # TODO
+        return abs(new_value - old_value) > 0.00001
+
+    elif type(new_value) != type(old_value):
+        return True
+
+    elif isinstance(new_value, (pd.DataFrame, pd.Series, np.ndarray)) or isinstance(
+        old_value, (pd.DataFrame, pd.Series, np.ndarray)
+    ):
+        return (abs(new_value - old_value) > 0.00001).any()
+
+    return new_value != old_value
+
+
+def _ismethod(callable):
+    try:
+        return callable and (
+            inspect.ismethod(callable)
+            or (
+                inspect.getargspec(callable).args
+                and inspect.getargspec(callable).args[0] == "self"
+            )
+        )
+    except TypeError:
+        return False
+
+
+def anext(obj):
+    return obj.__anext__()
+
+
+def _gen_to_foo(generator):
+    try:
+        return next(generator)
+    except StopIteration:
+        return StreamEnd()
+
+
+async def _agen_to_foo(generator):
+    try:
+        return await anext(generator)
+    except StopAsyncIteration:
+        return StreamEnd()
+
+
+def _gen_node(n):
+    from .streaming import Const, Foo
+    from .lazy import Node as LazyNode
+    from .streaming import Node as StreamingNode
+
+    if isinstance(n, StreamingNode):
+        return n
+    elif isinstance(n, LazyNode):
+        return LazyToStreaming(n)
+    elif callable(n):
+        return Foo(n, name="Callable")
+    return Const(n)
