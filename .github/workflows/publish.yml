@@ -34,12 +34,12 @@ jobs:
 
     - name: Test
       run: |
-        make tests
+        make testsci
       if: ${{ matrix.os != 'ubuntu-latest' }}
 
     - name: Test
       run: |
-        make dockerup && make tests && make dockerdown
+        make dockerup && make testsci && make dockerdown
       if: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Build and publish

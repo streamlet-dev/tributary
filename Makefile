@@ -4,11 +4,20 @@ build:  ## Build the repository
 tests: ## Clean and Make unit tests
 	python -m pytest tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
 
+testsci: ## Clean and Make unit tests
+	CI=true python -m pytest tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
+
 testsv: ## Clean and Make unit tests
 	python -m pytest -vvv tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
 
 testsnocov: ## Clean and Make unit tests
 	python -m pytest -v tributary -x
+
+dockerup:
+	docker-compose -f ci/docker-compose.yml up -d
+
+dockerdown:
+	docker-compose -f ci/docker-compose.yml down
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
@@ -18,12 +27,6 @@ lint: ## run linter
 
 fix:  ## run black fix
 	python -m black tributary/ setup.py
-
-annotate: ## MyPy type annotation check
-	python -m mypy -s tributary  
-
-annotate_l: ## MyPy type annotation check - count only
-	python -m mypy -s tributary | wc -l 
 
 clean: ## clean the repository
 	find . -name "__pycache__" | xargs  rm -rf 
@@ -55,11 +58,5 @@ help:
 
 print-%:
 	@echo '$*=$($*)'
-
-dockerup:
-	docker-compose -f ci/docker-compose.yml up -d
-
-dockerdown:
-	docker-compose -f ci/docker-compose.yml down
 
 .PHONY: clean build run test tests help annotate annotate_l docs dist dockerup dockerdown
