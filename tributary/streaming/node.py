@@ -1,5 +1,6 @@
 import asyncio
 import types
+import uuid
 from collections import deque
 from .dd3 import _DagreD3Mixin
 from .graph import StreamingGraph
@@ -10,8 +11,6 @@ from ..utils import _agen_to_foo, _gen_to_foo
 
 
 class Node(NodeSerializeMixin, _DagreD3Mixin, object):
-    _id_ref = 0
-
     def __init__(
         self,
         foo,
@@ -50,11 +49,8 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
                 _id_override (int); RESTORE ONLY. override default id allocation mechanism
 
         """
-        # Instances get an id but one id tracker for all nodes so we can
-        # uniquely identify them
-        # TODO different scheme
-        self._id = Node._id_ref
-        Node._id_ref += 1
+        # ID is unique identifier of the node
+        self._id = str(uuid.uuid4())
 
         # Graphviz shape
         self._graphvizshape = graphvizshape
@@ -63,7 +59,7 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         self._dd3g = None
 
         # Every node gets a name so it can be uniquely identified in the graph
-        self._name = "{}#{}".format(name or self.__class__.__name__, self._id)
+        self._name = "{}#{}".format(name or self.__class__.__name__, self._id[:5])
         self._name_only = name
 
         # Inputs are async queues from upstream nodes
