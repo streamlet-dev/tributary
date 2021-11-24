@@ -230,7 +230,7 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
     # Private interface
     # ***********************
     def __hash__(self):
-        return self._id
+        return hash(self._id)
 
     def __rshift__(self, other):
         """wire self to other"""
