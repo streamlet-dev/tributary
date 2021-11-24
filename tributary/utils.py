@@ -100,3 +100,46 @@ def _gen_node(n):
     elif callable(n):
         return Foo(n, name="Callable")
     return Const(n)
+
+
+class Parameter(object):
+     def __init__(self, name, position, default, kind):
+         self.name = name
+         self.position = position
+         self.kind = kind
+
+         if kind == inspect._ParameterKind.VAR_POSITIONAL:
+             # default is empty tuple
+             self.default = tuple()
+
+         elif kind == inspect._ParameterKind.VAR_KEYWORD:
+             # default is empty dict
+             self.default = {}
+         else:
+             # default can be inspect._empty
+             self.default = default
+
+def extractParameters(callable):
+     """Given a function, extract the arguments and defaults
+
+     Args:
+         value [callable]: a callable
+     """
+
+     # TODO handle generators as lambda g=g: next(g)
+     if inspect.isgeneratorfunction(callable):
+         raise NotImplementedError()
+
+     # wrap args and kwargs of function to node
+     try:
+         signature = inspect.signature(callable)
+
+     except ValueError:
+         # https://bugs.python.org/issue20189
+         signature = namedtuple("Signature", ["parameters"])({})
+
+     # extract all args. args/kwargs become tuple/dict input
+     return [
+         Parameter(p.name, i, p.default, p.kind)
+         for i, p in enumerate(signature.parameters.values())
+     ]
