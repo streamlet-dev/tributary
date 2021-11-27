@@ -1,4 +1,5 @@
 import inspect
+import uuid
 from collections import namedtuple
 
 from ..base import TributaryException
@@ -10,8 +11,6 @@ from .dd3 import _DagreD3Mixin
 
 class Node(_DagreD3Mixin):
     """Class to represent an operation that is lazy"""
-
-    _id_ref = 0
 
     def __init__(
         self,
@@ -37,18 +36,15 @@ class Node(_DagreD3Mixin):
             callable_kwargs (dict): kwargs for the wrapped callable
             dynamic (bool): node should not be lazy - always access underlying value
         """
-        # Instances get an id but one id tracker for all nodes so we can
-        # uniquely identify them
-        # TODO different scheme
-        self._id = Node._id_ref
-        Node._id_ref += 1
+        # ID is unique identifier of the node
+        self._id = str(uuid.uuid4())
 
-        # Every node gets a name so it can be uniquely identified in the graph
+        # Name is a string for display
         self._name = "{}#{}".format(
             name
             or (callable.__name__ if callable else None)
             or self.__class__.__name__,
-            self._id,
+            self._id[:5],
         )
 
         if isinstance(value, Node):
