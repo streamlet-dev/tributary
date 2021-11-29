@@ -89,7 +89,7 @@ setup(
     keywords="streaming lazy graph dag dataflow reactive",
     packages=find_packages(exclude=["tests"]),
     package_data={},
-    python_requires='>=3.7',
+    python_requires=">=3.7",
     include_package_data=True,
     zip_safe=False,
     entry_points={},
