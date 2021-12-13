@@ -2,10 +2,10 @@ import json as JSON
 from socketIO_client_nexus import SocketIO as SIO
 from urllib.parse import urlparse
 
-from .input import Foo
+from .input import Func
 
 
-class SocketIO(Foo):
+class SocketIO(Func):
     """Connect to socketIO server and yield back results
 
     Args:
@@ -58,5 +58,5 @@ class SocketIO(Foo):
 
                     yield msg
 
-        super().__init__(foo=_sio)
+        super().__init__(func=_sio)
         self._name = "SocketIO"

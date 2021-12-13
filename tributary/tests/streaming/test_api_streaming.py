@@ -184,8 +184,8 @@ class TestAPI:
 
     def test_api_outputs(self):
         # outputs
-        assert hasattr(ts.StreamingNode, "foo")
-        assert hasattr(ts, "FooOutput")
+        assert hasattr(ts.StreamingNode, "func")
+        assert hasattr(ts, "FuncOutput")
         assert hasattr(ts.StreamingNode, "collect")
         assert hasattr(ts, "Collect")
         assert hasattr(ts.StreamingNode, "perspective")
@@ -220,7 +220,7 @@ class TestAPI:
         assert hasattr(ts, "Timer")
         assert hasattr(ts, "Const")
         assert hasattr(ts, "Curve")
-        assert hasattr(ts, "Foo")
+        assert hasattr(ts, "Func")
         assert hasattr(ts, "Queue")
         assert hasattr(ts, "Random")
 

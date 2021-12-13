@@ -1,11 +1,11 @@
 import json as JSON
 from socketIO_client_nexus import SocketIO as SIO
 from urllib.parse import urlparse
-from .output import Foo
+from .output import Func
 from ..node import Node
 
 
-class SocketIO(Foo):
+class SocketIO(Func):
     """Connect to socketIO server and send updates
 
     Args:
@@ -50,7 +50,7 @@ class SocketIO(Foo):
             socketIO.wait(seconds=interval)
             return data
 
-        super().__init__(foo=_sio, name="SocketIO", inputs=1)
+        super().__init__(func=_sio, name="SocketIO", inputs=1)
         node >> self
 
 

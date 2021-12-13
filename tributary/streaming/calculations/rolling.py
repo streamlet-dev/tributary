@@ -12,13 +12,13 @@ def RollingCount(node):
         node (Node): input stream
     """
 
-    def foo(val):
+    def func(val):
         ret._count += 1
         return ret._count
 
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Count",
         inputs=1,
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
@@ -35,13 +35,13 @@ def RollingMax(node):
         node (Node): input stream
     """
 
-    def foo(val):
+    def func(val):
         ret._max = max(ret._max, val) if ret._max is not None else val
         return ret._max
 
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Max",
         inputs=1,
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
@@ -58,13 +58,13 @@ def RollingMin(node):
         node (Node): input stream
     """
 
-    def foo(val):
+    def func(val):
         ret._min = min(ret._min, val) if ret._min is not None else val
         return ret._min
 
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Min",
         inputs=1,
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
@@ -84,7 +84,7 @@ def RollingSum(node):
         node (Node): input stream
     """
 
-    def foo(val):
+    def func(val):
         try:
             # iterable, sum with sum function
             iter(val)
@@ -95,8 +95,8 @@ def RollingSum(node):
         return ret._sum
 
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Sum",
         inputs=1,
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
@@ -113,7 +113,7 @@ def RollingAverage(node):
     If input stream type is not iterable, will do (average + input)/count
     """
 
-    def foo(val):
+    def func(val):
         try:
             # iterable, sum with sum function
             iter(val)
@@ -126,8 +126,8 @@ def RollingAverage(node):
         return ret._sum / ret._count if ret._count > 0 else float("nan")
 
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Average",
         inputs=1,
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
@@ -200,7 +200,7 @@ def Last(node):
     Node to return the last value encountered
     """
 
-    def foo(val):
+    def func(val):
         try:
             iter(val)
             ret._last_val = val[-1]
@@ -209,7 +209,7 @@ def Last(node):
         return ret._last_val
 
     ret = Node(
-        foo=foo, name="Last", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE
+        func=func, name="Last", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE
     )
     ret.set("_last_val", StreamNone())
     node >> ret
@@ -221,7 +221,7 @@ def First(node):
     Node to return the first value encountered
     """
 
-    def foo(val):
+    def func(val):
         if not ret._populated:
             try:
                 iter(val)
@@ -232,7 +232,7 @@ def First(node):
         return ret._first
 
     ret = Node(
-        foo=foo, name="First", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE
+        func=func, name="First", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE
     )
     ret.set("_first", StreamNone())
     ret.set("_populated", False)
@@ -245,7 +245,7 @@ def Diff(node):
     Node to return the diff between values
     """
 
-    def foo(val):
+    def func(val):
         if ret._last_val == StreamNone():
             ret._last_val = val
             return None
@@ -254,7 +254,7 @@ def Diff(node):
         return diff
 
     ret = Node(
-        foo=foo, name="Diff", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE
+        func=func, name="Diff", inputs=1, graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE
     )
     ret.set("_last_val", StreamNone())
     node >> ret

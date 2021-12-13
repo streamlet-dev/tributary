@@ -8,12 +8,12 @@ import tributary.streaming as ts
 from asyncio import sleep
 
 
-def foo():
+def func():
     yield 1
     yield 2
 
 
-def foo2():
+def func2():
     yield [1, 2]
     yield [3, 4]
 
@@ -23,7 +23,7 @@ class TestUtils:
         time.sleep(0.2)
 
     def test_delay(self):
-        out = ts.Delay(ts.Foo(foo), delay=5)
+        out = ts.Delay(ts.Func(func), delay=5)
         now = time.time()
         ret = ts.run(out)
         assert time.time() - now > 5
@@ -33,71 +33,71 @@ class TestUtils:
         def square(val):
             return val ** 2
 
-        assert ts.run(ts.Apply(ts.Foo(foo), foo=square)) == [1, 4]
+        assert ts.run(ts.Apply(ts.Func(func), func=square)) == [1, 4]
 
     def test_window_any_size(self):
-        assert ts.run(ts.Window(ts.Foo(foo))) == [[1], [1, 2]]
+        assert ts.run(ts.Window(ts.Func(func))) == [[1], [1, 2]]
 
     def test_window_fixed_size(self):
-        assert ts.run(ts.Window(ts.Foo(foo), size=2)) == [[1], [1, 2]]
+        assert ts.run(ts.Window(ts.Func(func), size=2)) == [[1], [1, 2]]
 
     def test_window_fixed_size_full_only(self):
-        assert ts.run(ts.Window(ts.Foo(foo), size=2, full_only=True)) == [[1, 2]]
+        assert ts.run(ts.Window(ts.Func(func), size=2, full_only=True)) == [[1, 2]]
 
     def test_unroll(self):
-        assert ts.run(ts.Unroll(ts.Foo(foo2))) == [1, 2, 3, 4]
+        assert ts.run(ts.Unroll(ts.Func(func2))) == [1, 2, 3, 4]
 
     def test_merge(self):
-        def foo1():
+        def func1():
             yield 1
             yield 3
 
-        def foo2():
+        def func2():
             yield 2
             yield 4
             yield 6
 
-        out = ts.Merge(ts.Print(ts.Foo(foo1)), ts.Print(ts.Foo(foo2)))
+        out = ts.Merge(ts.Print(ts.Func(func1)), ts.Print(ts.Func(func2)))
         assert ts.run(out) == [(1, 2), (3, 4)]
 
     def test_fixed_map(self):
-        def foo():
+        def func():
             yield [1, 2, 3]
             yield [4, 5, 6]
 
-        out = ts.Reduce(*[x + 1 for x in ts.Foo(foo).map(3)])
+        out = ts.Reduce(*[x + 1 for x in ts.Func(func).map(3)])
         assert ts.run(out) == [(2, 3, 4), (5, 6, 7)]
 
     def test_reduce(self):
-        def foo1():
+        def func1():
             yield 1
             yield 4
 
-        def foo2():
+        def func2():
             yield 2
             yield 5
             yield 7
 
-        def foo3():
+        def func3():
             yield 3
             yield 6
             yield 8
 
-        out = ts.Reduce(ts.Foo(foo1), ts.Foo(foo2), ts.Foo(foo3))
+        out = ts.Reduce(ts.Func(func1), ts.Func(func2), ts.Func(func3))
         assert ts.run(out) == [(1, 2, 3), (4, 5, 6)]
 
     def test_reduce_stateful(self):
-        def foo1():
+        def func1():
             yield 0
             yield 2
             yield 4
 
-        def foo2():
+        def func2():
             yield 1
             yield 3
             yield 5
 
-        def foo3():
+        def func3():
             yield 2
             yield 4
             yield 6
@@ -119,9 +119,9 @@ class TestUtils:
 
             return reducer_node.state
 
-        n1 = ts.Foo(foo1)
-        n2 = ts.Foo(foo2)
-        n3 = ts.Foo(foo3)
+        n1 = ts.Func(func1)
+        n2 = ts.Func(func2)
+        n3 = ts.Func(func3)
 
         r = ts.Reduce(n1, n2, n3, reducer=reduce, inject_node=True)
         out = ts.run(r)
@@ -138,7 +138,7 @@ class TestUtils:
         reason="bug on windows py3.7 where pytest hangs",
     )
     def test_process(self):
-        def foo():
+        def func():
             yield {"a": 1, "b": 2}
             yield {"a": 2, "b": 4}
             yield {"a": 3, "b": 6}
@@ -153,7 +153,7 @@ class TestUtils:
         print(cmd)
 
         ret = ts.run(
-            ts.Subprocess(ts.Foo(foo).print("in:"), cmd, json=True).print("out:")
+            ts.Subprocess(ts.Func(func).print("in:"), cmd, json=True).print("out:")
         )
 
         print(ret)
@@ -182,13 +182,13 @@ class TestUtils:
             await sleep(2)
             return 2
 
-        def interval(foo, time=1):
+        def interval(func, time=1):
             task = None
 
             async def _ret():
                 nonlocal task
                 if task is None:
-                    task = asyncio.ensure_future(foo())
+                    task = asyncio.ensure_future(func())
 
                 if not task.done():
                     await sleep(time)
@@ -201,8 +201,8 @@ class TestUtils:
 
             return _ret
 
-        short_node = ts.Foo(interval(short, 1), count=5)
-        long_node = ts.Foo(interval(long, 1), count=5)
+        short_node = ts.Func(interval(short, 1), count=5)
+        long_node = ts.Func(interval(long, 1), count=5)
         out = ts.Reduce(
             short_node, long_node, reducer=reducer, inject_node=True
         ).print()

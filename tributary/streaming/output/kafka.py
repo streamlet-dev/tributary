@@ -1,10 +1,10 @@
 import json as JSON
 from aiokafka import AIOKafkaProducer
-from .output import Foo
+from .output import Func
 from ..node import Node
 
 
-class Kafka(Foo):
+class Kafka(Func):
     """Connect to kafka server and send data
 
     Args:
@@ -40,7 +40,7 @@ class Kafka(Foo):
 
         # # Wait for all pending messages to be delivered or expire.
         # await producer.stop()
-        super().__init__(foo=_send, name="Kafka", inputs=1)
+        super().__init__(func=_send, name="Kafka", inputs=1)
         node >> self
         self.set("_producer", None)
 

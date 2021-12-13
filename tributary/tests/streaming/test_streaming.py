@@ -11,49 +11,49 @@ class TestStreaming:
         t = ts.Const(value=1, count=1)
         assert ts.run(t) == [1]
 
-    def test_run_foo(self):
-        def foo():
+    def test_run_func(self):
+        def func():
             return 5
 
-        t = ts.Foo(foo, count=1)
+        t = ts.Func(func, count=1)
         assert ts.run(t) == [5]
 
     def test_run_stop(self):
         import time
         import tributary.streaming as ts
 
-        async def foo():
+        async def func():
             while True:
                 yield 1
                 await asyncio.sleep(1)
 
-        g = ts.run(ts.Print(ts.Foo(foo)), blocking=False)
+        g = ts.run(ts.Print(ts.Func(func)), blocking=False)
 
         time.sleep(5)
         g.stop()
 
     def test_run_generator(self):
-        def foo():
+        def func():
             yield 1
             yield 2
 
-        t = ts.Foo(foo)
+        t = ts.Func(func)
         assert ts.run(t) == [1, 2]
 
-    def test_run_async_foo(self):
-        async def foo():
+    def test_run_async_func(self):
+        async def func():
             await asyncio.sleep(0.1)
             return 5
 
-        t = ts.Foo(foo, count=1)
+        t = ts.Func(func, count=1)
         assert ts.run(t) == [5]
 
     def test_run_async_generator(self):
-        async def foo():
+        async def func():
             yield 1
             yield 2
 
-        t = ts.Foo(foo)
+        t = ts.Func(func)
         assert ts.run(t) == [1, 2]
 
     def test_deep_bfs(self):

@@ -3,12 +3,12 @@ import aiohttp
 import json as JSON
 from collections import deque
 from aiohttp import web
-from .output import Foo
+from .output import Func
 from ..node import Node
 from ...base import StreamNone, StreamEnd
 
 
-class WebSocket(Foo):
+class WebSocket(Func):
     """Connect to websocket and send data
 
     Args:
@@ -79,11 +79,11 @@ class WebSocket(Foo):
 
             return x
 
-        super().__init__(foo=_send, name="WebSocket", inputs=1)
+        super().__init__(func=_send, name="WebSocket", inputs=1)
         node >> self
 
 
-class WebSocketServer(Foo):
+class WebSocketServer(Func):
     """Host a websocket server and stream in the data
 
     Args:
@@ -215,7 +215,7 @@ class WebSocketServer(Foo):
             # TODO expect response from clients?
             return data
 
-        super().__init__(foo=_req, inputs=1)
+        super().__init__(func=_req, inputs=1)
         self._name = "WebSocketServer"
         node >> self
 

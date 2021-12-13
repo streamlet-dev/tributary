@@ -1,10 +1,10 @@
 from twilio.rest import Client
 
 from ..node import Node
-from .output import Foo
+from .output import Func
 
 
-class TextMessage(Foo):
+class TextMessage(Func):
     """Send a text message
 
     Args:
@@ -34,7 +34,7 @@ class TextMessage(Foo):
 
             return r, message
 
-        super().__init__(foo=_send, inputs=1)
+        super().__init__(func=_send, inputs=1)
         self._name = "TextMessage"
         node >> self
 

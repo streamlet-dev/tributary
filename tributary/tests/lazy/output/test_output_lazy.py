@@ -3,16 +3,16 @@ import tributary.lazy as tl
 
 class TestOutput:
     def test_graphviz(self):
-        def foo():
+        def func():
             return 1
 
-        assert tl.GraphViz(tl.Node(callable=foo, always_dirty=True))
+        assert tl.GraphViz(tl.Node(callable=func, always_dirty=True))
 
     def test_dagre(self):
-        def foo():
+        def func():
             return 1
 
-        assert tl.Dagre(tl.Node(callable=foo, always_dirty=True))
+        assert tl.Dagre(tl.Node(callable=func, always_dirty=True))
 
     def test_multiple_graph(self):
         n = tl.Node(5)

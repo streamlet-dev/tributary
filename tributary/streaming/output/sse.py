@@ -3,11 +3,11 @@ from collections import deque
 import json as JSON
 from aiohttp import web
 from aiohttp_sse import sse_response
-from .output import Foo
+from .output import Func
 from ..node import Node
 
 
-class SSE(Foo):
+class SSE(Func):
     """Host an sse server and send results on requests
 
     Args:
@@ -123,7 +123,7 @@ class SSE(Foo):
             # TODO expect response from clients?
             return data
 
-        super().__init__(foo=_req, inputs=1)
+        super().__init__(func=_req, inputs=1)
         self._name = "SSE"
         node >> self
 

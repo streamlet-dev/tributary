@@ -15,7 +15,7 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
     if len(elseifs) % 2 != 0:
         raise TributaryException("Else ifs must be in pairs")
 
-    def foo(cond, if_, else_=None):
+    def func(cond, if_, else_=None):
         # TODO else ifs
         if cond.value():
             return if_.value()
@@ -24,13 +24,13 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
     if isinstance(if_node._self_reference, Node):
         return if_node._gennode(
             "If",
-            foo,
+            func,
             [if_node, satisfied_node, unsatisfied_node],
             graphvizshare=_CONTROL_GRAPHVIZSHAPE,
         )
     return if_node._gennode(
         "If",
-        foo,
+        func,
         [if_node, satisfied_node, unsatisfied_node],
         graphvizshare=_CONTROL_GRAPHVIZSHAPE,
     )

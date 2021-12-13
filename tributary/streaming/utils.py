@@ -14,30 +14,30 @@ def Delay(node, delay=1):
         delay (float): time to delay input stream
     """
 
-    async def foo(val):
+    async def func(val):
         await asyncio.sleep(delay)
         return val
 
-    ret = Node(foo=foo, name="Delay", inputs=1)
+    ret = Node(func=func, name="Delay", inputs=1)
     node >> ret
     return ret
 
 
-def Apply(node, foo, foo_kwargs=None):
+def Apply(node, func, func_kwargs=None):
     """Streaming wrapper to apply a function to an input stream
 
     Arguments:
         node (node): input stream
-        foo (callable): function to apply
-        foo_kwargs (dict): kwargs for function
+        func (callable): function to apply
+        func_kwargs (dict): kwargs for function
     """
 
-    def _foo(val):
+    def _func(val):
         return ret._apply(val, **ret._apply_kwargs)
 
-    ret = Node(foo=_foo, name="Apply", inputs=1)
-    ret.set("_apply", foo)
-    ret.set("_apply_kwargs", foo_kwargs or {})
+    ret = Node(func=_func, name="Apply", inputs=1)
+    ret.set("_apply", func)
+    ret.set("_apply_kwargs", func_kwargs or {})
     node >> ret
     return ret
 
@@ -51,7 +51,7 @@ def Window(node, size=-1, full_only=False):
         full_only (bool): only return if list is full
     """
 
-    def foo(val, size=size, full_only=full_only):
+    def func(val, size=size, full_only=full_only):
         if size == 0:
             return val
         else:
@@ -67,7 +67,7 @@ def Window(node, size=-1, full_only=False):
         else:
             return ret._accum
 
-    ret = Node(foo=foo, name="Window[{}]".format(size if size > 0 else "∞"), inputs=1)
+    ret = Node(func=func, name="Window[{}]".format(size if size > 0 else "∞"), inputs=1)
     ret.set("_accum", [])
     node >> ret
     return ret
@@ -80,7 +80,7 @@ def Unroll(node):
         node (node): input stream
     """
 
-    async def foo(value):
+    async def func(value):
         # unrolled
         if ret._count > 0:
             ret._count -= 1
@@ -96,7 +96,7 @@ def Unroll(node):
         else:
             return StreamRepeat()
 
-    ret = Node(foo=foo, name="Unroll", inputs=1)
+    ret = Node(func=func, name="Unroll", inputs=1)
     ret.set("_count", 0)
     node >> ret
     return ret
@@ -109,7 +109,7 @@ def UnrollDataFrame(node, json=False, wrap=False):
         node (node): input stream
     """
 
-    async def foo(value, json=json, wrap=wrap):
+    async def func(value, json=json, wrap=wrap):
         # unrolled
         if ret._count > 0:
             ret._count -= 1
@@ -133,7 +133,7 @@ def UnrollDataFrame(node, json=False, wrap=False):
         else:
             return StreamRepeat()
 
-    ret = Node(foo=foo, name="UnrollDF", inputs=1)
+    ret = Node(func=func, name="UnrollDF", inputs=1)
     ret.set("_count", 0)
     node >> ret
     return ret
@@ -147,10 +147,10 @@ def Merge(node1, node2):
         node2 (node): input stream
     """
 
-    def foo(value1, value2):
+    def func(value1, value2):
         return value1, value2
 
-    ret = Node(foo=foo, name="Merge", inputs=2)
+    ret = Node(func=func, name="Merge", inputs=2)
     node1 >> ret
     node2 >> ret
     return ret
@@ -164,10 +164,10 @@ def ListMerge(node1, node2):
         node2 (node): input stream
     """
 
-    def foo(value1, value2):
+    def func(value1, value2):
         return list(value1) + list(value2)
 
-    ret = Node(foo=foo, name="ListMerge", inputs=2)
+    ret = Node(func=func, name="ListMerge", inputs=2)
     node1 >> ret
     node2 >> ret
     return ret
@@ -182,13 +182,13 @@ def DictMerge(node1, node2):
         node2 (node): input stream
     """
 
-    def foo(value1, value2):
+    def func(value1, value2):
         ret = {}
         ret.update(value1)
         ret.update(value2)
         return ret
 
-    ret = Node(foo=foo, name="DictMerge", inputs=2)
+    ret = Node(func=func, name="DictMerge", inputs=2)
     node1 >> ret
     node2 >> ret
     return ret
@@ -209,10 +209,10 @@ def FixedMap(node, count, mapper=None):
 
     for _ in range(count):
 
-        def foo(value, i=_, mapper=mapper or _default_mapper):
+        def func(value, i=_, mapper=mapper or _default_mapper):
             return mapper(value, i)
 
-        ret = Node(foo=foo, name="FixedMap", inputs=1)
+        ret = Node(func=func, name="FixedMap", inputs=1)
         node >> ret
         rets.append(ret)
 
@@ -251,7 +251,7 @@ def Reduce(*nodes, reducer=None, inject_node=False):
     For a full example, see tributary.tests.streaming.test_utils_streaming.TestUtils
     """
 
-    def foo(*values, reducer=reducer):
+    def func(*values, reducer=reducer):
         return (
             values
             if reducer is None
@@ -260,7 +260,7 @@ def Reduce(*nodes, reducer=None, inject_node=False):
             else reducer(*values)
         )
 
-    ret = Node(foo=foo, name="Reduce", inputs=len(nodes))
+    ret = Node(func=func, name="Reduce", inputs=len(nodes))
     for i, n in enumerate(nodes):
         n >> ret
     return ret
@@ -337,7 +337,7 @@ def Subprocess(
                 val = JSON.loads(val)
             return val
 
-    ret = Node(foo=_proc, name="Proc", inputs=1)
+    ret = Node(func=_proc, name="Proc", inputs=1)
     ret.set("_proc", None)
     node >> ret
     return ret
@@ -350,13 +350,13 @@ def Debounce(node):
         node (Node): input stream
     """
 
-    def _foo(val):
+    def _func(val):
         if val == ret._last_element:
             return StreamNone()
         ret._last_element = val
         return ret._last_element
 
-    ret = Node(foo=_foo, name="Debounce", inputs=1)
+    ret = Node(func=_func, name="Debounce", inputs=1)
     ret.set("_last_element", None)
     node >> ret
     return ret
@@ -372,7 +372,7 @@ def Throttle(node, interval=1, now=None):
     """
     now = now or datetime.now
 
-    def _foo(val):
+    def _func(val):
         ret._last_ticks.append(val)
 
         if ret._last_tick_time:
@@ -387,7 +387,7 @@ def Throttle(node, interval=1, now=None):
         ret._last_tick_time = now()
         return vals
 
-    ret = Node(foo=_foo, name="Throttle", inputs=1)
+    ret = Node(func=_func, name="Throttle", inputs=1)
     ret.set("_last_tick_time", None)
     ret.set("_last_ticks", [])
     node >> ret

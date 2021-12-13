@@ -6,11 +6,11 @@ from ..node import Node
 from ...utils import _gen_node
 
 
-def unary(foos, name):
-    def _foo(self):
-        foo = foos[0] if len(foos) == 1 or not self._use_dual else foos[1]
+def unary(funcs, name):
+    def _func(self):
+        func = funcs[0] if len(funcs) == 1 or not self._use_dual else funcs[1]
         downstream = Node(
-            foo,
+            func,
             {},
             name=name,
             inputs=1,
@@ -20,19 +20,19 @@ def unary(foos, name):
         self >> downstream
         return downstream
 
-    return _foo
+    return _func
 
 
-def binary(foos, name):
-    def _foo(self, other):
+def binary(funcs, name):
+    def _func(self, other):
         if not isinstance(other, Node):
             other = _gen_node(other)
             setattr(other, "_use_dual", self._use_dual)
         if self._use_dual != other._use_dual:
             raise NotImplementedError("Dual/Non-dual mismatch")
-        foo = foos[0] if len(foos) == 1 or not self._use_dual else foos[1]
+        func = funcs[0] if len(funcs) == 1 or not self._use_dual else funcs[1]
         downstream = Node(
-            foo,
+            func,
             {},
             name=name,
             inputs=2,
@@ -43,17 +43,17 @@ def binary(foos, name):
         other >> downstream
         return downstream
 
-    return _foo
+    return _func
 
 
-def n_ary(foos, name):
-    def _foo(*others):
+def n_ary(funcs, name):
+    def _func(*others):
         use_dual = [x._use_dual for x in others]
         if np.any(use_dual) != np.all(use_dual):
             raise NotImplementedError("Dual/Non-dual mismatch")
-        foo = foos[0] if len(foos) == 1 or not np.all(use_dual) else foos[1]
+        func = funcs[0] if len(funcs) == 1 or not np.all(use_dual) else funcs[1]
         downstream = Node(
-            foo,
+            func,
             {},
             name=name,
             inputs=len(others),
@@ -63,7 +63,7 @@ def n_ary(foos, name):
             other >> downstream
         return downstream
 
-    return _foo
+    return _func
 
 
 ########################

@@ -1,4 +1,4 @@
-def foo():
+def func():
     yield True
     yield False
     yield True
@@ -8,7 +8,7 @@ class TestConditional:
     def test_if(self):
         import tributary.lazy as tl
 
-        x = tl.Node(callable=foo)
+        x = tl.Node(callable=func)
         y = tl.Node(1)
         z = tl.Node(-1)
 

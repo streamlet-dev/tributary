@@ -1,8 +1,8 @@
 import asyncio
-from .input import Foo
+from .input import Func
 
 
-class SubprocessSource(Foo):
+class SubprocessSource(Func):
     """Open up a subprocess and yield the results as they come
 
     Args:
@@ -36,5 +36,5 @@ class SubprocessSource(Foo):
 
                         yield val
 
-        super().__init__(foo=_proc)
+        super().__init__(func=_proc)
         self._name = "Proc"

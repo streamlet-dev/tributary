@@ -14,7 +14,7 @@ class TestFile:
         if os.path.exists(file):
             os.remove(file)
 
-        def foo():
+        def func():
             yield 1
             yield 2
             yield 3
@@ -26,5 +26,5 @@ class TestFile:
             return [int(x) for x in data]
 
         # Test that output is equal to what is read (generalized)
-        out = ts.FileSink(ts.Foo(foo), filename=file, json=True)
+        out = ts.FileSink(ts.Func(func), filename=file, json=True)
         assert ts.run(out) == read_file(file)

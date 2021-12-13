@@ -7,14 +7,14 @@ from .graph import StreamingGraph
 from .serialize import NodeSerializeMixin
 from ..base import StreamEnd, StreamNone, StreamRepeat
 from ..base import TributaryException
-from ..utils import _agen_to_foo, _gen_to_foo
+from ..utils import _agen_to_func, _gen_to_func
 
 
 class Node(NodeSerializeMixin, _DagreD3Mixin, object):
     def __init__(
         self,
-        foo,
-        foo_kwargs=None,
+        func,
+        func_kwargs=None,
         name=None,
         inputs=0,
         drop=False,
@@ -29,12 +29,12 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         """A representation of a node in the forward propogating graph.
 
         Args:
-            foo (callable); the python callable to wrap in a forward propogating node, can be:
+            func (callable); the python callable to wrap in a forward propogating node, can be:
                                 - function
                                 - generator
                                 - async function
                                 - async generator
-            foo_kwargs (dict); kwargs for the wrapped callables, should be static call-to-call
+            func_kwargs (dict); kwargs for the wrapped callables, should be static call-to-call
             name (str); name of the node
             inputs (int); number of upstream inputs
             drop (bool); on mismatched tick timing, drop new ticks
@@ -81,11 +81,11 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         #    - vanilla generator
         #    - async function
         #    - async generator
-        self._foo = foo
+        self._func = func
 
         # Any kwargs necessary for the function.
         # These should be static call-to-call.
-        self._foo_kwargs = foo_kwargs or {}
+        self._func_kwargs = func_kwargs or {}
 
         # Delay between executions, useful for rate-limiting
         # default is no rate limiting
@@ -125,7 +125,7 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         self._onstops = ()
 
         # for safety
-        self._initial_attrs = dir(self) + ["_old_foo", "_initial_attrs"]
+        self._initial_attrs = dir(self) + ["_old_func", "_initial_attrs"]
 
     # ***********************
     # Public interface
@@ -194,8 +194,8 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
 
         # Stop executing
         if self._execution_max > 0 and self._execution_count >= self._execution_max:
-            self._foo = lambda: StreamEnd()
-            self._old_foo = lambda: StreamEnd()
+            self._func = lambda: StreamEnd()
+            self._old_func = lambda: StreamEnd()
 
         ready = True
         # iterate through inputs
@@ -263,25 +263,25 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         # wait for valid input
         while not valid:
             # await if its a coroutine
-            if asyncio.iscoroutine(self._foo):
-                _last = await self._foo(*self._active, **self._foo_kwargs)
+            if asyncio.iscoroutine(self._func):
+                _last = await self._func(*self._active, **self._func_kwargs)
 
             # else call it
-            elif isinstance(self._foo, types.FunctionType):
+            elif isinstance(self._func, types.FunctionType):
                 try:
                     # could be a generator
                     try:
-                        _last = self._foo(*self._active, **self._foo_kwargs)
+                        _last = self._func(*self._active, **self._func_kwargs)
                     except ZeroDivisionError:
                         _last = float("inf")
 
                 except ValueError:
                     # Swap back to function to get a new generator next iteration
-                    self._foo = self._old_foo
+                    self._func = self._old_func
                     continue
 
             else:
-                raise TributaryException("Cannot use type:{}".format(type(self._foo)))
+                raise TributaryException("Cannot use type:{}".format(type(self._func)))
 
             # calculation was valid
             valid = True
@@ -291,17 +291,17 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
 
         if isinstance(_last, types.AsyncGeneratorType):
 
-            async def _foo(g=_last):
-                return await _agen_to_foo(g)
+            async def _func(g=_last):
+                return await _agen_to_func(g)
 
-            self._foo = _foo
-            _last = await self._foo()
+            self._func = _func
+            _last = await self._func()
 
         elif isinstance(_last, types.GeneratorType):
             # Swap to generator unroller
-            self._old_foo = self._foo
-            self._foo = lambda g=_last: _gen_to_foo(g)
-            _last = self._foo()
+            self._old_func = self._func
+            self._func = lambda g=_last: _gen_to_func(g)
+            _last = self._func()
 
         elif asyncio.iscoroutine(_last):
             _last = await _last
