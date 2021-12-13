@@ -1,9 +1,9 @@
 import asyncpg
 import asyncio
-from .input import Foo
+from .input import Func
 
 
-class Postgres(Foo):
+class Postgres(Func):
     """Connects to Postgres and yields result of query
 
     Args:
@@ -49,5 +49,5 @@ class Postgres(Foo):
 
             await conn.close()
 
-        super().__init__(foo=_send)
+        super().__init__(func=_send)
         self._name = "Postgres"

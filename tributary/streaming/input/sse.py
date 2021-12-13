@@ -1,9 +1,9 @@
 import json as JSON
 from aiohttp_sse_client import client as sse_client
-from .input import Foo
+from .input import Func
 
 
-class SSE(Foo):
+class SSE(Func):
     """Connect to SSE url and yield results
 
     Args:
@@ -27,5 +27,5 @@ class SSE(Foo):
                         data = [data]
                     yield data
 
-        super().__init__(foo=_req)
+        super().__init__(func=_req)
         self._name = "SSE"

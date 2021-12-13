@@ -124,11 +124,11 @@ import math
 # f' = cos(x) + 2x
 
 rng = range(-10,11)
-def foo():
+def func():
     for _ in rng:
         yield(_,1)
 
-x = ts.Timer(foo, count=len(rng), use_dual=True)
+x = ts.Timer(func, count=len(rng), use_dual=True)
 out = ts.Add(ts.Sin(x), ts.Pow(x,2))
 ```
 

@@ -25,17 +25,17 @@ class Timer(Node):
        with a delay of `interval` in between
 
     Arguments:
-        foo (callable): callable to call
-        foo_kwargs (dict): kwargs for callable
+        func (callable): callable to call
+        func_kwargs (dict): kwargs for callable
         count (int): number of times to call, 0 means infinite (or until generator is complete)
         interval (int/float): minimum delay between calls (can be more due to async scheduling)
     """
 
-    def __init__(self, foo, foo_kwargs=None, count=1, interval=0, **kwargs):
+    def __init__(self, func, func_kwargs=None, count=1, interval=0, **kwargs):
         super().__init__(
-            foo=foo,
-            foo_kwargs=foo_kwargs,
-            name="Timer[{}]".format(foo.__name__),
+            func=func,
+            func_kwargs=func_kwargs,
+            name="Timer[{}]".format(func.__name__),
             inputs=0,
             execution_max=count,
             delay_interval=interval,
@@ -53,7 +53,7 @@ class Const(Timer):
     """
 
     def __init__(self, value, count=0, **kwargs):
-        super().__init__(foo=lambda: value, count=count, interval=0, **kwargs)
+        super().__init__(func=lambda: value, count=count, interval=0, **kwargs)
         self._name = "Const[{}]".format(value)
 
 
@@ -65,33 +65,33 @@ class Curve(Timer):
     """
 
     def __init__(self, value, **kwargs):
-        def foo(curve=value):
+        def func(curve=value):
             for v in curve:
                 yield v
 
-        super().__init__(foo=foo, count=0, **kwargs)
+        super().__init__(func=func, count=0, **kwargs)
         self._name = "Curve[{}]".format(len(value))
 
 
-class Foo(Timer):
+class Func(Timer):
     """Streaming wrapper to periodically call a function `count` times
        with a delay of `interval` in between
 
     Arguments:
-        foo (callable): callable to call
-        foo_kwargs (dict): kwargs for callable
+        func (callable): callable to call
+        func_kwargs (dict): kwargs for callable
         count (int): number of times to call, 0 means infinite (or until generator is complete)
         interval (int/float): minimum delay between calls (can be more due to async scheduling)
     """
 
-    def __init__(self, foo, foo_kwargs=None, count=0, interval=0, **kwargs):
+    def __init__(self, func, func_kwargs=None, count=0, interval=0, **kwargs):
         super().__init__(
-            foo=foo, foo_kwargs=foo_kwargs, count=count, interval=interval, **kwargs
+            func=func, func_kwargs=func_kwargs, count=count, interval=interval, **kwargs
         )
-        self._name = "Foo[{}]".format(foo.__name__)
+        self._name = "Func[{}]".format(func.__name__)
 
 
-class Random(Foo):
+class Random(Func):
     """Yield a random dictionary of data
 
     Args:
@@ -115,11 +115,11 @@ class Random(Foo):
                     }
                     step += 1
 
-        super().__init__(foo=_random, count=count, interval=interval, **kwargs)
+        super().__init__(func=_random, count=count, interval=interval, **kwargs)
         self._name = "Random"
 
 
-class Console(Foo):
+class Console(Func):
     """Read from console input, optionally parse as json
 
     Args:
@@ -140,11 +140,11 @@ class Console(Foo):
                 # TODO other options?
                 raise
 
-        super().__init__(foo=_input, message=message, json=json, **kwargs)
+        super().__init__(func=_input, message=message, json=json, **kwargs)
         self._name = "Console"
 
 
-class Queue(Foo):
+class Queue(Func):
     """Streaming wrapper to emit as values are received from an asynchronous queue
 
     Arguments:
@@ -152,10 +152,10 @@ class Queue(Foo):
     """
 
     def __init__(self, queue, **kwargs):
-        async def foo(queue=queue):
+        async def func(queue=queue):
             return await queue.get()
 
-        super().__init__(foo=foo, count=0, **kwargs)
+        super().__init__(func=func, count=0, **kwargs)
         self._name = "Queue"
 
 

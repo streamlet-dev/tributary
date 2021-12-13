@@ -17,7 +17,7 @@
 - Postgres - streams data from postgres
 
 ## Sinks
-- Foo - data to a python function
+- Func - data to a python function
 - File - data to a file
 - HTTP - POSTs data to an url
 - HTTPServer - runs an http server and streams data to connections

@@ -1,9 +1,9 @@
 import aiofiles
 import json as JSON
-from .input import Foo
+from .input import Func
 
 
-class File(Foo):
+class File(Func):
     """Open up a file and yield back lines in the file
 
     Args:
@@ -27,5 +27,5 @@ class File(Foo):
                         else:
                             yield line
 
-        super().__init__(foo=_file)
+        super().__init__(func=_file)
         self._name = "File"

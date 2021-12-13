@@ -8,8 +8,8 @@ from ..node import Node
 def unary(node, name, lam):
     return node._gennode(
         name=name,
-        foo=lam,
-        foo_args=[node],
+        func=lam,
+        func_args=[node],
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
         use_dual=node._use_dual,
     )
@@ -19,15 +19,15 @@ def binary(node1, other, name, lam):
     if isinstance(node1._self_reference, Node):
         return node1._gennode(
             name=name,
-            foo=lam,
-            foo_args=[node1._self_reference, other],
+            func=lam,
+            func_args=[node1._self_reference, other],
             graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
             use_dual=node1._use_dual,
         )
     return node1._gennode(
         name=name,
-        foo=lam,
-        foo_args=[node1, other],
+        func=lam,
+        func_args=[node1, other],
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
         use_dual=node1._use_dual,
     )
@@ -37,15 +37,15 @@ def n_ary(node, others, name, lam):
     if isinstance(node._self_reference, Node):
         return node._gennode(
             name=name,
-            foo=lam,
-            foo_args=[node._self_reference] + others,
+            func=lam,
+            func_args=[node._self_reference] + others,
             graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
             use_dual=node._use_dual,
         )
     return node._gennode(
         name=name,
-        foo=lam,
-        foo_args=[node] + others,
+        func=lam,
+        func_args=[node] + others,
         graphvizshape=_CALCULATIONS_GRAPHVIZSHAPE,
         use_dual=node._use_dual,
     )

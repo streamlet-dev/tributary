@@ -1,9 +1,9 @@
 import asyncpg
-from .output import Foo
+from .output import Func
 from ..node import Node
 
 
-class Postgres(Foo):
+class Postgres(Func):
     """Connects to Postgres and executes queries
 
     Args:
@@ -38,7 +38,7 @@ class Postgres(Foo):
             await conn.close()
             return data
 
-        super().__init__(foo=_send, name="PostgresSink", inputs=1)
+        super().__init__(func=_send, name="PostgresSink", inputs=1)
         node >> self
 
 

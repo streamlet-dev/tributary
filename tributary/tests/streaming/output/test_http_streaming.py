@@ -13,12 +13,12 @@ class TestHttp:
     def test_http(self):
         """Test http server"""
 
-        def foo():
+        def func():
             yield "x"
             yield "y"
             yield "z"
 
-        out = ts.HTTPSink(ts.Foo(foo), url="http://localhost:8080")
+        out = ts.HTTPSink(ts.Func(func), url="http://localhost:8080")
         assert len(ts.run(out)) == 3
 
     @pytest.mark.skipif('os.name == "nt"')

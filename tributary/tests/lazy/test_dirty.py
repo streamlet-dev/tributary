@@ -1,7 +1,7 @@
 import tributary.lazy as t
 
 
-class Foo5(t.LazyGraph):
+class Func5(t.LazyGraph):
     @t.node()
     def z(self):
         return self.x | self.y()
@@ -19,7 +19,7 @@ class Foo5(t.LazyGraph):
 
 class TestDirtyPropogation:
     def test_or_dirtypropogation(self):
-        f = Foo5()
+        f = Func5()
         assert f.z()() == 10
         assert f.x() is None
 

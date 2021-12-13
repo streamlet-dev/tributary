@@ -84,7 +84,7 @@ def Window(node, size=-1, full_only=False):
         full_only (bool): only return if list is full
     """
 
-    def foo(node=node, size=size, full_only=full_only):
+    def func(node=node, size=size, full_only=full_only):
         if size.value() == 0:
             return node.value()
 
@@ -103,7 +103,7 @@ def Window(node, size=-1, full_only=False):
         return ret._accum
 
     # make new node
-    ret = node._gennode("Window[{}]".format(size if size > 0 else "∞"), foo, [node])
+    ret = node._gennode("Window[{}]".format(size if size > 0 else "∞"), func, [node])
     ret._accum = None
     return ret
 

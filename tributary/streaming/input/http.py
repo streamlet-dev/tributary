@@ -2,11 +2,11 @@ import aiohttp
 import asyncio
 import json as JSON
 from aiohttp import web
-from .input import Foo
+from .input import Func
 from ...base import TributaryException
 
 
-class HTTP(Foo):
+class HTTP(Func):
     """Connect to url and yield results
 
     Args:
@@ -76,11 +76,11 @@ class HTTP(Foo):
                         if repeat >= 0:
                             count += 1
 
-        super().__init__(foo=_req)
+        super().__init__(func=_req)
         self._name = "HTTP"
 
 
-class HTTPServer(Foo):
+class HTTPServer(Func):
     """Host a server and yield posted data
 
     Args:
@@ -118,7 +118,7 @@ class HTTPServer(Foo):
         # instantiate server if not existing
         server = server or web.Application()
 
-        # create asyncio queue to manage between the http server and the tributary foo
+        # create asyncio queue to manage between the http server and the tributary func
         queue = asyncio.Queue()
 
         # http server handler
@@ -168,7 +168,7 @@ class HTTPServer(Foo):
             # return the end result
             return data
 
-        super().__init__(foo=_req)
+        super().__init__(func=_req)
         self._name = "HTTPServer"
 
         # set server attribute so it can be accessed

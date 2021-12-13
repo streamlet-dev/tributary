@@ -64,13 +64,15 @@ def run_submit(fn, function_to_call, *args, **kwargs):
         )
 
 
-def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs=None):
+def pipeline(
+    funcs, func_callbacks, func_kwargs=None, on_data=print, on_data_kwargs=None
+):
     """Pipeline a sequence of functions together via callbacks
 
     Args:
-        foos (list of callables): list of functions to pipeline
-        foo_callbacks (List[str]): list of strings indicating the callback names (kwargs of the foos)
-        foo_kwargs (List[dict]):
+        funcs (list of callables): list of functions to pipeline
+        func_callbacks (List[str]): list of strings indicating the callback names (kwargs of the funcs)
+        func_kwargs (List[dict]):
         on_data (callable): callable to call at the end of the pipeline
         on_data_kwargs (dict): kwargs to pass to the on_data function>?
     """
@@ -78,34 +80,34 @@ def pipeline(foos, foo_callbacks, foo_kwargs=None, on_data=print, on_data_kwargs
     if _EXECUTOR is None:
         _EXECUTOR = ThreadPoolExecutor(max_workers=2)
 
-    foo_kwargs = foo_kwargs or []
+    func_kwargs = func_kwargs or []
     on_data_kwargs = on_data_kwargs or {}
 
     # organize args for functional pipeline
     assembled = []
-    for i, foo in enumerate(foos):
-        cb = foo_callbacks[i] if i < len(foo_callbacks) else "on_data"
-        kwargs = foo_kwargs[i] if i < len(foo_kwargs) else {}
-        assembled.append((foo, cb, kwargs))
+    for i, func in enumerate(funcs):
+        cb = func_callbacks[i] if i < len(func_callbacks) else "on_data"
+        kwargs = func_kwargs[i] if i < len(func_kwargs) else {}
+        assembled.append((func, cb, kwargs))
 
     # assemble pipeline
     assembled.reverse()
     lambdas = [lambda d, f=on_data: run_submit(f, None, d, **on_data_kwargs)]
     for i, a in enumerate(assembled):
-        foo, cb, kwargs = a
+        func, cb, kwargs = a
         function_to_call = lambdas[i]
         kwargs[cb] = function_to_call
 
         if i != len(assembled) - 1:
             lambdas.append(
-                lambda d, kw=kwargs, f=foo: run_submit(f, function_to_call, d, **kw)
+                lambda d, kw=kwargs, f=func: run_submit(f, function_to_call, d, **kw)
             )
-            lambdas[-1].__name__ = foo.__name__
+            lambdas[-1].__name__ = func.__name__
         else:
             lambdas.append(
-                lambda kw=kwargs, f=foo: run_submit(f, function_to_call, **kw)
+                lambda kw=kwargs, f=func: run_submit(f, function_to_call, **kw)
             )
-            lambdas[-1].__name__ = foo.__name__
+            lambdas[-1].__name__ = func.__name__
 
     # start entrypoint
     lambdas[-1]()
@@ -122,6 +124,6 @@ def stop():
 
 def wrap(function, *args, **kwargs):
     """wrap a function in a partial"""
-    foo = partial(function, *args, **kwargs)
-    foo.__name__ = function.__name__
-    return foo
+    func = partial(function, *args, **kwargs)
+    func.__name__ = function.__name__
+    return func

@@ -2,12 +2,12 @@ import asyncio
 import aiohttp
 import json as JSON
 from aiohttp import web
-from .output import Foo
+from .output import Func
 from ..node import Node
 from ...base import StreamEnd, TributaryException
 
 
-class HTTP(Foo):
+class HTTP(Func):
     """Connect to url and post results to it
 
     Args:
@@ -77,12 +77,12 @@ class HTTP(Foo):
 
                     return msg
 
-        super().__init__(foo=_send, inputs=1)
+        super().__init__(func=_send, inputs=1)
         self._name = "HTTP"
         node >> self
 
 
-class HTTPServer(Foo):
+class HTTPServer(Func):
     """Host a server and send results on get requests
 
     Args:
@@ -121,7 +121,7 @@ class HTTPServer(Foo):
         # instantiate server if not existing
         server = server or web.Application()
 
-        # create asyncio queue to manage between the http server and the tributary foo
+        # create asyncio queue to manage between the http server and the tributary func
         queue = asyncio.Queue()
 
         # http server handler
@@ -171,7 +171,7 @@ class HTTPServer(Foo):
             # TODO expect response from clients?
             return data
 
-        super().__init__(foo=_req, inputs=1)
+        super().__init__(func=_req, inputs=1)
         self._name = "HTTPServer"
         node >> self
 

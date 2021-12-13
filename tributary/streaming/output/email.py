@@ -4,7 +4,7 @@ import emails
 from bs4 import BeautifulSoup
 
 from ..node import Node
-from .output import Foo
+from .output import Func
 
 
 def make_email(html, from_, subject="", attachments=None):
@@ -61,7 +61,7 @@ def make_email(html, from_, subject="", attachments=None):
     return message
 
 
-class Email(Foo):
+class Email(Func):
     """Send an email
 
     Args:
@@ -84,7 +84,7 @@ class Email(Foo):
             r = message.send(to=to, smtp=smtp)
             return r, message
 
-        super().__init__(foo=_send, inputs=1)
+        super().__init__(func=_send, inputs=1)
         self._name = "Email"
         node >> self
 

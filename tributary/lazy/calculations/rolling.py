@@ -1,10 +1,10 @@
 from ..node import Node
 
 # def RollingCount(node):
-#     def foo(node=node):
+#     def func(node=node):
 #         return node()
 #     # make new node
-#     ret = node._gennode('RollingCount({})'.format(node._name), foo, [node])
+#     ret = node._gennode('RollingCount({})'.format(node._name), func, [node])
 #     return ret
 
 

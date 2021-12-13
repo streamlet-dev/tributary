@@ -9,7 +9,7 @@ import random, time
 
 
 ```python
-def foo():
+def func():
     return random.random()
 
 def long():
@@ -19,7 +19,7 @@ def long():
 
 
 # A timer calls the given function every interval up to count times
-test = ts.Timer(foo, {}, interval=.5, count=5)
+test = ts.Timer(func, {}, interval=.5, count=5)
 
 test2 = ts.Negate(test)
 
@@ -71,14 +71,14 @@ Let's construct a slightly more complex graph
 ```python
 import asyncio
 
-def foo():
+def func():
     return random.random()
 
 async def long():
     await asyncio.sleep(1)
     return 5
     
-rand = ts.Timer(foo, interval=0, count=5)
+rand = ts.Timer(func, interval=0, count=5)
 five = ts.Timer(long, interval=0, count=5)
 one = ts.Const(1)
 five2 = ts.Const(5)
@@ -142,7 +142,7 @@ def stream():
     for _ in range(10):
         yield _
 
-f = ts.Foo(stream)
+f = ts.Func(stream)
 s = f.rollingSum()
 c = f.rollingCount()
 f3 = ts.Div(s, c)
@@ -197,7 +197,7 @@ x.result()
 
 
 ```python
-def myfoo(ds):
+def myfunc(ds):
     for d in ds:
         vals = d.values()
         d['HIGH'] = max(vals)
@@ -212,7 +212,7 @@ def myfoo(ds):
 ```python
 vals = ts.Random(100)
 w = ts.Window(vals, size=5)
-n = ts.Apply(w, myfoo)
+n = ts.Apply(w, myfunc)
 psp1 = ts.Perspective(n, schema={'HIGH': float, 'LOW': float, 'MID': float, 'SMA': float}, plugin='y_line')
 x = ts.run(ts.Perspective(psp1, schema={'HIGH': float, 'LOW': float, 'MID': float, 'SMA': float}))
 # This will only display in the notebook, not on Github
@@ -243,12 +243,12 @@ clz = ts.construct_streaming(expr)
 
 
 # A function to use as an input
-def foo(*args):
+def func(*args):
     for _ in range(5):
         yield _
 
 # Construct with inputs
-x = clz(x=tss.Const(1), y=tss.Foo(foo), z=tss.Timer(lambda: 1, count=0), theta=tss.Const(4))
+x = clz(x=tss.Const(1), y=tss.Func(func), z=tss.Timer(lambda: 1, count=0), theta=tss.Const(4))
 ```
 
 
@@ -339,7 +339,7 @@ def strikes():
         strike += 2.5
 
 price = PriceClass(spot=tss.Const(210.59),
-                   strike=tss.Foo(strikes),
+                   strike=tss.Func(strikes),
                    vol=tss.Const(14.04),
                    dte=tss.Const(4),
                    rate=tss.Const(.2175),

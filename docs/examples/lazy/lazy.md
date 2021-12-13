@@ -141,12 +141,12 @@ clz = ts.construct_lazy(expr)
 
 
 # A function to use as an input
-def foo(*args):
+def func(*args):
     for _ in range(5):
         yield _
 
 # Construct with inputs
-x = clz(x=tl.Node(value=1), y=tl.Node(callable=foo, always_dirty=True), z=tl.Node(value=1), theta=tl.Node(value=4))
+x = clz(x=tl.Node(value=1), y=tl.Node(callable=func, always_dirty=True), z=tl.Node(value=1), theta=tl.Node(value=4))
 ```
 
 

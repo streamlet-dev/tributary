@@ -3,7 +3,7 @@ from datetime import datetime
 from time import sleep
 
 
-def foo():
+def func():
     yield 1
     yield 2
 
@@ -43,17 +43,17 @@ class TestUtils:
         assert out() == 6
 
     def test_window_any_size(self):
-        n = tl.Window(tl.Node(callable=foo))
+        n = tl.Window(tl.Node(callable=func))
 
         assert n() == [1]
         assert n() == [1, 2]
 
     def test_window_fixed_size(self):
-        n = tl.Window(tl.Node(callable=foo), size=2)
+        n = tl.Window(tl.Node(callable=func), size=2)
         assert n() == [1]
         assert n() == [1, 2]
 
     def test_window_fixed_size_full_only(self):
-        n = tl.Window(tl.Node(callable=foo), size=2, full_only=True)
+        n = tl.Window(tl.Node(callable=func), size=2, full_only=True)
         assert n() is None
         assert n() == [1, 2]

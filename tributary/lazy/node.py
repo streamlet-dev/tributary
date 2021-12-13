@@ -486,13 +486,13 @@ class Node(_DagreD3Mixin):
         # return result of computation
         return new_value
 
-    def _gennode(self, name, foo, foo_args, **kwargs):
+    def _gennode(self, name, func, func_args, **kwargs):
         if name not in self._node_op_cache:
             self._node_op_cache[name] = Node(
                 name=name,
                 derived=True,
-                callable=foo,
-                callable_args=foo_args,
+                callable=func,
+                callable_args=func_args,
                 override_callable_dirty=True,
                 **kwargs,
             )

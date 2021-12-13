@@ -10,25 +10,25 @@ from ...utils import _gen_node
 _OUTPUT_GRAPHVIZSHAPE = "box"
 
 
-class Foo(Node):
+class Func(Node):
     """Streaming wrapper to send data to function
 
     Arguments:
-        foo (callable): callable to call
-        foo_kwargs (dict): kwargs for callable
+        func (callable): callable to call
+        func_kwargs (dict): kwargs for callable
     """
 
-    def __init__(self, foo, foo_kwargs=None, **kwargs):
+    def __init__(self, func, func_kwargs=None, **kwargs):
         super().__init__(
-            foo=foo,
-            foo_kwargs=foo_kwargs,
+            func=func,
+            func_kwargs=func_kwargs,
             graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
             **kwargs
         )
 
 
 def Print(node, text=""):
-    async def foo(val):
+    async def func(val):
         if getattr(Print, "_multiprocess", None):
             print(text + str(val))
         else:
@@ -37,8 +37,8 @@ def Print(node, text=""):
 
     node = _gen_node(node)
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Print",
         inputs=1,
         graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
@@ -48,7 +48,7 @@ def Print(node, text=""):
 
 
 def Logging(node, level=logging.CRITICAL):
-    def foo(val):
+    def func(val):
         if level == logging.DEBUG:
             logging.debug(node)
         elif level == logging.INFO:
@@ -63,8 +63,8 @@ def Logging(node, level=logging.CRITICAL):
 
     node = _gen_node(node)
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Log",
         inputs=1,
         graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
@@ -76,7 +76,7 @@ def Logging(node, level=logging.CRITICAL):
 def Collect(node, limit=None):
     ret = []
 
-    def foo(val, ret=ret):
+    def func(val, ret=ret):
         if not isinstance(val, (StreamEnd, StreamNone, StreamRepeat)):
             ret.append(copy.deepcopy(val))
             if limit:
@@ -85,8 +85,8 @@ def Collect(node, limit=None):
 
     node = _gen_node(node)
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Collect",
         inputs=1,
         graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
@@ -185,14 +185,14 @@ def Perspective(node, text="", **psp_kwargs):
 
     p = PerspectiveWidget(psp_kwargs.pop("schema", []), **psp_kwargs)
 
-    def foo(val):
+    def func(val):
         p.update(val)
         return val
 
     node = _gen_node(node)
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Perspective",
         inputs=1,
         graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
@@ -204,14 +204,14 @@ def Perspective(node, text="", **psp_kwargs):
 
 
 def Queue(node, queue):
-    async def foo(val):
+    async def func(val):
         await queue.put(val)
         return val
 
     node = _gen_node(node)
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="Queue",
         inputs=1,
         graphvizshape=_OUTPUT_GRAPHVIZSHAPE,
@@ -220,7 +220,7 @@ def Queue(node, queue):
     return ret
 
 
-Node.foo = Foo
+Node.func = Func
 Node.collect = Collect
 Node.graph = Graph
 Node.pprint = PPrint

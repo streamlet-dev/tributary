@@ -16,8 +16,8 @@ class NodeSerializeMixin(object):
         ] = []  # TODO think about this more [_.save() for _ in self._downstream]
         ret["upstream"] = [_.save() for _ in self._upstream]
 
-        ret["foo"] = dill.dumps(self._foo)
-        ret["foo_kwargs"] = dill.dumps(self._foo_kwargs)
+        ret["func"] = dill.dumps(self._func)
+        ret["func_kwargs"] = dill.dumps(self._func_kwargs)
 
         ret["delay_interval"] = self._delay_interval
         ret["execution_max"] = self._execution_max
@@ -42,8 +42,8 @@ class NodeSerializeMixin(object):
         # self._dd3g = None  # TODO
 
         # constructor args
-        foo = dill.loads(ret["foo"])
-        foo_kwargs = dill.loads(ret["foo_kwargs"])
+        func = dill.loads(ret["func"])
+        func_kwargs = dill.loads(ret["func_kwargs"])
         name = ret["name"]
         inputs = len(ret["input"])
         drop = ret["drop"]
@@ -56,8 +56,8 @@ class NodeSerializeMixin(object):
 
         # construct node
         n = Node(
-            foo=foo,
-            foo_kwargs=foo_kwargs,
+            func=func,
+            func_kwargs=func_kwargs,
             name=name,
             inputs=inputs,
             drop=drop,
@@ -96,11 +96,11 @@ if __name__ == "__main__":
     import tributary.streaming as ts
     import time
 
-    async def foo():
+    async def func():
         await asyncio.sleep(2)
         return 1
 
-    o = ts.Foo(foo, count=3).print()
+    o = ts.Func(func, count=3).print()
 
     g = ts.run(o, blocking=False)
     time.sleep(3)

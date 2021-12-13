@@ -1,10 +1,10 @@
 import aiofiles
 import json as JSON
-from .output import Foo
+from .output import Func
 from ..node import Node
 
 
-class File(Foo):
+class File(Func):
     """Open up a file and write lines to the file
 
     Args:
@@ -27,7 +27,7 @@ class File(Foo):
                         await f.write(data)
                 return data
 
-        super().__init__(foo=_file, name="File", inputs=1)
+        super().__init__(func=_file, name="File", inputs=1)
         node >> self
 
 

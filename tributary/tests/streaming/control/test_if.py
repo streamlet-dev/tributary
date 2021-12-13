@@ -22,6 +22,6 @@ class TestConditional:
 
         assert ts.run(
             ts.Print(
-                ts.If(ts.Foo(conditionals), ts.Foo(if_stream), ts.Foo(else_stream))
+                ts.If(ts.Func(conditionals), ts.Func(if_stream), ts.Func(else_stream))
             )
         ) == [1, 2, 3]

@@ -15,15 +15,15 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
     if len(elseifs) % 2 != 0:
         raise TributaryException("Else ifs must be in pairs")
 
-    def foo(conditional, if_val, else_val):
+    def func(conditional, if_val, else_val):
         # TODO else ifs
         if conditional:
             return if_val
         return else_val
 
     ret = Node(
-        foo=foo,
-        foo_kwargs=None,
+        func=func,
+        func_kwargs=None,
         name="If",
         inputs=3,
         graphvizshape=_CONTROL_GRAPHVIZSHAPE,

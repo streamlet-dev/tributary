@@ -3,10 +3,10 @@ import asyncio
 import json as JSON
 from aiohttp import web
 
-from .input import Foo
+from .input import Func
 
 
-class WebSocket(Foo):
+class WebSocket(Func):
     """Connect to websocket and yield back results
 
     Args:
@@ -36,11 +36,11 @@ class WebSocket(Foo):
                     elif msg.type == aiohttp.WSMsgType.ERROR:
                         break
 
-        super().__init__(foo=_listen)
+        super().__init__(func=_listen)
         self._name = "WebSocket"
 
 
-class WebSocketServer(Foo):
+class WebSocketServer(Func):
     """Host a websocket server and stream in the data
 
     Args:
@@ -143,7 +143,7 @@ class WebSocketServer(Foo):
 
                 yield data
 
-        super().__init__(foo=_req, inputs=1)
+        super().__init__(func=_req, inputs=1)
         self._name = "WebSocketServer"
         node >> self
 

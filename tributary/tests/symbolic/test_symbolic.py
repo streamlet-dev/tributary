@@ -89,7 +89,7 @@ class TestConfig:
         price = PriceClass(
             spot=tss.Const(210.59),
             #    strike=tss.Print(tss.Const(205), text='strike'),
-            strike=tss.Foo(strikes, interval=1),
+            strike=tss.Func(strikes, interval=1),
             vol=tss.Const(14.04),
             dte=tss.Const(4),
             rate=tss.Const(0.2175),
