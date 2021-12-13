@@ -64,7 +64,9 @@ def run_submit(fn, function_to_call, *args, **kwargs):
         )
 
 
-def pipeline(funcs, func_callbacks, func_kwargs=None, on_data=print, on_data_kwargs=None):
+def pipeline(
+    funcs, func_callbacks, func_kwargs=None, on_data=print, on_data_kwargs=None
+):
     """Pipeline a sequence of functions together via callbacks
 
     Args:
