@@ -5,7 +5,6 @@ Python Data Streams
 [![Coverage](https://codecov.io/gh/timkpaine/tributary/branch/main/graph/badge.svg)](https://codecov.io/gh/timkpaine/tributary)
 [![PyPI](https://img.shields.io/pypi/l/tributary.svg)](https://pypi.python.org/pypi/tributary)
 [![PyPI](https://img.shields.io/pypi/v/tributary.svg)](https://pypi.python.org/pypi/tributary)
-[![Docs](https://img.shields.io/readthedocs/tributary.svg)](https://tributary.readthedocs.io)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/timkpaine/tributary/main?urlpath=lab)
 
 
