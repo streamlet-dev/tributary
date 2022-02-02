@@ -123,7 +123,7 @@ def stop():
 
 
 def wrap(function, *args, **kwargs):
-    """wrap a function in a partial"""
+    """Wrap a function in a partial"""
     func = partial(function, *args, **kwargs)
     func.__name__ = function.__name__
     return func

@@ -31,7 +31,7 @@ def RSI(node, period=14, basket=False):
 
 
 def MACD(node, period_fast=12, period_slow=26, signal=9, basket=False):
-    """Moving Average Convergence/Divergence
+    """Calculate Moving Average Convergence/Divergence
 
     Args:
         node (Node): input data
