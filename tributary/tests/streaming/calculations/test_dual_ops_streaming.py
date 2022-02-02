@@ -127,7 +127,7 @@ class TestDualOps:
         f = x^2
         f' = 2x
         """
-        expected = [(x ** 2, 2 * x) for x in rng]
+        expected = [(x**2, 2 * x) for x in rng]
         t = ts.Timer(func_range, count=len(rng), use_dual=True)
         out = ts.Pow(t, 2)
         assert ts.run(out) == expected
@@ -252,7 +252,7 @@ class TestDualOps:
         f = arcsin(x)
         f' = 1/sqrt(1-x^2)
         """
-        expected = [(math.asin(x), 0.05 / math.sqrt(1 - x ** 2)) for x in zero_one_rng]
+        expected = [(math.asin(x), 0.05 / math.sqrt(1 - x**2)) for x in zero_one_rng]
         t = ts.Timer(func_zero_one, count=len(zero_one_rng), use_dual=True)
         out = ts.Arcsin(t)
         assert ts.run(out) == expected
@@ -262,7 +262,7 @@ class TestDualOps:
         f = arccos(x)
         f' = -1/sqrt(1-x^2)
         """
-        expected = [(math.acos(x), -0.05 / math.sqrt(1 - x ** 2)) for x in zero_one_rng]
+        expected = [(math.acos(x), -0.05 / math.sqrt(1 - x**2)) for x in zero_one_rng]
         t = ts.Timer(func_zero_one, count=len(zero_one_rng), use_dual=True)
         out = ts.Arccos(t)
         assert ts.run(out) == expected
@@ -272,7 +272,7 @@ class TestDualOps:
         f = arctan(x)
         f' = 1/(1+x^2)
         """
-        expected = [(math.atan(x), 0.05 / (1 + x ** 2)) for x in zero_one_rng]
+        expected = [(math.atan(x), 0.05 / (1 + x**2)) for x in zero_one_rng]
         t = ts.Timer(func_zero_one, count=len(zero_one_rng), use_dual=True)
         out = ts.Arctan(t)
         assert ts.run(out) == expected
@@ -313,7 +313,7 @@ class TestDualOps:
         f' = (2/sqrt(pi))*e^(-x^2)
         """
         expected = [
-            (math.erf(x), (2 / math.sqrt(math.pi)) * math.exp(-(x ** 2))) for x in rng
+            (math.erf(x), (2 / math.sqrt(math.pi)) * math.exp(-(x**2))) for x in rng
         ]
         t = ts.Timer(func_range, count=len(rng), use_dual=True)
         out = ts.Erf(t)

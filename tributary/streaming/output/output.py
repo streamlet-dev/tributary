@@ -28,6 +28,8 @@ class Func(Node):
 
 
 def Print(node, text=""):
+    """Streaming wrapper to print the result to stdout, along with a helpertext"""
+
     async def func(val):
         if getattr(Print, "_multiprocess", None):
             print(text + str(val))
@@ -48,6 +50,8 @@ def Print(node, text=""):
 
 
 def Logging(node, level=logging.CRITICAL):
+    """Streaming wrapper to log the result using a logger"""
+
     def func(val):
         if level == logging.DEBUG:
             logging.debug(node)

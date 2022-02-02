@@ -31,7 +31,7 @@ class TestUtils:
 
     def test_apply(self):
         def square(val):
-            return val ** 2
+            return val**2
 
         assert ts.run(ts.Apply(ts.Func(func), func=square)) == [1, 4]
 

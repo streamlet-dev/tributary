@@ -602,9 +602,11 @@ class Node(_DagreD3Mixin):
                             break
 
     def getValue(self):
+        """Get the value of the node"""
         return self.value()
 
     def value(self):
+        """Get the value of the node"""
         # if tweaking, return my tweaked value
         if self._tweaks and self in self._tweaks:
             return self._tweaks[self]
