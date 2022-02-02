@@ -99,7 +99,7 @@ Mod = binary(
     name="Mod",
 )
 Pow = binary(
-    (lambda x, y: x ** y, lambda x, y: (x[0] ** y, y * x[1] * x[0] ** (y - 1))),
+    (lambda x, y: x**y, lambda x, y: (x[0] ** y, y * x[1] * x[0] ** (y - 1))),
     name="Pow",
 )
 Sum = n_ary(

@@ -17,6 +17,7 @@ init_printing(use_unicode=True)
 
 def parse_expression(expr):
     """Parse string as sympy expression
+
     Args:
         expr (string): string to convert to sympy expression
     """
@@ -25,6 +26,7 @@ def parse_expression(expr):
 
 def graphviz(expr):
     """Plot sympy expression tree using graphviz
+
     Args:
         expr (sympy expression)
     """
@@ -34,6 +36,7 @@ def graphviz(expr):
 
 def traversal(expr):
     """Traverse sympy expression tree
+
     Args:
         expr (sympy expression)
     """
@@ -43,6 +46,7 @@ def traversal(expr):
 
 def symbols(expr):
     """Get symbols used in sympy expression
+
     Args:
         expr (sympy expression)
     """
@@ -84,8 +88,6 @@ def construct_streaming(expr, modules=None):
     Args:
         expr (sympy expression): A Sympy expression
         modules (list): a list of modules to use for sympy's lambdify function
-    Returns:
-
     """
     syms = list(symbols(expr))
     names = [s.name for s in syms]

@@ -20,7 +20,7 @@ def map(data, *callbacks):
 
 
 def merge(data1, data2, callback):
-    """merge two data sources into one callback
+    """Merge two data sources into one callback
 
     Args:
         data1 (any): first data to pass to callback
@@ -31,7 +31,7 @@ def merge(data1, data2, callback):
 
 
 def reduce(callback, *datas):
-    """merge multiple data sources into one callback
+    """Merge multiple data sources into one callback
 
     Args:
         callback (callable): callback to pass data to
