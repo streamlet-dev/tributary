@@ -49,12 +49,12 @@ class TestLazy:
 
     def test_lazy_default_func_arg(self):
         def func(val, prev_val=0):
-            print("val:\t{}\t{}".format(val, val.value()))
-            print("prev_val:\t{}\t{}".format(prev_val, prev_val.value()))
-            return val.value() + prev_val.value()
+            print("val:\t{}".format(val))
+            print("prev_val:\t{}".format(prev_val))
+            return val + prev_val
 
-        n = t.Node(callable=func)
-        n.set(val=5)
+        n = t.Node(value=func)
+        n.kwargs["val"].setValue(5)
 
         assert n() == 5
 
@@ -67,8 +67,4 @@ class TestLazy:
         n = t.Node(name="Test", value=5)
         n2 = n + 1
 
-        print(n2._callable_args_mapping)
-        print(n2._callable_args_mapping[0]["node"])
-        print(n2._callable_args_mapping[0]["arg"])
-        assert n2._callable_args_mapping[0]["node"] == "Test"
-        assert n2._callable_args_mapping[0]["arg"] == "x"
+        assert n2.kwargs["x"]._name_no_id == "Test"

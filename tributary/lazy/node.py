@@ -7,7 +7,7 @@ from tomlkit import value
 from ..base import TributaryException, StreamNone
 
 # from boltons.funcutils import wraps
-from ..utils import _compare, _ismethod
+from ..utils import _compare, _ismethod, _either_type
 from .dd3 import _DagreD3Mixin
 
 ArgState = namedtuple("ArgState", ["args", "kwargs"])
@@ -125,8 +125,8 @@ class Node(_DagreD3Mixin):
             raise TributaryException("Cannot set value to be itself a node")
 
         # Name is a string for display
-        self._name = "{}#{}".format(
-            name or self._value.__name__ if hasattr(self._value, "__name__") else "?",
+        self._name_no_id = name or self._value.__name__ if hasattr(self._value, "__name__") else "?"
+        self._name = "{}#{}".format(self._name_no_id,
             self._id[:5],
         )
 
@@ -237,16 +237,35 @@ class Node(_DagreD3Mixin):
             # don't set self to dirty since overwriting previous value
             self.setDirty(myself=False)
 
+            # explicitly un-dirty me
+            self._dirty = False
+
+            # explicitly un-dynamic me
+            if not hasattr(self, "_was_dynamic"):
+                self._was_dynamic = self._dynamic
+            self._dynamic = False
+
         self._last_value = value
+
+    def set(self, **kwargs):
+        """this method sets upstream dependencys' values to those given"""
+        for k, v in kwargs.items():
+            self.kwargs[k].setValue(v)
+
+    def unlock(self):
+        # reset my dynamic state
+        self._dynamic = self._was_dynamic
 
     def _computeArgState(self, *argsTweaks, **kwargTweaks):
         # will build these into a named tuple later
         args = []
         kwargs = {}
 
+        # TODO
         # first, handle self if method
-        if self._callable_is_method:
-            kwargs["self"] = self._self_reference
+        # if self._callable_is_method:
+        #     print("callable is method")
+        #     kwargs["self"] = self._self_reference
 
         # go through each parameter and try to respect the type it was defined as
         for param in self._parameters:
@@ -295,7 +314,7 @@ class Node(_DagreD3Mixin):
         return ArgState(args, kwargs)
 
     def _execute(self, args_state):
-        print("executing: {}".format(self._name))
+        print("executing: {}\t{}".format(self._name, args_state))
         return self._value(*args_state.args, **args_state.kwargs)
 
 
@@ -307,16 +326,15 @@ class Node(_DagreD3Mixin):
 
         if self._dirty or self._dynamic or tweaking:
             # reexecute
-            print(args_state)
             new_value = self._execute(args_state)
         else:
             new_value = self.value()
 
-        if new_value != self.value() and not tweaking:
+        if self._compare(value, self._last_value) and not tweaking:
             # push dirtinesss to downstream nodes
-            self._pushDirtyToDownstream()
+            self.setDirty(myself=False)
 
-            # unset my dirtiness
+            # explicitly un-dirty me
             self._dirty = False
         
         if not tweaking:
@@ -332,12 +350,12 @@ class Node(_DagreD3Mixin):
     def value(self):
         return self._last_value
 
-    def _gennode(self, name, func, args, **kwargs):
+    def _gennode(self, name, func, func_args=(), **kwargs):
         if name not in self._node_op_cache:
             self._node_op_cache[name] = Node(
                 name=name,
                 value=func,
-                args=args,
+                args=func_args,
                 **kwargs,
             )
         return self._node_op_cache[name]
@@ -350,3 +368,23 @@ class Node(_DagreD3Mixin):
                 value=other, name="var(" + str(other) + ")"
             )
         return self._node_op_cache[str(other)]
+
+
+@_either_type
+def node(meth, **attribute_kwargs):
+    """Convert a method into a lazy node
+    Since `self` is not defined at the point of method creation, you can pass in
+    extra kwargs which represent attributes of the future `self`. These will be
+    converted to node args during instantiation
+    The format is:
+        @node(my_existing_attr_as_an_arg="_attribute_name"):
+        def my_method(self):
+            pass
+    this will be converted into a graph of the form:
+        self._attribute_name -> my_method
+    e.g. as if self._attribute_name was passed as an argument to my_method, and converted to a node in the usual manner
+    """
+
+    # TODO attribute kwargs into nodes
+
+    return Node(value=meth)
