@@ -637,9 +637,9 @@ def Equal(self, other):
         other,
         self._name_no_id + "==" + other._name_no_id,
         (
-            lambda x, y: x.value() == y.value()
+            lambda x, y: x == y
             if not self._use_dual
-            else x.value()[0] == y.value()[0]
+            else x[0] == y[0]
         ),
     )
 
@@ -655,9 +655,9 @@ def NotEqual(self, other):
         other,
         self._name_no_id + "!=" + other._name_no_id,
         (
-            lambda x, y: x.value() != y.value()
+            lambda x, y: x != y
             if not self._use_dual
-            else x.value()[0] != y.value()[0]
+            else x[0] != y[0]
         ),
     )
 
@@ -673,9 +673,9 @@ def Ge(self, other):
         other,
         self._name_no_id + ">=" + other._name_no_id,
         (
-            lambda x, y: x.value() >= y.value()
+            lambda x, y: x >= y
             if not self._use_dual
-            else x.value()[0] > y.value()[0] or x.value()[0] == y.value()[0]
+            else x[0] > y[0] or x[0] == y[0]
         ),
     )
 
@@ -691,9 +691,9 @@ def Gt(self, other):
         other,
         self._name_no_id + ">" + other._name_no_id,
         (
-            lambda x, y: x.value() > y.value()
+            lambda x, y: x > y
             if not self._use_dual
-            else x.value()[0] > y.value()[0]
+            else x[0] > y[0]
         ),
     )
 
@@ -709,9 +709,9 @@ def Le(self, other):
         other,
         self._name_no_id + "<=" + other._name_no_id,
         (
-            lambda x, y: x.value() <= y.value()
+            lambda x, y: x <= y
             if not self._use_dual
-            else x.value()[0] <= y.value()[0] or x.value()[0] == y.value()[0]
+            else x[0] <= y[0] or x[0] == y[0]
         ),
     )
 
@@ -727,9 +727,9 @@ def Lt(self, other):
         other,
         self._name_no_id + "<" + other._name_no_id,
         (
-            lambda x, y: x.value() < y.value()
+            lambda x, y: x < y
             if not self._use_dual
-            else x.value()[0] < y.value()[0]
+            else x[0] < y[0]
         ),
     )
 
