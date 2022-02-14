@@ -1,48 +1,25 @@
 from ..node import Node
 
 
-def _print(node, cache=None):
-    if cache is None:
-        cache = {}
-
-    if id(node) in cache:
-        # loop, return None
-        return node
-
-    cache[id(node)] = node
-
-    ret = {node: []}
-
-    if node._dependencies:
-        for call, deps in node._dependencies.items():
-            # callable node
-            if hasattr(call, "_node_wrapper") and call._node_wrapper is not None:
-                ret[node].append(call._node_wrapper._print(cache))
-
-            # args
-            for arg in deps[0]:
-                ret[node].append(arg._print(cache))
-
-            # kwargs
-            for kwarg in deps[1].values():
-                ret[node].append(kwarg._print(cache))
-
-    return ret
-
-
-def Print(node):
-    return node._print({})
-
-
 def Graph(node):
-    if isinstance(node, Node):
-        return node.print()
+    if not node.upstream():
+        # leaf node
+        return {node: []}
+    return {node: [_.graph() for _ in node.upstream()]}
 
-    ret = {}
-    for n in node:
-        ret.update(n.print())
-    return ret
 
+def Print(node, level=0):
+    ret = "    " * (level - 1) if level else ""
+
+    if not node.upstream():
+        # leaf node
+        return ret + "  \\  " + repr(node)
+    return (
+        "    " * level
+        + repr(node)
+        + "\n"
+        + "\n".join(_.print(level + 1) for _ in node.upstream())
+    )
 
 def GraphViz(node):
     # allow for lists of nodes
@@ -186,7 +163,6 @@ def Dagre(node):
     return graph
 
 
-Node._print = _print
 Node.print = Print
 Node.graph = Graph
 Node.graphviz = GraphViz

@@ -1,4 +1,4 @@
-from .base import LazyGraph, Node as LazyNode, node
+from .base import LazyGraph, Node as LazyNode
 from .calculations import *
 from .control import *
 from .input import *
