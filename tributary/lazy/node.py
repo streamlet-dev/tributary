@@ -7,7 +7,7 @@ from tomlkit import value
 from ..base import TributaryException, StreamNone
 
 # from boltons.funcutils import wraps
-from ..utils import _compare, _ismethod, _either_type
+from ..utils import _compare, _ismethod, _either_type, _gen_to_func
 from .dd3 import _DagreD3Mixin
 
 ArgState = namedtuple("ArgState", ["args", "kwargs", "varargs", "varkwargs"])
@@ -21,7 +21,11 @@ def extractParameters(callable):
 
     # TODO handle generators as lambda g=g: next(g)
     if inspect.isgeneratorfunction(callable):
-        raise NotImplementedError()
+        gen = callable()
+        print(callable, gen)
+        def foo():
+            return _gen_to_func(gen)
+        callable = foo
 
     # wrap args and kwargs of function to node
     try:
