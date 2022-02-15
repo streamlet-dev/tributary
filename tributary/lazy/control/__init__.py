@@ -17,9 +17,9 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
 
     def func(cond, if_, else_=None):
         # TODO else ifs
-        if cond.value():
-            return if_.value()
-        return else_.value() if else_ is not None else None
+        if cond:
+            return if_
+        return else_ if else_ is not None else None
 
     if isinstance(if_node._self_reference, Node):
         return if_node._gennode(

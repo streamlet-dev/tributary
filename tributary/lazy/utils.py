@@ -13,8 +13,8 @@ def Expire(
     month=None,
     maxsize=128,
 ):
-    def _interval(node=node):
-        return node()
+    def _interval(data):
+        return data
 
     # make new node
     ret = node._gennode(
@@ -45,8 +45,8 @@ def Expire(
 def Interval(
     node, seconds=0, minutes=0, hours=0, days=0, weeks=0, months=0, years=0, maxsize=128
 ):
-    def _interval(node=node):
-        return node()
+    def _interval(data):
+        return data
 
     # make new node
     ret = node._gennode(
@@ -84,21 +84,21 @@ def Window(node, size=-1, full_only=False):
         full_only (bool): only return if list is full
     """
 
-    def func(node=node, size=size, full_only=full_only):
-        if size.value() == 0:
-            return node.value()
+    def func(data, size=size, full_only=full_only):
+        if size == 0:
+            return data
 
         if ret._accum is None:
             ret._accum = []
 
-        ret._accum.append(node.value())
+        ret._accum.append(data)
 
-        if size.value() > 0:
-            ret._accum = ret._accum[-size.value() :]
+        if size > 0:
+            ret._accum = ret._accum[-size:]
 
-        if full_only.value() and len(ret._accum) == size.value():
+        if full_only and len(ret._accum) == size:
             return ret._accum
-        elif full_only.value():
+        elif full_only:
             return None
         return ret._accum
 

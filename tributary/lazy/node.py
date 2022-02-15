@@ -10,7 +10,7 @@ from ..base import TributaryException, StreamNone
 from ..utils import _compare, _ismethod, _either_type
 from .dd3 import _DagreD3Mixin
 
-ArgState = namedtuple("ArgState", ["args", "kwargs"])
+ArgState = namedtuple("ArgState", ["args", "kwargs", "varargs", "varkwargs"])
 
 def extractParameters(callable):
     """Given a function, extract the arguments and defaults
@@ -260,6 +260,8 @@ class Node(_DagreD3Mixin):
         # will build these into a named tuple later
         args = []
         kwargs = {}
+        varargs = ()
+        varkwargs = {}
 
         # TODO
         # first, handle self if method
@@ -296,12 +298,12 @@ class Node(_DagreD3Mixin):
                 elif param.kind == inspect._ParameterKind.VAR_POSITIONAL:
                     # pass in by name without packing/unpacking
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
-                    kwargs[param.name] = self.kwargs[param.name](**kwargTweaks)  # TODO handle special?
+                    varargs = (self.kwargs[param.name](**kwargTweaks), )
 
                 elif param.kind == inspect._ParameterKind.VAR_KEYWORD:
                     # pass in by name without packing/unpacking
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
-                    kwargs[param.name] = self.kwargs[param.name](**kwargTweaks)  # TODO handle special?
+                    varkwargs = dict(**self.kwargs[param.name](**kwargTweaks))
 
         # validate arg state
         for i, arg in enumerate(args):
@@ -311,11 +313,11 @@ class Node(_DagreD3Mixin):
             if kwarg == StreamNone():
                 raise TypeError("Must provide argument for {}".format(name))
 
-        return ArgState(args, kwargs)
+        return ArgState(args, kwargs, varargs, varkwargs)
 
     def _execute(self, args_state):
         print("executing: {}\t{}".format(self._name, args_state))
-        return self._value(*args_state.args, **args_state.kwargs)
+        return self._value(*args_state.args, *args_state.varargs, **args_state.kwargs, **args_state.varkwargs)
 
 
     def __call__(self, *argTweaks, **kwargTweaks):
