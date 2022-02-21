@@ -29,6 +29,7 @@ def extractParameters(callable):
         for i, p in enumerate(signature.parameters.values())
     ]
 
+
 class Parameter(object):
     def __init__(self, name, position, default, kind):
         self.name = name
@@ -116,8 +117,11 @@ class Node(_DagreD3Mixin):
             raise TributaryException("Cannot set value to be itself a node")
 
         # Name is a string for display
-        self._name_no_id = name or self._value.__name__ if hasattr(self._value, "__name__") else "?"
-        self._name = "{}#{}".format(self._name_no_id,
+        self._name_no_id = (
+            name or self._value.__name__ if hasattr(self._value, "__name__") else "?"
+        )
+        self._name = "{}#{}".format(
+            self._name_no_id,
             self._id[:5],
         )
 
@@ -152,7 +156,11 @@ class Node(_DagreD3Mixin):
             # if we can't do this and we're a method,
             # detach our self. This it to handle errors that
             # come from methods like random.random()
-            if self._callable_is_method and self._parameters and self._parameters[0].name == "self":
+            if (
+                self._callable_is_method
+                and self._parameters
+                and self._parameters[0].name == "self"
+            ):
                 self._parameters = self._parameters[1:]
 
         # go through parameters and wrap in node, or used provided default
@@ -165,7 +173,9 @@ class Node(_DagreD3Mixin):
                 continue
 
             # calculate the real position taking into account the "self"
-            param.position = param.position if not self._callable_is_method else param.position - 1
+            param.position = (
+                param.position if not self._callable_is_method else param.position - 1
+            )
 
             if param.position < len(args or ()):
                 # use input arg
@@ -192,7 +202,6 @@ class Node(_DagreD3Mixin):
             self.args.append(parameter_node)
             self.kwargs[param.name] = parameter_node
             self << parameter_node
-
 
     # ***********************
     # Public interface
@@ -271,14 +280,14 @@ class Node(_DagreD3Mixin):
         self._dynamic = self._was_dynamic
 
     def _computeArgState(self, *argsTweaks, **kwargTweaks):
-        '''recompute, potentially applying tweaks'''
+        """recompute, potentially applying tweaks"""
         # argsTweak can be positional varargs, or dict mapping node to value
         if argsTweaks and isinstance(argsTweaks[0], dict):
             # set flag
             pass_arg_tweaks_by_node = True
 
             # pass it through to upper function calls
-            passThroughArgsTweaks = (argsTweaks[0], )
+            passThroughArgsTweaks = (argsTweaks[0],)
 
         else:
             # set flag
@@ -300,7 +309,10 @@ class Node(_DagreD3Mixin):
                 kwargs["self"] = self._self_reference
 
             # check if overridden in argsTweaks
-            elif pass_arg_tweaks_by_node and self.args[param.position] in passThroughArgsTweaks[0]:
+            elif (
+                pass_arg_tweaks_by_node
+                and self.args[param.position] in passThroughArgsTweaks[0]
+            ):
                 # tweaked by object reference, add to positionals
                 args.append(passThroughArgsTweaks[0][self.args[param.position]])
 
@@ -316,31 +328,43 @@ class Node(_DagreD3Mixin):
                 # try to repect original function definition
                 if param.kind == inspect._ParameterKind.POSITIONAL_ONLY:
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
-                    args.append(self.args[param.position](*passThroughArgsTweaks, **kwargTweaks))
+                    args.append(
+                        self.args[param.position](*passThroughArgsTweaks, **kwargTweaks)
+                    )
 
                 elif param.kind == inspect._ParameterKind.KEYWORD_ONLY:
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
-                    kwargs[param.name] = self.kwargs[param.name](*passThroughArgsTweaks, **kwargTweaks)
+                    kwargs[param.name] = self.kwargs[param.name](
+                        *passThroughArgsTweaks, **kwargTweaks
+                    )
 
                 elif param.kind == inspect._ParameterKind.POSITIONAL_OR_KEYWORD:
                     # use keyword
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
-                    kwargs[param.name] = self.kwargs[param.name](*passThroughArgsTweaks, **kwargTweaks)
+                    kwargs[param.name] = self.kwargs[param.name](
+                        *passThroughArgsTweaks, **kwargTweaks
+                    )
 
                 elif param.kind == inspect._ParameterKind.VAR_POSITIONAL:
                     # pass in by name without packing/unpacking
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
-                    varargs = (self.kwargs[param.name](*passThroughArgsTweaks, **kwargTweaks), )
+                    varargs = (
+                        self.kwargs[param.name](*passThroughArgsTweaks, **kwargTweaks),
+                    )
 
                 elif param.kind == inspect._ParameterKind.VAR_KEYWORD:
                     # pass in by name without packing/unpacking
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
-                    varkwargs = dict(**self.kwargs[param.name](*passThroughArgsTweaks, **kwargTweaks))
+                    varkwargs = dict(
+                        **self.kwargs[param.name](*passThroughArgsTweaks, **kwargTweaks)
+                    )
 
         # validate arg state
         for i, arg in enumerate(args):
             if arg == StreamNone():
-                raise TypeError("Must provide argument for {}".format(self.args[i].name))
+                raise TypeError(
+                    "Must provide argument for {}".format(self.args[i].name)
+                )
         for name, kwarg in kwargs.items():
             if kwarg == StreamNone():
                 raise TypeError("Must provide argument for {}".format(name))
@@ -349,10 +373,15 @@ class Node(_DagreD3Mixin):
 
     def _execute(self, args_state):
         print("executing: {}\t{}".format(self._name, args_state))
-        return self._value(*args_state.args, *args_state.varargs, **args_state.kwargs, **args_state.varkwargs)
+        return self._value(
+            *args_state.args,
+            *args_state.varargs,
+            **args_state.kwargs,
+            **args_state.varkwargs,
+        )
 
     def _bind(self, other_self=None, *args, **kwargs):
-        '''This function binds an alternative `self` to the node's callable'''
+        """This function binds an alternative `self` to the node's callable"""
         if other_self is not None:
             self._self_reference = other_self
         return self(*args, **kwargs)
@@ -376,7 +405,7 @@ class Node(_DagreD3Mixin):
 
             # explicitly un-dirty me
             self._dirty = False
-        
+
         if not tweaking:
             # update last value
             self._last_value = new_value
@@ -428,14 +457,10 @@ def node(meth, **attribute_kwargs):
     # TODO attribute kwargs into nodes
     new_node = Node(value=meth)
     if new_node._callable_is_method:
-        ret = lambda self, *args, **kwargs: new_node._bind(
-            self, *args, **kwargs
-        )
+        ret = lambda self, *args, **kwargs: new_node._bind(self, *args, **kwargs)
     else:
-        ret = lambda *args, **kwargs: new_node._bind(
-            None, *args, **kwargs
-        )
+        ret = lambda *args, **kwargs: new_node._bind(None, *args, **kwargs)
 
     ret._node_wrapper = new_node
     # ret = wraps(meth)(ret)
-    return  ret
+    return ret

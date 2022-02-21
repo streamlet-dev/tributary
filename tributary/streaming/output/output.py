@@ -100,6 +100,9 @@ def Collect(node, limit=None):
 
 
 def Graph(node):
+    if isinstance(node, list):
+        return {n: n.graph() for n in node}
+
     if not node.upstream():
         # leaf node
         return {node: []}
