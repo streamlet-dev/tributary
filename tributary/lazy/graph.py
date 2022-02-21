@@ -11,6 +11,7 @@ class LazyGraph(object):
         # the last thing we do is go through all of our methods and ensure that all `_callable_args` in our methods are replaced with nodes
         for meth in dir(self):
             meth = getattr(self, meth)
+
             # bind self on nodes
             if isinstance(meth, Node):
                 meth._self_reference = self
