@@ -13,6 +13,14 @@ from .dd3 import _DagreD3Mixin
 ArgState = namedtuple("ArgState", ["args", "kwargs", "varargs", "varkwargs"])
 
 
+class ParamType:
+    POSITIONAL_ONLY = inspect._ParameterKind.POSITIONAL_ONLY
+    KEYWORD_ONLY = inspect._ParameterKind.KEYWORD_ONLY
+    POSITIONAL_OR_KEYWORD = inspect._ParameterKind.POSITIONAL_OR_KEYWORD
+    VAR_POSITIONAL = inspect._ParameterKind.VAR_POSITIONAL
+    VAR_KEYWORD = inspect._ParameterKind.VAR_KEYWORD
+
+
 def extractParameters(callable):
     """Given a function, extract the arguments and defaults"""
     # wrap args and kwargs of function to node
@@ -36,11 +44,11 @@ class Parameter(object):
         self.position = position
         self.kind = kind
 
-        if kind == inspect._ParameterKind.VAR_POSITIONAL:
+        if kind == ParamType.VAR_POSITIONAL:
             # default is empty tuple
             self.default = tuple()
 
-        elif kind == inspect._ParameterKind.VAR_KEYWORD:
+        elif kind == ParamType.VAR_KEYWORD:
             # default is empty dict
             self.default = {}
 
@@ -167,6 +175,9 @@ class Node(_DagreD3Mixin):
         self.args = []
         self.kwargs = {}
 
+        # we may need to update parameters for dynamic args/kwargs, so we will modify this and set it at the end
+        updated_parameters = self._parameters.copy()
+
         for param in self._parameters:
             if param.name == "self" and self._callable_is_method:
                 # skip this
@@ -177,7 +188,38 @@ class Node(_DagreD3Mixin):
                 param.position if not self._callable_is_method else param.position - 1
             )
 
-            if param.position < len(args or ()):
+            print(param.kind)
+
+            if param.kind == ParamType.VAR_POSITIONAL:
+                # flush the remaining args into new parameters
+                # first pop the args placeholder parameters
+                updated_parameters.pop()
+
+                # now flush into parameters
+                for i, arg in enumerate(args):
+                    new_param = Parameter(
+                        "{}{}".format(param.name, param.position + i),
+                        param.position + i,
+                        None,
+                        ParamType.POSITIONAL_ONLY,
+                    )
+                    updated_parameters.append(new_param)
+
+                    if isinstance(arg, Node):
+                        # if its a node, use the node
+                        parameter_node = arg
+                    else:
+                        # else wrap it in a node with the provided value
+                        parameter_node = Node(arg, new_param.name)
+
+                    self._pushDep(new_param, parameter_node)
+
+            elif param.kind == ParamType.VAR_KEYWORD:
+                # flush the remaining kwargs into new parameters
+                # TODO
+                raise NotImplemented()
+
+            elif param.position < len(args or ()):
                 # use input arg
                 if isinstance(args[param.position], Node):
                     # if its a node, use the node
@@ -185,6 +227,9 @@ class Node(_DagreD3Mixin):
                 else:
                     # else wrap it in a node with the provided value
                     parameter_node = Node(args[param.position], param.name)
+
+                # push node as dependency
+                self._pushDep(param, parameter_node)
 
             elif param.name in (kwargs or {}):
                 # use input kwarg
@@ -195,13 +240,26 @@ class Node(_DagreD3Mixin):
                     # else wrap it in a node with the provided value
                     parameter_node = Node(kwargs[param.name], param.name)
 
+                # push node as dependency
+                self._pushDep(param, parameter_node)
+
             else:
                 # otherwise, wrap the function argument to a node using the function-defined default
                 parameter_node = Node(param.default, param.name)
 
-            self.args.append(parameter_node)
-            self.kwargs[param.name] = parameter_node
-            self << parameter_node
+                # push node as dependency
+                self._pushDep(param, parameter_node)
+
+        self._parameters = updated_parameters
+
+        print(self._name, self.args)
+        print(self._name, self.kwargs)
+        print(self._name, self._parameters)
+
+    def _pushDep(self, param, parameter_node):
+        self.args.append(parameter_node)
+        self.kwargs[param.name] = parameter_node
+        self << parameter_node
 
     # ***********************
     # Public interface
@@ -326,33 +384,33 @@ class Node(_DagreD3Mixin):
 
             else:
                 # try to repect original function definition
-                if param.kind == inspect._ParameterKind.POSITIONAL_ONLY:
+                if param.kind == ParamType.POSITIONAL_ONLY:
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
                     args.append(
                         self.args[param.position](*passThroughArgsTweaks, **kwargTweaks)
                     )
 
-                elif param.kind == inspect._ParameterKind.KEYWORD_ONLY:
+                elif param.kind == ParamType.KEYWORD_ONLY:
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
                     kwargs[param.name] = self.kwargs[param.name](
                         *passThroughArgsTweaks, **kwargTweaks
                     )
 
-                elif param.kind == inspect._ParameterKind.POSITIONAL_OR_KEYWORD:
+                elif param.kind == ParamType.POSITIONAL_OR_KEYWORD:
                     # use keyword
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
                     kwargs[param.name] = self.kwargs[param.name](
                         *passThroughArgsTweaks, **kwargTweaks
                     )
 
-                elif param.kind == inspect._ParameterKind.VAR_POSITIONAL:
+                elif param.kind == ParamType.VAR_POSITIONAL:
                     # pass in by name without packing/unpacking
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
                     varargs = (
                         self.kwargs[param.name](*passThroughArgsTweaks, **kwargTweaks),
                     )
 
-                elif param.kind == inspect._ParameterKind.VAR_KEYWORD:
+                elif param.kind == ParamType.VAR_KEYWORD:
                     # pass in by name without packing/unpacking
                     # NOTE: only pass kwarg tweaks, cannot tweak via indirect position
                     varkwargs = dict(
