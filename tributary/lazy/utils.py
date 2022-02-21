@@ -26,10 +26,10 @@ def Expire(
     )
 
     # stash original recompute
-    ret._orig_recompute = ret._recompute
+    ret._orig_execute = ret._execute
 
     # make recompute run on expire
-    ret._recompute = expire(
+    ret._execute = expire(
         second=second,
         minute=minute,
         hour=hour,
@@ -38,7 +38,7 @@ def Expire(
         week=week,
         month=month,
         maxsize=maxsize,
-    )(ret._recompute)
+    )(ret._execute)
     return ret
 
 
@@ -58,10 +58,10 @@ def Interval(
     )
 
     # stash original recompute
-    ret._orig_recompute = ret._recompute
+    ret._orig_value = ret._value
 
     # make recompute run on interval
-    ret._recompute = interval(
+    ret._value = interval(
         seconds=seconds,
         minutes=minutes,
         hours=hours,
@@ -70,7 +70,7 @@ def Interval(
         months=months,
         years=years,
         maxsize=maxsize,
-    )(ret._recompute)
+    )(ret._value)
     return ret
 
 

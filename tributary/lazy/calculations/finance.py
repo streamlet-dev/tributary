@@ -51,15 +51,11 @@ def MACD(node, period_fast=12, period_slow=26, signal=9, basket=False):
         basket=basket,
     ):
         EMA_fast = pd.Series(
-            pd.Series(data)
-            .ewm(ignore_na=False, span=period_fast, adjust=False)
-            .mean(),
+            pd.Series(data).ewm(ignore_na=False, span=period_fast, adjust=False).mean(),
             name="EMA_fast",
         )
         EMA_slow = pd.Series(
-            pd.Series(data)
-            .ewm(ignore_na=False, span=period_slow, adjust=False)
-            .mean(),
+            pd.Series(data).ewm(ignore_na=False, span=period_slow, adjust=False).mean(),
             name="EMA_slow",
         )
         MACD = pd.Series(EMA_fast - EMA_slow, name="MACD")

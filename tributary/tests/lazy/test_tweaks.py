@@ -11,7 +11,7 @@ class TestLazyTweaks:
         assert n2() == 6
 
         print(n2(1))
-        assert n2.isDirty({n: 1})
+        assert n2.isDirty()
 
         # tweaking operation applied to `n`
         assert n2(1) == 2

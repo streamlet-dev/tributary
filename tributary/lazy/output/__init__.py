@@ -21,6 +21,7 @@ def Print(node, level=0):
         + "\n".join(_.print(level + 1) for _ in node.upstream())
     )
 
+
 def GraphViz(node):
     # allow for lists of nodes
     if isinstance(node, Node):

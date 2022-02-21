@@ -64,11 +64,7 @@ def Add(self, other):
         self,
         other,
         "{}+{}".format(self._name_no_id, other._name_no_id),
-        (
-            lambda x, y: x + y
-            if not self._use_dual
-            else (x[0] + y[0], x[1] + y[1])
-        ),
+        (lambda x, y: x + y if not self._use_dual else (x[0] + y[0], x[1] + y[1])),
     )
 
 
@@ -80,11 +76,7 @@ def Sub(self, other):
         self,
         other,
         "{}-{}".format(self._name_no_id, other._name_no_id),
-        (
-            lambda x, y: x - y
-            if not self._use_dual
-            else (x[0] - y[0], x[1] - y[1])
-        ),
+        (lambda x, y: x - y if not self._use_dual else (x[0] - y[0], x[1] - y[1])),
     )
 
 
@@ -120,8 +112,7 @@ def Div(self, other):
             if not self._use_dual
             else (
                 x[0] / y[0],
-                (x[1] * y[0] - x[0] * y[1])
-                / y[0] ** 2,
+                (x[1] * y[0] - x[0] * y[1]) / y[0] ** 2,
             )
         ),
     )
@@ -140,8 +131,7 @@ def RDiv(self, other):
             if not self._use_dual
             else (
                 y[0] / x[0],
-                (y[1] * x[0] - y[0] * x[1])
-                / x[0] ** 2,
+                (y[1] * x[0] - y[0] * x[1]) / x[0] ** 2,
             )
         ),
     )
@@ -156,7 +146,7 @@ def Pow(self, other):
         other,
         "{}^{}".format(self._name_no_id, other._name_no_id),
         (
-            lambda x, y: x ** y
+            lambda x, y: x**y
             if not self._use_dual
             else (
                 x[0] ** y,
@@ -184,11 +174,7 @@ def Negate(self):
     return unary(
         self,
         "(-{})".format(self._name_no_id),
-        (
-            lambda x: -x
-            if not self._use_dual
-            else (-1 * x[0], -1 * x[1])
-        ),
+        (lambda x: -x if not self._use_dual else (-1 * x[0], -1 * x[1])),
     )
 
 
@@ -197,11 +183,7 @@ def Invert(self):
     return unary(
         self,
         "1/{}".format(self._name_no_id),
-        (
-            lambda x: 1 / x
-            if not self._use_dual
-            else (1 / x[0], -x[1] / (x[0] ** 2))
-        ),
+        (lambda x: 1 / x if not self._use_dual else (1 / x[0], -x[1] / (x[0] ** 2))),
     )
 
 
@@ -466,9 +448,7 @@ def Erf(self):
             if not self._use_dual
             else (
                 math.erf(x[0]),
-                x[1]
-                * (2 / math.sqrt(math.pi))
-                * math.exp(-1 * math.pow(x[0], 2)),
+                x[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(x[0], 2)),
             )
         ),
     )
@@ -482,11 +462,7 @@ def Float(self):
     return unary(
         self,
         "float({})".format(self._name_no_id),
-        (
-            lambda x: float(x)
-            if not self._use_dual
-            else float(x[0])
-        ),
+        (lambda x: float(x) if not self._use_dual else float(x[0])),
     )
 
 
@@ -519,11 +495,7 @@ def Str(self):
     return unary(
         self,
         "str({})".format(self._name_no_id),
-        (
-            lambda x: str(x)
-            if not self._use_dual
-            else str(x[0]) + "+" + str(x[1]) + "ε"
-        ),
+        (lambda x: str(x) if not self._use_dual else str(x[0]) + "+" + str(x[1]) + "ε"),
     )
 
 
@@ -636,11 +608,7 @@ def Equal(self, other):
         self,
         other,
         self._name_no_id + "==" + other._name_no_id,
-        (
-            lambda x, y: x == y
-            if not self._use_dual
-            else x[0] == y[0]
-        ),
+        (lambda x, y: x == y if not self._use_dual else x[0] == y[0]),
     )
 
 
@@ -654,11 +622,7 @@ def NotEqual(self, other):
         self,
         other,
         self._name_no_id + "!=" + other._name_no_id,
-        (
-            lambda x, y: x != y
-            if not self._use_dual
-            else x[0] != y[0]
-        ),
+        (lambda x, y: x != y if not self._use_dual else x[0] != y[0]),
     )
 
 
@@ -672,11 +636,7 @@ def Ge(self, other):
         self,
         other,
         self._name_no_id + ">=" + other._name_no_id,
-        (
-            lambda x, y: x >= y
-            if not self._use_dual
-            else x[0] > y[0] or x[0] == y[0]
-        ),
+        (lambda x, y: x >= y if not self._use_dual else x[0] > y[0] or x[0] == y[0]),
     )
 
 
@@ -690,11 +650,7 @@ def Gt(self, other):
         self,
         other,
         self._name_no_id + ">" + other._name_no_id,
-        (
-            lambda x, y: x > y
-            if not self._use_dual
-            else x[0] > y[0]
-        ),
+        (lambda x, y: x > y if not self._use_dual else x[0] > y[0]),
     )
 
 
@@ -708,11 +664,7 @@ def Le(self, other):
         self,
         other,
         self._name_no_id + "<=" + other._name_no_id,
-        (
-            lambda x, y: x <= y
-            if not self._use_dual
-            else x[0] <= y[0] or x[0] == y[0]
-        ),
+        (lambda x, y: x <= y if not self._use_dual else x[0] <= y[0] or x[0] == y[0]),
     )
 
 
@@ -726,11 +678,7 @@ def Lt(self, other):
         self,
         other,
         self._name_no_id + "<" + other._name_no_id,
-        (
-            lambda x, y: x < y
-            if not self._use_dual
-            else x[0] < y[0]
-        ),
+        (lambda x, y: x < y if not self._use_dual else x[0] < y[0]),
     )
 
 

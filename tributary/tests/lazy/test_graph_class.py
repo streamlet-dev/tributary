@@ -1,9 +1,12 @@
 import tributary.lazy as t
+
+import tributary.lazy as t
 import random
 
 
 class Func1(t.LazyGraph):
     def __init__(self, *args, **kwargs):
+        super().__init__()
         self.x = self.node("x", readonly=False, value=1)
 
 
@@ -39,13 +42,30 @@ class Func4(t.LazyGraph):
         return random.random()
 
 
+class Func5(t.LazyGraph):
+    @t.node()
+    def z(self):
+        return self.x | self.y()
+
+    @t.node()
+    def y(self):
+        return 10
+
+    def reset(self):
+        self.x = None
+
+    def __init__(self):
+        self.x = self.node(name="x", value=None)
+
+
 class TestLazy:
     def test_misc(self):
         f4 = Func4()
         z = f4.func1()
-        assert z.print()
-        assert z.graph()
-        assert z.graphviz()
+        assert isinstance(z, float) and z >= 1
+        assert f4.func1.print()
+        assert f4.func1.graph()
+        assert f4.func1.graphviz()
 
     def test_lazy_default_func_arg(self):
         def func(val, prev_val=0):
@@ -68,3 +88,18 @@ class TestLazy:
         n2 = n + 1
 
         assert n2.kwargs["x"]._name_no_id == "Test"
+
+    def test_or_dirtypropogation(self):
+        f = Func5()
+        assert f.z()() == 10
+        assert f.x() is None
+
+        f.x = 5
+
+        assert f.x() == 5
+        assert f.z()() == 5
+
+        f.reset()
+
+        assert f.x() is None
+        assert f.z()() == 10
