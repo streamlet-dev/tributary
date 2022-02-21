@@ -8,7 +8,7 @@ class TestConditional:
     def test_if(self):
         import tributary.lazy as tl
 
-        x = tl.Node(callable=func)
+        x = tl.Node(value=func)
         y = tl.Node(1)
         z = tl.Node(-1)
 

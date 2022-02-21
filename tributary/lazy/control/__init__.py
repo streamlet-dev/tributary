@@ -26,13 +26,13 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
             "If",
             func,
             [if_node, satisfied_node, unsatisfied_node],
-            graphvizshare=_CONTROL_GRAPHVIZSHAPE,
+            graphvizshape=_CONTROL_GRAPHVIZSHAPE,
         )
     return if_node._gennode(
         "If",
         func,
         [if_node, satisfied_node, unsatisfied_node],
-        graphvizshare=_CONTROL_GRAPHVIZSHAPE,
+        graphvizshape=_CONTROL_GRAPHVIZSHAPE,
     )
 
 
