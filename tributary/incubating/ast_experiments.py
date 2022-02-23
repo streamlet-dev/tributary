@@ -8,6 +8,7 @@ import tributary.lazy as t
 
 blerg = t.Node(value=5)
 
+
 class Func5(t.LazyGraph):
     def __init__(self):
         super().__init__()
@@ -27,10 +28,12 @@ class Func5(t.LazyGraph):
     def y(self):
         return 10
 
+
 source = inspect.getsource(Func5.zz)
 root = ast.parse(textwrap.dedent(source)).body[0]
 
 print(ast.dump(root, indent=4))
+
 
 def isClassAttribute(node):
     # right=Call(
@@ -40,7 +43,11 @@ def isClassAttribute(node):
     #         ctx=Load()),
     #     args=[],
     # keywords=[])),
-    if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.value.id == "self":
+    if (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.value.id == "self"
+    ):
         return node.func.attr
     elif isinstance(node, ast.Attribute) and node.value.id == "self":
         return node.attr
@@ -53,6 +60,7 @@ def getClassAttributesUsedInMethod(root):
         if attr:
             attribute_deps.append(attr)
     return attribute_deps
+
 
 ads = getClassAttributesUsedInMethod(root)
 # print("attribute deps:", ads)
@@ -73,12 +81,13 @@ def addAttributeDepsToMethodSignature(root, attribute_deps):
         for meth_arg in root.args.args:
             if meth_arg.arg == attribute_dep:
                 append = False
-        
+
         if append:
             root.args.args.append(ast.arg(attribute_dep))
 
 
 addAttributeDepsToMethodSignature(root, ads)
+
 
 class Transformer(ast.NodeTransformer):
     def generic_visit(self, node):
@@ -87,10 +96,10 @@ class Transformer(ast.NodeTransformer):
 
         # if isClassAttribute(node):
         #     return ast.Attribute()
-            # Attribute(
-            #                 value=Name(id='self', ctx=Load()),
-            #                 attr='x',
-            #                 ctx=Load()),
+        # Attribute(
+        #                 value=Name(id='self', ctx=Load()),
+        #                 attr='x',
+        #                 ctx=Load()),
         return node
 
 
@@ -115,4 +124,3 @@ print(ast.unparse(Transformer().visit(root)))
 
 # # assert f.x() is None
 # # assert f.z()() == 10
-
