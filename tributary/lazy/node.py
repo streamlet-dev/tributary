@@ -3,8 +3,6 @@ import uuid
 from collections import namedtuple
 from frozendict import frozendict
 
-from tomlkit import value
-
 from ..base import TributaryException, StreamNone
 
 # from boltons.funcutils import wraps
@@ -453,7 +451,7 @@ class Node(_DagreD3Mixin):
         else:
             new_value = self.value()
 
-        if self._compare(value, self._last_value) and not tweaking:
+        if self._compare(new_value, self._last_value) and not tweaking:
             # push dirtinesss to downstream nodes
             self.setDirty(myself=False)
 

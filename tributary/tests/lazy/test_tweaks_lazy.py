@@ -11,13 +11,15 @@ class TestLazyTweaks:
         assert n2() == 6
 
         print(n2(1))
-        assert n2.isDirty()
+        assert not n2.isDirty()
 
         # tweaking operation applied to `n`
         assert n2(1) == 2
+        assert not n2.isDirty()
 
         # not permanently set
         assert n2() == 6
+        assert not n2.isDirty()
 
     def test_tweaks_dirtiness_and_parent(self):
         n1 = tl.Node(value=1, name="n1")
