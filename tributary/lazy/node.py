@@ -3,7 +3,7 @@ import uuid
 from collections import namedtuple
 from frozendict import frozendict
 
-from ..base import TributaryException, StreamNone
+from ..base import StreamEnd, TributaryException, StreamNone, StreamRepeat
 
 # from boltons.funcutils import wraps
 from ..utils import _compare, _ismethod, _either_type, _gen_to_func
@@ -446,11 +446,20 @@ class Node(_DagreD3Mixin):
         tweaking = argTweaks or kwargTweaks
 
         if self._dirty or self._dynamic or tweaking:
-            # reexecute
+            # reexecute if dirty or dynamic or i tweak
             new_value = self._execute(args_state)
         else:
+            # else use the old value
             new_value = self.value()
 
+        # if the provided value is done, return my preview value from now on
+        if isinstance(new_value, (StreamNone, StreamEnd, StreamRepeat)):
+            # FIXME should i do this?
+            self._dynamic = False
+            return self.value()
+
+        # if the new value is far away enough from the old value and it's not a
+        # tweak, notify my dependents of my dirtiness
         if self._compare(new_value, self._last_value) and not tweaking:
             # push dirtinesss to downstream nodes
             self.setDirty(myself=False)
@@ -458,6 +467,7 @@ class Node(_DagreD3Mixin):
             # explicitly un-dirty me
             self._dirty = False
 
+        # if i'm not tweaking, overload my value
         if not tweaking:
             # update last value
             self._last_value = new_value

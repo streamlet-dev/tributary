@@ -15,6 +15,10 @@ def If(if_node, satisfied_node, unsatisfied_node=None, *elseifs):
     if len(elseifs) % 2 != 0:
         raise TributaryException("Else ifs must be in pairs")
 
+    if elseifs:
+        # TODO else ifs
+        raise NotImplementedError()
+
     def func(conditional, if_val, else_val):
         # TODO else ifs
         if conditional:
