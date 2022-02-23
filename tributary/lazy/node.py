@@ -1,6 +1,7 @@
 import inspect
 import uuid
 from collections import namedtuple
+from frozendict import frozendict
 
 from tomlkit import value
 
@@ -188,8 +189,6 @@ class Node(_DagreD3Mixin):
                 param.position if not self._callable_is_method else param.position - 1
             )
 
-            print(param.kind)
-
             if param.kind == ParamType.VAR_POSITIONAL:
                 # flush the remaining args into new parameters
                 # first pop the args placeholder parameters
@@ -217,7 +216,7 @@ class Node(_DagreD3Mixin):
             elif param.kind == ParamType.VAR_KEYWORD:
                 # flush the remaining kwargs into new parameters
                 # TODO
-                raise NotImplemented()
+                raise NotImplementedError()
 
             elif param.position < len(args or ()):
                 # use input arg
@@ -251,10 +250,6 @@ class Node(_DagreD3Mixin):
                 self._pushDep(param, parameter_node)
 
         self._parameters = updated_parameters
-
-        print(self._name, self.args)
-        print(self._name, self.kwargs)
-        print(self._name, self._parameters)
 
     def _pushDep(self, param, parameter_node):
         self.args.append(parameter_node)
@@ -427,10 +422,12 @@ class Node(_DagreD3Mixin):
             if kwarg == StreamNone():
                 raise TypeError("Must provide argument for {}".format(name))
 
-        return ArgState(args, kwargs, varargs, varkwargs)
+        # Use tuple and fronzendict for hashing state
+        return ArgState(
+            tuple(args), frozendict(kwargs), tuple(varargs), frozendict(varkwargs)
+        )
 
     def _execute(self, args_state):
-        print("executing: {}\t{}".format(self._name, args_state))
         return self._value(
             *args_state.args,
             *args_state.varargs,
@@ -444,7 +441,7 @@ class Node(_DagreD3Mixin):
             self._self_reference = other_self
         return self(*args, **kwargs)
 
-    def __call__(self, *argTweaks, **kwargTweaks):
+    def _call(self, *argTweaks, **kwargTweaks):
         args_state = self._computeArgState(*argTweaks, **kwargTweaks)
 
         # when tweaking, dont save the results
@@ -452,7 +449,6 @@ class Node(_DagreD3Mixin):
 
         if self._dirty or self._dynamic or tweaking:
             # reexecute
-            print(args_state)
             new_value = self._execute(args_state)
         else:
             new_value = self.value()
@@ -473,6 +469,10 @@ class Node(_DagreD3Mixin):
 
         # otherwise don't manipulate state and just return the calculated value
         return new_value
+
+    def __call__(self, *argTweaks, **kwargTweaks):
+        # NOTE: use separate `_call` function so that expire and interval work properly
+        return self._call(*argTweaks, **kwargTweaks)
 
     def value(self):
         return self._last_value
@@ -515,9 +515,13 @@ def node(meth, **attribute_kwargs):
     # TODO attribute kwargs into nodes
     new_node = Node(value=meth)
     if new_node._callable_is_method:
-        ret = lambda self, *args, **kwargs: new_node._bind(self, *args, **kwargs)
+        ret = lambda self, *args, **kwargs: new_node._bind(  # noqa: E731
+            self, *args, **kwargs
+        )
     else:
-        ret = lambda *args, **kwargs: new_node._bind(None, *args, **kwargs)
+        ret = lambda *args, **kwargs: new_node._bind(  # noqa: E731
+            None, *args, **kwargs
+        )
 
     ret._node_wrapper = new_node
     # ret = wraps(meth)(ret)

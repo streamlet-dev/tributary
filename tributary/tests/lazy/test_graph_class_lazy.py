@@ -1,6 +1,4 @@
 import tributary.lazy as t
-
-import tributary.lazy as t
 import random
 
 

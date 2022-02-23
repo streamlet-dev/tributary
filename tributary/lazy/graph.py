@@ -1,7 +1,5 @@
-import types
-from .node import Node  # noqa: F401
+from .node import Node
 from ..base import TributaryException
-from ..utils import _compare
 
 
 class LazyGraph(object):

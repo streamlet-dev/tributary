@@ -21,7 +21,7 @@ class Func5(t.LazyGraph):
         return self.x() | self.y() | blerg
 
     def zz(self):
-        return self.x() | self.y() | blerg
+        return self.x | self.y() | blerg
 
     @t.node()
     def y(self):
@@ -32,37 +32,65 @@ root = ast.parse(textwrap.dedent(source)).body[0]
 
 print(ast.dump(root, indent=4))
 
-attribute_deps = []
-# code for parsing out self's node deps
-for node in ast.walk(root):
-    if isinstance(node, ast.Attribute) and node.value.id == "self":
-        attribute_deps.append(node.attr)
+def isClassAttribute(node):
+    # right=Call(
+    #     func=Attribute(
+    #         value=Name(id='self', ctx=Load()),
+    #         attr='y',
+    #         ctx=Load()),
+    #     args=[],
+    # keywords=[])),
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.value.id == "self":
+        return node.func.attr
+    elif isinstance(node, ast.Attribute) and node.value.id == "self":
+        return node.attr
 
-print("attribute deps:", attribute_deps)
-print("***Args***")
-print(root.args.posonlyargs)
-print(root.args.args)
-print(root.args.kwonlyargs)
-print(root.args.kw_defaults)
-print(root.args.defaults)
-print("***")
+
+def getClassAttributesUsedInMethod(root):
+    attribute_deps = []
+    for node in ast.walk(root):
+        attr = isClassAttribute(node)
+        if attr:
+            attribute_deps.append(attr)
+    return attribute_deps
+
+ads = getClassAttributesUsedInMethod(root)
+# print("attribute deps:", ads)
+# print("***Args***")
+# print(root.args.posonlyargs)
+# print(root.args.args)
+# print(root.args.kwonlyargs)
+# print(root.args.kw_defaults)
+# print(root.args.defaults)
+# print("***")
+
+
+# append attribute args to method definition
+def addAttributeDepsToMethodSignature(root, attribute_deps):
+    for attribute_dep in attribute_deps:
+        append = True
+
+        for meth_arg in root.args.args:
+            if meth_arg.arg == attribute_dep:
+                append = False
+        
+        if append:
+            root.args.args.append(ast.arg(attribute_dep))
+
+
+addAttributeDepsToMethodSignature(root, ads)
 
 class Transformer(ast.NodeTransformer):
     def generic_visit(self, node):
         # Need to call super() in any case to visit child nodes of the current one.
         super().generic_visit(node)
-        ordered_dict_conditions = (
-            isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Name)
-            and node.func.id == 'OrderedDict'
-            and len(node.args) == 1
-            and isinstance(node.args[0], ast.List)
-        )
-        if ordered_dict_conditions:
-            return ast.Dict(
-                [x.elts[0] for x in node.args[0].elts],
-                [x.elts[1] for x in node.args[0].elts]
-            )
+
+        # if isClassAttribute(node):
+        #     return ast.Attribute()
+            # Attribute(
+            #                 value=Name(id='self', ctx=Load()),
+            #                 attr='x',
+            #                 ctx=Load()),
         return node
 
 
