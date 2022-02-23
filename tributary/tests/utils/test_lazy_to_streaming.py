@@ -13,7 +13,7 @@ class TestLazyToStreaming:
             for _ in range(5):
                 yield _
 
-        lazy_node = tl.Node(callable=func) + 5
+        lazy_node = tl.Node(value=func) + 5
         # 5 6 7 8 9
 
         streaming_node = ts.Print(ts.Func(func) - 5, "streaming:")
@@ -31,7 +31,7 @@ class TestLazyToStreaming:
             for _ in range(5):
                 yield _
 
-        lazy_node = tl.Node(callable=func) + 5
+        lazy_node = tl.Node(value=func) + 5
         # 5 6 7 8 9
 
         streaming_node = ts.Print(ts.Func(func) - 5, "streaming:")

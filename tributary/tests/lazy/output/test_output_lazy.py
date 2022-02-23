@@ -6,13 +6,13 @@ class TestOutput:
         def func():
             return 1
 
-        assert tl.GraphViz(tl.Node(callable=func, always_dirty=True))
+        assert tl.GraphViz(tl.Node(value=func, dynamic=True))
 
     def test_dagre(self):
         def func():
             return 1
 
-        assert tl.Dagre(tl.Node(callable=func, always_dirty=True))
+        assert tl.Dagre(tl.Node(value=func, dynamic=True))
 
     def test_multiple_graph(self):
         n = tl.Node(5)

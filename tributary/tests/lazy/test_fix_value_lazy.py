@@ -5,7 +5,7 @@ import tributary.lazy as t
 
 class TestCallableLock:
     def test_callable_lock(self):
-        n = t.Node(callable=random.random, dynamic=True)
+        n = t.Node(value=random.random, dynamic=True)
 
         x = n()
         assert n() != x

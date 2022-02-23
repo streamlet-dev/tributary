@@ -22,7 +22,7 @@ class TestFinance:
 
         for i, x in enumerate(df["A"][1:]):
             val.append(x)
-            n._dirty = True
+            n.setDirty(True)
             print("data\t", i, x, n_rsi(), rsi[i])
             assert abs(n_rsi() - rsi[i]) < 0.003
 
@@ -59,7 +59,7 @@ class TestFinance:
 
         for i, x in enumerate(df["A"]):
             val.append(x)
-            n_macd._dirty = True
+            n_macd.setDirty(True)
             ret = n_macd()
             assert expected.values[i][0] - ret[0] < 0.001
             assert expected.values[i][1] - ret[1] < 0.001

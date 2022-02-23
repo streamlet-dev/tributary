@@ -35,6 +35,7 @@ requires = [
     "beautifulsoup4>=4.9.1",
     "boltons>=20.1.0",
     "emails>=0.5.15",
+    "frozendict>=1.2",
     "future>=0.17.1",
     "gevent>=1.3.7",
     "graphviz>=0.10.1",

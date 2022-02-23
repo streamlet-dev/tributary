@@ -1,7 +1,5 @@
-import types
-from .node import Node  # noqa: F401
+from .node import Node
 from ..base import TributaryException
-from ..utils import _compare
 
 
 class LazyGraph(object):
@@ -11,34 +9,39 @@ class LazyGraph(object):
         # the last thing we do is go through all of our methods and ensure that all `_callable_args` in our methods are replaced with nodes
         for meth in dir(self):
             meth = getattr(self, meth)
-            if hasattr(meth, "_node_wrapper"):
+
+            # bind self on nodes
+            if isinstance(meth, Node):
+                meth._self_reference = self
+
+            elif hasattr(meth, "_node_wrapper"):
                 node = meth._node_wrapper
                 if node is None:
                     continue
-
+                # FIXME redo
                 # modify in place in case used elsewhere
-                for i, arg in enumerate(node._callable_args):
-                    if not isinstance(arg, Node):
-                        replace = getattr(self, arg)
-                        if not isinstance(replace, Node) and (
-                            isinstance(replace, types.FunctionType)
-                            or isinstance(replace, types.MethodType)
-                        ):
-                            # call function to get node
-                            replace = replace()
-                        node._callable_args[i] = replace
+                # for i, arg in enumerate(node._callable_args):
+                #     if not isinstance(arg, Node):
+                #         replace = getattr(self, arg)
+                #         if not isinstance(replace, Node) and (
+                #             isinstance(replace, types.FunctionType)
+                #             or isinstance(replace, types.MethodType)
+                #         ):
+                #             # call function to get node
+                #             replace = replace()
+                #         node._callable_args[i] = replace
 
-                # modify in place in case used elsewhere
-                for k, arg in node._callable_kwargs.items():
-                    if not isinstance(arg, Node):
-                        replace = getattr(self, arg)
-                        if not isinstance(replace, Node) and (
-                            isinstance(replace, types.FunctionType)
-                            or isinstance(replace, types.MethodType)
-                        ):
-                            # call function to get node
-                            replace = replace()
-                        node._callable_kwargs[k] = replace
+                # # modify in place in case used elsewhere
+                # for k, arg in node._callable_kwargs.items():
+                #     if not isinstance(arg, Node):
+                #         replace = getattr(self, arg)
+                #         if not isinstance(replace, Node) and (
+                #             isinstance(replace, types.FunctionType)
+                #             or isinstance(replace, types.MethodType)
+                #         ):
+                #             # call function to get node
+                #             replace = replace()
+                #         node._callable_kwargs[k] = replace
 
     def node(self, name, readonly=False, nullable=True, value=None):  # noqa: F811
         """method to create a lazy node attached to a graph.
@@ -58,9 +61,6 @@ class LazyGraph(object):
             if not isinstance(value, Node):
                 value = Node(
                     name=name,
-                    derived=False,
-                    readonly=readonly,
-                    nullable=nullable,
                     value=value,
                 )
             self.__nodes[name] = value
@@ -87,7 +87,6 @@ class LazyGraph(object):
             elif isinstance(value, Node):
                 raise TributaryException("Cannot set to node")
             else:
-                node._dirty = _compare(node.value(), value)
-                node._setValue(value)
+                node.setValue(value)
         else:
             super(LazyGraph, self).__setattr__(name, value)
