@@ -35,19 +35,14 @@ print(ast.dump(root, indent=4))
 
 
 def isClassAttribute(node):
-    # right=Call(
-    #     func=Attribute(
-    #         value=Name(id='self', ctx=Load()),
-    #         attr='y',
-    #         ctx=Load()),
-    #     args=[],
-    # keywords=[])),
+    # self.aNode()
     if (
         isinstance(node, ast.Call)
         and isinstance(node.func, ast.Attribute)
         and node.func.value.id == "self"
     ):
         return node.func.attr
+    # self.aNode
     elif isinstance(node, ast.Attribute) and node.value.id == "self":
         return node.attr
 
