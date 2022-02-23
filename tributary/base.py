@@ -2,42 +2,7 @@ class TributaryException(Exception):
     pass
 
 
-class StreamEnd:
-    """Indicates that a stream has nothing left in it"""
-
-    instance = None
-
-    def __new__(cls):
-        if not StreamEnd.instance:
-            StreamEnd.instance = super().__new__(cls)
-            return StreamEnd.instance
-        return StreamEnd.instance
-
-
-class StreamRepeat:
-    """Indicates that a stream has a gap, this object should be ignored
-    and the previous action repeated"""
-
-    instance = None
-
-    def __new__(cls):
-        if not StreamRepeat.instance:
-            StreamRepeat.instance = super().__new__(cls)
-            return StreamRepeat.instance
-        return StreamRepeat.instance
-
-
-class StreamNone:
-    """indicates that a stream does not have a value"""
-
-    instance = None
-
-    def __new__(cls):
-        if not StreamNone.instance:
-            StreamNone.instance = super().__new__(cls)
-            return StreamNone.instance
-        return StreamNone.instance
-
+class BaseNodeValue:
     def all_bin_ops(self, other):
         return self
 
@@ -77,7 +42,7 @@ class StreamNone:
     __ge__ = all_bin_ops
 
     def __eq__(self, other):
-        if isinstance(other, StreamNone):
+        if isinstance(other, self.__class__):
             return True
         return False
 
@@ -85,3 +50,40 @@ class StreamNone:
     __neg__ = all_un_ops
     __nonzero__ = all_un_ops
     __len__ = all_un_ops
+
+
+class StreamEnd(BaseNodeValue):
+    """Indicates that a stream has nothing left in it"""
+
+    instance = None
+
+    def __new__(cls):
+        if not StreamEnd.instance:
+            StreamEnd.instance = super().__new__(cls)
+            return StreamEnd.instance
+        return StreamEnd.instance
+
+
+class StreamRepeat(BaseNodeValue):
+    """Indicates that a stream has a gap, this object should be ignored
+    and the previous action repeated"""
+
+    instance = None
+
+    def __new__(cls):
+        if not StreamRepeat.instance:
+            StreamRepeat.instance = super().__new__(cls)
+            return StreamRepeat.instance
+        return StreamRepeat.instance
+
+
+class StreamNone(BaseNodeValue):
+    """indicates that a stream does not have a value"""
+
+    instance = None
+
+    def __new__(cls):
+        if not StreamNone.instance:
+            StreamNone.instance = super().__new__(cls)
+            return StreamNone.instance
+        return StreamNone.instance
