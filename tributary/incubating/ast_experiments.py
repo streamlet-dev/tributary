@@ -2,7 +2,6 @@ import ast
 import inspect
 import textwrap
 
-from attr import attr
 import tributary.lazy as t
 
 
