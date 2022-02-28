@@ -62,6 +62,7 @@ class Parameter(object):
     def __repr__(self):
         return "Param[{}-{}-{}]".format(self.name, self.position, self.kind)
 
+
 class Node(_DagreD3Mixin):
     """Class to represent an operation that is lazy"""
 
@@ -176,6 +177,9 @@ class Node(_DagreD3Mixin):
         self.args = []
         self.kwargs = {}
 
+        # map from node back to corresponding param
+        self.node_to_param = {}
+
         # we may need to update parameters for dynamic args/kwargs, so we will modify this and set it at the end
         updated_parameters = self._parameters.copy()
 
@@ -251,11 +255,17 @@ class Node(_DagreD3Mixin):
 
         self._parameters = updated_parameters
 
-        print(self._parameters, self.upstream())
-
     def _pushDep(self, param, parameter_node):
+        # add to param map
+        self.node_to_param[parameter_node] = param
+
+        # add to args lookup
         self.args.append(parameter_node)
+
+        # add to kwargs lookup
         self.kwargs[param.name] = parameter_node
+
+        # add to upstream
         self << parameter_node
 
     # ***********************

@@ -41,30 +41,31 @@ class Func4(t.LazyGraph):
 
 
 class Func5(t.LazyGraph):
+    def __init__(self):
+        self.x = self.node(name="x", value=None)
+        super().__init__()
+
     @t.node()
     def z(self):
         return self.x | self.y()
 
-    @t.node()
+    @t.node
     def y(self):
         return 10
 
     def reset(self):
         self.x = None
 
-    def __init__(self):
-        self.x = self.node(name="x", value=None)
-
 
 class TestLazy:
     # FIXME
-    # def test_misc(self):
-    #     f4 = Func4()
-    #     z = f4.func1()
-    #     assert isinstance(z, float) and z >= 1
-    #     assert f4.func1.print()
-    #     assert f4.func1.graph()
-    #     assert f4.func1.graphviz()
+    def test_misc(self):
+        f4 = Func4()
+        z = f4.func1()
+        assert isinstance(z, float) and z >= 1
+        assert f4.func1.print()
+        assert f4.func1.graph()
+        assert f4.func1.graphviz()
 
     def test_lazy_default_func_arg(self):
         def func(val, prev_val=0):

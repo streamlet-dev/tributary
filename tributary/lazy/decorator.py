@@ -1,6 +1,6 @@
 from .node import Node
 from ..utils import _either_type
-from ..parser import (
+from ..parser import (  # noqa: F401
     pprintCode,
     pprintAst,
     parseASTForMethod,

@@ -82,7 +82,12 @@ class Transformer(ast.NodeTransformer):
             # then replace with argument
             #
             # Name(id='blerg', ctx=Load())
-            return ast.Name(id=node.func.attr, ctx=ast.Load(), lineno=node.func.lineno, col_offset=node.func.col_offset)
+            return ast.Name(
+                id=node.func.attr,
+                ctx=ast.Load(),
+                lineno=node.func.lineno,
+                col_offset=node.func.col_offset,
+            )
         elif isClassAttribute(node) and isinstance(node, ast.Attribute):
             # Attribute(
             #     value=Name(id='self', ctx=Load()),
@@ -92,7 +97,12 @@ class Transformer(ast.NodeTransformer):
             # then replace with argument
             #
             # Name(id='blerg', ctx=Load())
-            name = ast.Name(id=node.attr, ctx=ast.Load(), lineno=node.lineno, col_offset=node.col_offset)
+            name = ast.Name(
+                id=node.attr,
+                ctx=ast.Load(),
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+            )
             self._transformed_to_nodes.append(name)
             return name
         elif isinstance(node, ast.Call) and node.func in self._transformed_to_nodes:

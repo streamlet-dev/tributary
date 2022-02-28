@@ -20,11 +20,17 @@ class LazyGraph(object):
 
                     for node in nodes_to_bind:
                         if not hasattr(self, node):
-                            raise TributaryException("Error binding dependency {} to node {} - make sure to super() after all nodes are defined".format(node, meth))
+                            raise TributaryException(
+                                "Error binding dependency {} to node {} - make sure to super() after all nodes are defined".format(
+                                    node, meth
+                                )
+                            )
 
                         node_to_bind = getattr(self, node)
                         if isinstance(node_to_bind, Node):
-                            meth << getattr(self, node)                     
+                            meth << getattr(self, node)
+
+                print(meth._name, meth._parameters, meth.upstream())
 
     def node(self, name, readonly=False, nullable=True, value=None):  # noqa: F811
         """method to create a lazy node attached to a graph.
