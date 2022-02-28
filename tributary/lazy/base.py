@@ -1,2 +1,3 @@
 from .graph import LazyGraph
-from .node import Node, node
+from .node import Node
+from .decorator import node

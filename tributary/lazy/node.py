@@ -6,7 +6,7 @@ from frozendict import frozendict
 from ..base import StreamEnd, TributaryException, StreamNone, StreamRepeat
 
 # from boltons.funcutils import wraps
-from ..utils import _compare, _ismethod, _either_type, _gen_to_func
+from ..utils import _compare, _ismethod, _gen_to_func
 from .dd3 import _DagreD3Mixin
 
 ArgState = namedtuple("ArgState", ["args", "kwargs", "varargs", "varkwargs"])
@@ -59,6 +59,8 @@ class Parameter(object):
             # TODO default-as-function
             self.default = default
 
+    def __repr__(self):
+        return "Param[{}-{}-{}]".format(self.name, self.position, self.kind)
 
 class Node(_DagreD3Mixin):
     """Class to represent an operation that is lazy"""
@@ -249,6 +251,8 @@ class Node(_DagreD3Mixin):
 
         self._parameters = updated_parameters
 
+        print(self._parameters, self.upstream())
+
     def _pushDep(self, param, parameter_node):
         self.args.append(parameter_node)
         self.kwargs[param.name] = parameter_node
@@ -260,11 +264,11 @@ class Node(_DagreD3Mixin):
     def __repr__(self):
         return "{}".format(self._name)
 
-    def upstream(self, node=None):
+    def upstream(self):
         """Access list of upstream nodes"""
         return self._upstream
 
-    def downstream(self, node=None):
+    def downstream(self):
         """Access list of downstream nodes"""
         return self._downstream
 
@@ -503,34 +507,3 @@ class Node(_DagreD3Mixin):
                 value=other, name="var(" + str(other) + ")"
             )
         return self._node_op_cache[str(other)]
-
-
-@_either_type
-def node(meth, **attribute_kwargs):
-    """Convert a method into a lazy node
-    Since `self` is not defined at the point of method creation, you can pass in
-    extra kwargs which represent attributes of the future `self`. These will be
-    converted to node args during instantiation
-    The format is:
-        @node(my_existing_attr_as_an_arg="_attribute_name"):
-        def my_method(self):
-            pass
-    this will be converted into a graph of the form:
-        self._attribute_name -> my_method
-    e.g. as if self._attribute_name was passed as an argument to my_method, and converted to a node in the usual manner
-    """
-
-    # TODO attribute kwargs into nodes
-    new_node = Node(value=meth)
-    if new_node._callable_is_method:
-        ret = lambda self, *args, **kwargs: new_node._bind(  # noqa: E731
-            self, *args, **kwargs
-        )
-    else:
-        ret = lambda *args, **kwargs: new_node._bind(  # noqa: E731
-            None, *args, **kwargs
-        )
-
-    ret._node_wrapper = new_node
-    # ret = wraps(meth)(ret)
-    return ret
