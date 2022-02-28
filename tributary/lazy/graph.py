@@ -14,34 +14,23 @@ class LazyGraph(object):
             if isinstance(meth, Node):
                 meth._self_reference = self
 
-            elif hasattr(meth, "_node_wrapper"):
-                node = meth._node_wrapper
-                if node is None:
-                    continue
-                # FIXME redo
-                # modify in place in case used elsewhere
-                # for i, arg in enumerate(node._callable_args):
-                #     if not isinstance(arg, Node):
-                #         replace = getattr(self, arg)
-                #         if not isinstance(replace, Node) and (
-                #             isinstance(replace, types.FunctionType)
-                #             or isinstance(replace, types.MethodType)
-                #         ):
-                #             # call function to get node
-                #             replace = replace()
-                #         node._callable_args[i] = replace
+                # replace upstream dependencies with their actual node equivalents
+                if hasattr(meth, "_nodes_to_bind"):
+                    nodes_to_bind = meth._nodes_to_bind
 
-                # # modify in place in case used elsewhere
-                # for k, arg in node._callable_kwargs.items():
-                #     if not isinstance(arg, Node):
-                #         replace = getattr(self, arg)
-                #         if not isinstance(replace, Node) and (
-                #             isinstance(replace, types.FunctionType)
-                #             or isinstance(replace, types.MethodType)
-                #         ):
-                #             # call function to get node
-                #             replace = replace()
-                #         node._callable_kwargs[k] = replace
+                    for node in nodes_to_bind:
+                        if not hasattr(self, node):
+                            raise TributaryException(
+                                "Error binding dependency {} to node {} - make sure to super() after all nodes are defined".format(
+                                    node, meth
+                                )
+                            )
+
+                        node_to_bind = getattr(self, node)
+                        if isinstance(node_to_bind, Node):
+                            meth << getattr(self, node)
+
+                print(meth._name, meth._parameters, meth.upstream())
 
     def node(self, name, readonly=False, nullable=True, value=None):  # noqa: F811
         """method to create a lazy node attached to a graph.
