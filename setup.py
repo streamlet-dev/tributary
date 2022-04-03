@@ -54,6 +54,7 @@ requires = [
 
 requires_dev = [
     "black>=20.",
+    "check-manifest",
     "flake8>=3.7.8",
     "flake8-black>=0.2.1",
     "mock",
