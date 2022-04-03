@@ -1,6 +1,9 @@
 graft tributary
 include LICENSE
 include README.md
+include CODE_OF_CONDUCT.md
+include CONTRIBUTING.md
+
 
 include setup.cfg
 include pyproject.toml
@@ -8,6 +11,15 @@ include .bumpversion.cfg
 include Makefile
 
 graft tributary/tests
+exclude tributary/tests/streaming/output/test_file_data.json
+
+# Get rid of docs, ci, and binder
+prune ci
+prune docs
+prune binder
+prune examples
+exclude CATALOG.md
+
 
 # Patterns to exclude from any directory
 global-exclude *~

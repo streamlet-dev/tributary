@@ -1,17 +1,15 @@
 build:  ## Build the repository
 	python setup.py build 
 
+develop:  ## install to site-packages in editable mode
+	python -m pip install --upgrade build pip setuptools twine wheel
+	python -m pip install -e .[develop]
+
 tests: ## Clean and Make unit tests
 	python -m pytest tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
 
 testsci: ## Clean and Make unit tests
 	CI=true python -m pytest tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
-
-testsv: ## Clean and Make unit tests
-	python -m pytest -vvv tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
-
-testsnocov: ## Clean and Make unit tests
-	python -m pytest -v tributary -x
 
 dockerup:
 	docker-compose -f ci/docker-compose.yml up -d
@@ -28,11 +26,15 @@ lint: ## run linter
 fix:  ## run black fix
 	python -m black tributary/ setup.py
 
+check: checks
+checks:  ## run lint and other checks
+	check-manifest
+
 clean: ## clean the repository
 	find . -name "__pycache__" | xargs  rm -rf 
 	find . -name "*.pyc" | xargs rm -rf 
 	find . -name ".ipynb_checkpoints" | xargs  rm -rf 
-	rm -rf .coverage cover htmlcov logs build dist *.egg-info
+	rm -rf .coverage coverage *.xml build dist *.egg-info lib node_modules .pytest_cache *.egg-info .autoversion .mypy_cache
 	rm -rf ./*.gv*
 	make -C ./docs clean
 
@@ -59,4 +61,4 @@ help:
 print-%:
 	@echo '$*=$($*)'
 
-.PHONY: clean build run test tests help annotate annotate_l docs dist dockerup dockerdown
+.PHONY: testjs testpy tests test lintpy lintjs lint fixpy fixjs fix checks check build develop install labextension dist publishpy publishjs publish docs clean dockerup dockerdown
