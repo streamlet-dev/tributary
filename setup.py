@@ -78,6 +78,7 @@ setup(
     install_requires=requires,
     extras_require={
         "dev": requires_dev,
+        "develop": requires_dev,
         "functional": ["confluent-kafka>=0.11.6", "websocket_client>=0.57.0"],
     },
     classifiers=[
