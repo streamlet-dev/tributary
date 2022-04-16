@@ -21,10 +21,10 @@ import os
 import sys
 import os.path
 import subprocess
-import shutil
 import sphinx_rtd_theme
 from recommonmark.transform import AutoStructify
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 # -- General configuration ------------------------------------------------
@@ -36,23 +36,29 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.coverage', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'recommonmark']
+extensions = [
+    "sphinx.ext.coverage",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "recommonmark",
+]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst', '.md']
+source_suffix = [".rst", ".md"]
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'tributary'
-copyright = '2018, Tim Paine'
-author = 'Tim Paine'
+project = "tributary"
+copyright = "2018, Tim Paine"
+author = "Tim Paine"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -74,10 +80,10 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
@@ -101,7 +107,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -109,9 +115,9 @@ html_static_path = ['_static']
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
-    '**': [
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
+    "**": [
+        "relations.html",  # needs 'show_related': True theme option to display
+        "searchbox.html",
     ]
 }
 
@@ -119,7 +125,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'tributarydoc'
+htmlhelp_basename = "tributarydoc"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -128,15 +134,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -146,8 +149,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'tributary.tex', 'tributary Documentation',
-     'Tim Paine', 'manual'),
+    (master_doc, "tributary.tex", "tributary Documentation", "Tim Paine", "manual"),
 ]
 
 
@@ -155,10 +157,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'tributary', 'tributary Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, "tributary", "tributary Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -167,23 +166,29 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'tributary', 'tributary Documentation',
-     author, 'tributary', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        "tributary",
+        "tributary Documentation",
+        author,
+        "tributary",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]
 
 
 def run_copyreadme(_):
-    out = os.path.abspath(os.path.join(os.path.dirname(__file__), 'index.md'))
-    readme = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'README.md'))
-    api = os.path.abspath(os.path.join(os.path.dirname(__file__), 'api.md'))
-    with open(out, 'w') as fp1:
-        with open(readme, 'r') as fp2:
+    out = os.path.abspath(os.path.join(os.path.dirname(__file__), "index.md"))
+    readme = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "README.md"))
+    api = os.path.abspath(os.path.join(os.path.dirname(__file__), "api.md"))
+    with open(out, "w") as fp1:
+        with open(readme, "r") as fp2:
             # Skip img
             fp2.readline()
             fp1.write("# Tributary\n")
             for line in fp2:
-                if 'src=' in line:
+                if "src=" in line:
                     # <img>
                     fp1.write(line.replace("docs/", ""))
                 elif "](docs/" in line:
@@ -192,30 +197,30 @@ def run_copyreadme(_):
                 else:
                     fp1.write(line)
 
-        with open(api, 'r') as fp2:
+        with open(api, "r") as fp2:
             fp1.write(fp2.read())
 
 
 def run_apidoc(_):
-    out_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'api'))
-    lib_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'tributary'))
-    cmd_path = 'sphinx-apidoc'
-    if hasattr(sys, 'real_prefix'):  # Check to see if we are in a virtualenv
+    out_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "api"))
+    lib_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "tributary")
+    )
+    cmd_path = "sphinx-apidoc"
+    if hasattr(sys, "real_prefix"):  # Check to see if we are in a virtualenv
         # If we are, assemble the path manually
-        cmd_path = os.path.abspath(os.path.join(sys.prefix, 'bin', 'sphinx-apidoc'))
-    subprocess.check_call([cmd_path,
-                           '-E',
-                           '-M',
-                           '-o',
-                           out_dir,
-                           lib_dir,
-                           '--force'])
+        cmd_path = os.path.abspath(os.path.join(sys.prefix, "bin", "sphinx-apidoc"))
+    subprocess.check_call([cmd_path, "-E", "-M", "-o", out_dir, lib_dir, "--force"])
 
 
 def setup(app):
-    app.add_config_value('recommonmark_config', {
-        'auto_toc_tree_section': 'Contents',
-    }, True)
+    app.add_config_value(
+        "recommonmark_config",
+        {
+            "auto_toc_tree_section": "Contents",
+        },
+        True,
+    )
     app.add_transform(AutoStructify)
-    app.connect('builder-inited', run_copyreadme)
-    app.connect('builder-inited', run_apidoc)
+    app.connect("builder-inited", run_copyreadme)
+    app.connect("builder-inited", run_apidoc)
