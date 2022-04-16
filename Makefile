@@ -21,10 +21,10 @@ notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
 
 lint: ## run linter
-	python -m flake8 tributary setup.py
+	python -m flake8 tributary setup.py docs/conf.py
 
 fix:  ## run black fix
-	python -m black tributary/ setup.py
+	python -m black tributary/ setup.py docs/conf.py
 
 check: checks
 checks:  ## run lint and other checks
