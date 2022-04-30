@@ -378,7 +378,6 @@ def Throttle(node, interval=1, now=None):
         if ret._last_tick_time:
             duration = now() - ret._last_tick_time
             duration = duration.seconds + duration.microseconds / 1000000
-            print(duration, interval)
             if duration < interval:
                 return StreamNone()
 
