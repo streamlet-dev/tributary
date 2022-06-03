@@ -67,7 +67,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Upload coverage
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
 
     - name: Twine check
       run: |
