@@ -7,6 +7,7 @@ on:
   pull_request:
   tags:
   paths-ignore:
+      - docs/
       - CATALOG.md
       - CONTRIBUTING.md
       - LICENSE
