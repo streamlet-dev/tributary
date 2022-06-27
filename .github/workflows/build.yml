@@ -4,14 +4,15 @@ on:
   push:
     branches:
       - main
-  pull_request:
-  tags:
-  paths-ignore:
+    tags:
+      - v*
+    paths-ignore:
       - docs/
       - CATALOG.md
       - CONTRIBUTING.md
       - LICENSE
       - README.md
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
