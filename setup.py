@@ -71,7 +71,7 @@ setup(
     description="Streaming reactive and dataflow graphs in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/timkpaine/{name}".format(name=name),
+    url="https://github.com/streamlet-dev/{name}".format(name=name),
     author="Tim Paine",
     author_email="t.paine154@gmail.com",
     license="Apache 2.0",
