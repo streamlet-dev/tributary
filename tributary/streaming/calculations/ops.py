@@ -168,6 +168,8 @@ def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         return inputs[0].exp()
     elif ufunc == np.log:
         return inputs[0].log()
+    elif ufunc == np.sqrt:
+        return inputs[0].sqrt()
     elif ufunc == sp.special.erf:
         return inputs[0].erf()
     raise NotImplementedError("Not Implemented: {}".format(ufunc))
