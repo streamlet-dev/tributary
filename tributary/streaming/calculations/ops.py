@@ -168,7 +168,7 @@ def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         return inputs[0].exp()
     elif ufunc == sp.special.erf:
         return inputs[0].erf()
-    raise NotImplementedError("Not Implemented!")
+    raise NotImplementedError("Not Implemented: {}".format(ufunc))
 
 
 def __array_function__(self, func, method, *inputs, **kwargs):
