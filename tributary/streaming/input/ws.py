@@ -20,7 +20,6 @@ class WebSocket(Func):
         async def _listen(url=url, json=json, wrap=wrap):
             session = aiohttp.ClientSession()
             async with session.ws_connect(url) as ws:
-
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.TEXT:
                         x = msg.data
