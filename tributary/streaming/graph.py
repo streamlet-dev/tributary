@@ -85,7 +85,6 @@ class StreamingGraph(object):
             loop = asyncio.ProactorEventLoop()
 
         else:
-
             if newloop:
                 loop = asyncio.new_event_loop()
 

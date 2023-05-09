@@ -140,9 +140,9 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
     def set(self, key, value):
         """Use this method to set attributes
 
-        Since we often use attributes to track node state, let's make sure we don't clobber any important ones"""
+        Since we often use attributes to track node state, let's make sure we don't clobber any important ones
+        """
         if hasattr(self, "_initial_attrs") and key in self._initial_attrs:
-
             # if we've completed our construction, ensure critical attrs arent overloaded
             raise TributaryException(
                 "Overloading node-critical attribute: {}".format(key)
@@ -344,7 +344,6 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         # if downstreams, output
         if not isinstance(ret, (StreamNone, StreamRepeat)):
             for down, i in self.downstream():
-
                 if self._drop:
                     if len(down._input[i]) > 0:
                         # do nothing

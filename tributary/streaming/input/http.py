@@ -49,7 +49,6 @@ class HTTP(Func):
                     async with session.get(
                         url, cookies=cookies, proxy=proxies
                     ) as response:
-
                         if response_handler and callable(response_handler):
                             yield response_handler(response)
 

@@ -40,7 +40,6 @@ class Kafka(Func):
             interval=interval,
         ):
             if self._consumer is None:
-
                 self._consumer = AIOKafkaConsumer(
                     *topics,
                     bootstrap_servers=servers,

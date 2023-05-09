@@ -29,7 +29,6 @@ class TextMessage(Func):
             from_=from_,
             twilio=twilio,
         ):
-
             r = self._twilio_client.messages.create(to=to, from_=from_, body=message)
 
             return r, message

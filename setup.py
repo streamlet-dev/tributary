@@ -53,7 +53,7 @@ requires = [
 ]
 
 requires_dev = [
-    "black>=20.",
+    "black>=23",
     "check-manifest",
     "flake8>=3.7.8",
     "flake8-black>=0.2.1",

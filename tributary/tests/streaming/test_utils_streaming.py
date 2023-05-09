@@ -103,7 +103,6 @@ class TestUtils:
             yield 6
 
         def reduce(node1_value, node2_value, node3_value, reducer_node):
-
             if not hasattr(reducer_node, "state"):
                 # on first call, make sure node tracks state
                 reducer_node.set("state", {"n1": None, "n2": None, "n3": None})
