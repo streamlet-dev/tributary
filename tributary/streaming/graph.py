@@ -105,7 +105,7 @@ class StreamingGraph(object):
                 if loop.is_running():
 
                     async def wait(task):
-                        await task
+                        return await task
 
                     return asyncio.run_coroutine_threadsafe(wait(task), loop)
                 # block until done
