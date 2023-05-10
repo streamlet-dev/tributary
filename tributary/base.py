@@ -51,6 +51,9 @@ class BaseNodeValue:
     __nonzero__ = all_un_ops
     __len__ = all_un_ops
 
+    def __repr__(self) -> str:
+        return self.__class__.__name__
+
 
 class StreamEnd(BaseNodeValue):
     """Indicates that a stream has nothing left in it"""

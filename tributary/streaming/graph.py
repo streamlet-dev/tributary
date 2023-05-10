@@ -5,6 +5,9 @@ from threading import Thread
 from ..base import StreamEnd, StreamNone, StreamRepeat, TributaryException  # noqa: F401
 
 
+# nest_asyncio.apply()
+
+
 class StreamingGraph(object):
     """internal representation of the entire graph state"""
 
@@ -86,9 +89,10 @@ class StreamingGraph(object):
 
         else:
             if newloop:
+                # create a new loop
                 loop = asyncio.new_event_loop()
-
             else:
+                # get the current loop
                 loop = asyncio.get_event_loop()
 
         asyncio.set_event_loop(loop)
@@ -96,8 +100,15 @@ class StreamingGraph(object):
         task = loop.create_task(self._run())
 
         if blocking:
-            # block until done
+            # if loop is already running, make reentrant
             try:
+                if loop.is_running():
+
+                    async def wait(task):
+                        await task
+
+                    return asyncio.run_coroutine_threadsafe(wait(task), loop)
+                # block until done
                 return loop.run_until_complete(task)
             except KeyboardInterrupt:
                 return

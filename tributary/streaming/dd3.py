@@ -1,7 +1,12 @@
 import asyncio
 
-_DD3_TRANSITION_DELAY = 0.1  # used so you can visually see the
+_DD3_TRANSITION_DELAY = 0.25  # used so you can visually see the
 # transition e.g. not too fast
+
+
+def set_transition_delay(amt):
+    global _DD3_TRANSITION_DELAY
+    _DD3_TRANSITION_DELAY = amt
 
 
 class _DagreD3Mixin(object):
