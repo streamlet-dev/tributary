@@ -140,9 +140,9 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
     def set(self, key, value):
         """Use this method to set attributes
 
-        Since we often use attributes to track node state, let's make sure we don't clobber any important ones"""
+        Since we often use attributes to track node state, let's make sure we don't clobber any important ones
+        """
         if hasattr(self, "_initial_attrs") and key in self._initial_attrs:
-
             # if we've completed our construction, ensure critical attrs arent overloaded
             raise TributaryException(
                 "Overloading node-critical attribute: {}".format(key)
@@ -176,14 +176,14 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
 
     async def __call__(self):
         """execute the callable if possible, and propogate values downstream"""
+        # Previously ended stream
+        if self._finished:
+            return await self._finish()
+
         # Downstream nodes can't process
         if self._backpressure():
             await self._waitdd3g()
             return StreamNone()
-
-        # Previously ended stream
-        if self._finished:
-            return await self._finish()
 
         # dd3g
         await self._startdd3g()
@@ -315,12 +315,12 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         else:
             self._last = _last
 
+        await self._enddd3g()
         await self._output(self._last)
 
         for i in range(len(self._active)):
             self._active[i] = StreamNone()
 
-        await self._enddd3g()
         if isinstance(self._last, StreamEnd):
             await self._finish()
 
@@ -344,7 +344,6 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         # if downstreams, output
         if not isinstance(ret, (StreamNone, StreamRepeat)):
             for down, i in self.downstream():
-
                 if self._drop:
                     if len(down._input[i]) > 0:
                         # do nothing
