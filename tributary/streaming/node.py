@@ -176,14 +176,14 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
 
     async def __call__(self):
         """execute the callable if possible, and propogate values downstream"""
+        # Previously ended stream
+        if self._finished:
+            return await self._finish()
+
         # Downstream nodes can't process
         if self._backpressure():
             await self._waitdd3g()
             return StreamNone()
-
-        # Previously ended stream
-        if self._finished:
-            return await self._finish()
 
         # dd3g
         await self._startdd3g()
@@ -315,12 +315,12 @@ class Node(NodeSerializeMixin, _DagreD3Mixin, object):
         else:
             self._last = _last
 
+        await self._enddd3g()
         await self._output(self._last)
 
         for i in range(len(self._active)):
             self._active[i] = StreamNone()
 
-        await self._enddd3g()
         if isinstance(self._last, StreamEnd):
             await self._finish()
 
