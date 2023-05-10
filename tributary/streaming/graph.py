@@ -1,5 +1,4 @@
 import asyncio
-import nest_asyncio
 import sys
 from threading import Thread
 
