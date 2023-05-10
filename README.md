@@ -78,8 +78,8 @@ This software is licensed under the Apache 2.0 license. See the [LICENSE](LICENS
 Here is an incomplete list of libraries which implement similar/overlapping functionality
 
 - [man-group/mdf](https://github.com/man-group/mdf)
+- [janushendersonassetallocation/loman](https://github.com/janushendersonassetallocation/loman)
 - [cedricleroy/pyungo](https://github.com/cedricleroy/pyungo)
 - [python-streamz/streamz](https://github.com/python-streamz/streamz)
 - [EntilZha/pyfunctional](https://github.com/EntilZha/PyFunctional)
 - [stitchfix/hamilton](https://github.com/stitchfix/hamilton)
-
