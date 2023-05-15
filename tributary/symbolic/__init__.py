@@ -110,6 +110,6 @@ def construct_streaming(expr, modules=None):
             self._lambda = lambdify(syms, expr, modules=modules)(**self._kwargs)
             self._expr = expr
 
-            super(Streaming, self).__init__(node=self._lambda)
+            super(Streaming, self).__init__(node=self._lambda.collect())
 
     return Streaming
