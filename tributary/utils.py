@@ -43,12 +43,12 @@ def LazyToStreaming(lazy_node):
 
 def _compare(new_value, old_value):
     """return true if value is new, otherwise false"""
-    if isinstance(new_value, (int, float)) and type(new_value) == type(old_value):
+    if isinstance(new_value, (int, float)) and type(new_value) is type(old_value):
         # if numeric, compare within a threshold
         # TODO
         return abs(new_value - old_value) > 0.00001
 
-    elif type(new_value) != type(old_value):
+    elif type(new_value) is not type(old_value):
         return True
 
     elif isinstance(new_value, (pd.DataFrame, pd.Series, np.ndarray)) or isinstance(
