@@ -67,7 +67,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: pytest-results-${{ matrix.os }}-${{ matrix.python-version }}
         path: python_junit.xml
