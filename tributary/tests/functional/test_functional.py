@@ -4,7 +4,7 @@ import time
 
 
 class TestFunctional:
-    def setup(self):
+    def setup_method(self):
         time.sleep(1)
 
     @pytest.mark.skipif("os.name == 'nt'")

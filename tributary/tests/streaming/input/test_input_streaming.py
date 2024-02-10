@@ -3,7 +3,7 @@ import tributary.streaming as ts
 
 
 class TestConst:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.5)
 
     def test_const_1(self):
@@ -16,7 +16,7 @@ class TestConst:
 
 
 class TestTimer:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.5)
 
     def test_timer(self):
@@ -87,7 +87,7 @@ class TestTimer:
 
 
 class TestFunc:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.5)
 
     def test_timer(self):

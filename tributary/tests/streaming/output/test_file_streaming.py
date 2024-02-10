@@ -4,7 +4,7 @@ import tributary.streaming as ts
 
 
 class TestFile:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.5)
 
     def test_file(self):

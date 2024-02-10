@@ -89,11 +89,13 @@ def Mult(self, other):
         other,
         "{}*{}".format(self._name_no_id, other._name_no_id),
         (
-            lambda x, y: x * y
-            if not self._use_dual
-            else (
-                x[0] * y[0],
-                x[0] * y[1] + x[1] * y[0],
+            lambda x, y: (
+                x * y
+                if not self._use_dual
+                else (
+                    x[0] * y[0],
+                    x[0] * y[1] + x[1] * y[0],
+                )
             )
         ),
     )
@@ -108,11 +110,13 @@ def Div(self, other):
         other,
         "{}/{}".format(self._name_no_id, other._name_no_id),
         (
-            lambda x, y: x / y
-            if not self._use_dual
-            else (
-                x[0] / y[0],
-                (x[1] * y[0] - x[0] * y[1]) / y[0] ** 2,
+            lambda x, y: (
+                x / y
+                if not self._use_dual
+                else (
+                    x[0] / y[0],
+                    (x[1] * y[0] - x[0] * y[1]) / y[0] ** 2,
+                )
             )
         ),
     )
@@ -127,11 +131,13 @@ def RDiv(self, other):
         other,
         "{}\\{}".format(self._name_no_id, other._name_no_id),
         (
-            lambda x, y: y / x
-            if not self._use_dual
-            else (
-                y[0] / x[0],
-                (y[1] * x[0] - y[0] * x[1]) / x[0] ** 2,
+            lambda x, y: (
+                y / x
+                if not self._use_dual
+                else (
+                    y[0] / x[0],
+                    (y[1] * x[0] - y[0] * x[1]) / x[0] ** 2,
+                )
             )
         ),
     )
@@ -146,11 +152,13 @@ def Pow(self, other):
         other,
         "{}^{}".format(self._name_no_id, other._name_no_id),
         (
-            lambda x, y: x**y
-            if not self._use_dual
-            else (
-                x[0] ** y,
-                y * x[1] * x[0] ** (y - 1),
+            lambda x, y: (
+                x**y
+                if not self._use_dual
+                else (
+                    x[0] ** y,
+                    y * x[1] * x[0] ** (y - 1),
+                )
             )
         ),
     )
@@ -205,9 +213,11 @@ def Sum(self, *others):
             self._name_no_id, ",".join(other._name_no_id for other in others_nodes)
         ),
         (
-            lambda *args: sum(x for x in args)
-            if not self._use_dual
-            else (sum([x[0] for x in args]), sum(x[1] for x in args))
+            lambda *args: (
+                sum(x for x in args)
+                if not self._use_dual
+                else (sum([x[0] for x in args]), sum(x[1] for x in args))
+            )
         ),
     )
 
@@ -230,12 +240,14 @@ def Average(self, *others):
             self._name_no_id, ",".join(other._name_no_id for other in others_nodes)
         ),
         (
-            lambda *args: sum(x for x in args) / len(args)
-            if not self._use_dual
-            else (
-                (
-                    sum([x[0] for x in args]) / len(args),
-                    sum(x[1] for x in args) / len(args),
+            lambda *args: (
+                sum(x for x in args) / len(args)
+                if not self._use_dual
+                else (
+                    (
+                        sum([x[0] for x in args]) / len(args),
+                        sum(x[1] for x in args) / len(args),
+                    )
                 )
             )
         ),
@@ -287,11 +299,13 @@ def Sin(self):
         self,
         "sin({})".format(self._name_no_id),
         (
-            lambda x: math.sin(x)
-            if not self._use_dual
-            else (
-                math.sin(x[0]),
-                math.cos(x[0]) * x[1],
+            lambda x: (
+                math.sin(x)
+                if not self._use_dual
+                else (
+                    math.sin(x[0]),
+                    math.cos(x[0]) * x[1],
+                )
             )
         ),
     )
@@ -303,11 +317,13 @@ def Cos(self):
         self,
         "cos({})".format(self._name_no_id),
         (
-            lambda x: math.cos(x)
-            if not self._use_dual
-            else (
-                math.cos(x[0]),
-                -1 * math.sin(x[0]) * x[1],
+            lambda x: (
+                math.cos(x)
+                if not self._use_dual
+                else (
+                    math.cos(x[0]),
+                    -1 * math.sin(x[0]) * x[1],
+                )
             )
         ),
     )
@@ -319,11 +335,13 @@ def Tan(self):
         self,
         "tan({})".format(self._name_no_id),
         (
-            lambda x: math.tan(x)
-            if not self._use_dual
-            else (
-                math.tan(x[0]),
-                x[1] * (1 / math.cos(x[0])) ** 2,
+            lambda x: (
+                math.tan(x)
+                if not self._use_dual
+                else (
+                    math.tan(x[0]),
+                    x[1] * (1 / math.cos(x[0])) ** 2,
+                )
             )
         ),
     )
@@ -335,11 +353,13 @@ def Arcsin(self):
         self,
         "arcsin({})".format(self._name_no_id),
         (
-            lambda x: math.asin(x)
-            if not self._use_dual
-            else (
-                math.asin(x[0]),
-                x[1] / math.sqrt(1 - x[0] ** 2),
+            lambda x: (
+                math.asin(x)
+                if not self._use_dual
+                else (
+                    math.asin(x[0]),
+                    x[1] / math.sqrt(1 - x[0] ** 2),
+                )
             )
         ),
     )
@@ -351,11 +371,13 @@ def Arccos(self):
         self,
         "arccos({})".format(self._name_no_id),
         (
-            lambda x: math.acos(x)
-            if not self._use_dual
-            else (
-                math.acos(x[0]),
-                -1 * x[1] / math.sqrt(1 - x[0] ** 2),
+            lambda x: (
+                math.acos(x)
+                if not self._use_dual
+                else (
+                    math.acos(x[0]),
+                    -1 * x[1] / math.sqrt(1 - x[0] ** 2),
+                )
             )
         ),
     )
@@ -367,11 +389,13 @@ def Arctan(self):
         self,
         "arctan({})".format(self._name_no_id),
         (
-            lambda x: math.atan(x)
-            if not self._use_dual
-            else (
-                math.atan(x[0]),
-                x[1] / (1 + x[0] ** 2),
+            lambda x: (
+                math.atan(x)
+                if not self._use_dual
+                else (
+                    math.atan(x[0]),
+                    x[1] / (1 + x[0] ** 2),
+                )
             )
         ),
     )
@@ -383,11 +407,13 @@ def Abs(self):
         self,
         "||{}||".format(self._name_no_id),
         (
-            lambda x: abs(x)
-            if not self._use_dual
-            else (
-                abs(x[0]),
-                x[1] * x[0] / abs(x[0]),
+            lambda x: (
+                abs(x)
+                if not self._use_dual
+                else (
+                    abs(x[0]),
+                    x[1] * x[0] / abs(x[0]),
+                )
             )
         ),
     )
@@ -399,11 +425,13 @@ def Sqrt(self):
         self,
         "sqrt({})".format(self._name_no_id),
         (
-            lambda x: math.sqrt(x)
-            if not self._use_dual
-            else (
-                math.sqrt(x[0]),
-                x[1] * 0.5 / math.sqrt(x[0]),
+            lambda x: (
+                math.sqrt(x)
+                if not self._use_dual
+                else (
+                    math.sqrt(x[0]),
+                    x[1] * 0.5 / math.sqrt(x[0]),
+                )
             )
         ),
     )
@@ -415,9 +443,9 @@ def Log(self):
         self,
         "log({})".format(self._name_no_id),
         (
-            lambda x: math.log(x)
-            if not self._use_dual
-            else (math.log(x[0]), x[1] / x[0])
+            lambda x: (
+                math.log(x) if not self._use_dual else (math.log(x[0]), x[1] / x[0])
+            )
         ),
     )
 
@@ -428,11 +456,13 @@ def Exp(self):
         self,
         "exp({})".format(self._name_no_id),
         (
-            lambda x: math.exp(x)
-            if not self._use_dual
-            else (
-                math.exp(x[0]),
-                x[1] * math.exp(x[0]),
+            lambda x: (
+                math.exp(x)
+                if not self._use_dual
+                else (
+                    math.exp(x[0]),
+                    x[1] * math.exp(x[0]),
+                )
             )
         ),
     )
@@ -444,11 +474,13 @@ def Erf(self):
         self,
         "erf({})".format(self._name_no_id),
         (
-            lambda x: math.erf(x)
-            if not self._use_dual
-            else (
-                math.erf(x[0]),
-                x[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(x[0], 2)),
+            lambda x: (
+                math.erf(x)
+                if not self._use_dual
+                else (
+                    math.erf(x[0]),
+                    x[1] * (2 / math.sqrt(math.pi)) * math.exp(-1 * math.pow(x[0], 2)),
+                )
             )
         ),
     )
@@ -508,9 +540,11 @@ def Floor(self):
         self,
         "floor({})".format(self._name_no_id),
         (
-            lambda x: math.floor(x)
-            if not self._use_dual
-            else (math.floor(x[0]), math.floor(x[1]))
+            lambda x: (
+                math.floor(x)
+                if not self._use_dual
+                else (math.floor(x[0]), math.floor(x[1]))
+            )
         ),
     )
 
@@ -521,9 +555,11 @@ def Ceil(self):
         self,
         "ceil({})".format(self._name_no_id),
         (
-            lambda x: math.ceil(x)
-            if not self._use_dual
-            else (math.ceil(x[0]), math.ceil(x[1]))
+            lambda x: (
+                math.ceil(x)
+                if not self._use_dual
+                else (math.ceil(x[0]), math.ceil(x[1]))
+            )
         ),
     )
 
@@ -534,11 +570,13 @@ def Round(self, ndigits=0):
         self,
         "round({}, {})".format(self._name_no_id, ndigits),
         (
-            lambda x: round(x, ndigits=ndigits)
-            if not self._use_dual
-            else (
-                round(x[0], ndigits=ndigits),
-                round(x[1], ndigits=ndigits),
+            lambda x: (
+                round(x, ndigits=ndigits)
+                if not self._use_dual
+                else (
+                    round(x[0], ndigits=ndigits),
+                    round(x[1], ndigits=ndigits),
+                )
             )
         ),
     )

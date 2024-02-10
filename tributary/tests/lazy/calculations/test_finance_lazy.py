@@ -1,13 +1,11 @@
 import pandas as pd
+import superstore
 import tributary.lazy as tl
 
 
 class TestFinance:
     def test_rsi(self):
-        try:
-            df = pd.DataFrame(pd.util.testing.getTimeSeriesData(20))
-        except AttributeError:
-            df = pd.DataFrame(pd._testing.getTimeSeriesData(20))
+        df = pd.DataFrame(superstore.getTimeSeriesData(20))
         adjust = False
         period = 14
         delta = df["A"].diff().shift(-1)
@@ -34,10 +32,7 @@ class TestFinance:
         assert n_rsi().tolist() == rsi.tolist()
 
     def test_macd(self):
-        try:
-            df = pd.DataFrame(pd.util.testing.getTimeSeriesData(20))
-        except AttributeError:
-            df = pd.DataFrame(pd._testing.getTimeSeriesData(20))
+        df = pd.DataFrame(superstore.getTimeSeriesData(20))
 
         period_fast = 12
         period_slow = 26

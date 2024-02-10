@@ -3,7 +3,7 @@ import tributary.streaming as ts
 
 
 class TestOutput:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.5)
 
     def test_print(self):
