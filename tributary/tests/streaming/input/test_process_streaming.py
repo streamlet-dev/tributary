@@ -19,7 +19,7 @@ vals = [
 
 
 class TestProcess:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.5)
 
     @pytest.mark.skipif("'--cov=tributary' in sys.argv")

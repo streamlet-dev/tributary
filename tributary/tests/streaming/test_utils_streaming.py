@@ -19,7 +19,7 @@ def func2():
 
 
 class TestUtils:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.2)
 
     def test_delay(self):

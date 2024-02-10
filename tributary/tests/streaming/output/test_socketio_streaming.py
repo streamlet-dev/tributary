@@ -4,7 +4,7 @@ import time
 
 
 class TestSocketIO:
-    def setup(self):
+    def setup_method(self):
         time.sleep(0.5)
 
     @pytest.mark.skipif("int(os.environ.get('TRIBUTARY_SKIP_DOCKER_TESTS', '1'))")
