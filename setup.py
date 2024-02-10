@@ -61,6 +61,7 @@ requires_dev = [
     "pybind11>=2.4.0",
     "pytest>=4.3.0",
     "pytest-cov>=2.6.1",
+    "superstore",
     "Sphinx>=1.8.4",
     "sphinx-markdown-builder>=0.5.2",
 ] + requires
