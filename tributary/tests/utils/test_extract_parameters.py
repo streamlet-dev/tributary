@@ -3,12 +3,12 @@ from tributary.utils import extractParameters, Parameter
 
 
 def func(a, b=1, *c, **d):
-    ...
+    pass
 
 
 class Test:
     def meth(self, a, b=1, *c, **d):
-        ...
+        pass
 
 
 class TestLazyToStreaming:

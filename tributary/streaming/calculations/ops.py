@@ -291,9 +291,11 @@ Ceil = unary(
 
 def Round(self, ndigits=0):
     downstream = Node(
-        lambda x: round(x, ndigits=ndigits)
-        if not self._use_dual
-        else (round(x[0], ndigits=ndigits), round(x[1], ndigits=ndigits)),
+        lambda x: (
+            round(x, ndigits=ndigits)
+            if not self._use_dual
+            else (round(x[0], ndigits=ndigits), round(x[1], ndigits=ndigits))
+        ),
         {},
         name="Round",
         inputs=1,

@@ -255,9 +255,7 @@ def Reduce(*nodes, reducer=None, inject_node=False):
         return (
             values
             if reducer is None
-            else reducer(*values, ret)
-            if inject_node
-            else reducer(*values)
+            else reducer(*values, ret) if inject_node else reducer(*values)
         )
 
     ret = Node(func=func, name="Reduce", inputs=len(nodes))
