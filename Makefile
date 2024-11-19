@@ -12,10 +12,10 @@ testsci: ## Clean and Make unit tests
 	CI=true python -m pytest tributary --cov=tributary --junitxml=python_junit.xml --cov-report=xml --cov-branch
 
 dockerup:
-	docker-compose -f ci/docker-compose.yml up -d
+	docker compose -f ci/docker-compose.yml up -d
 
 dockerdown:
-	docker-compose -f ci/docker-compose.yml down
+	docker compose -f ci/docker-compose.yml down
 
 notebooks:  ## test execute the notebooks
 	./scripts/test_notebooks.sh
